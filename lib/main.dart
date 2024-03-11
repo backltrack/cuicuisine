@@ -1,0 +1,196 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'database/database_mgr.dart';
+import 'generated/l10n.dart';
+import 'package:dynamic_themes/dynamic_themes.dart';
+import 'pages/authentication/authentication_page.dart';
+import 'pages/authentication/email_connexion.dart';
+import 'pages/authentication/email_registration.dart';
+import 'themes/themes.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Disable landscape mode
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+
+  runApp(const Cuicuisine());
+}
+
+class Cuicuisine extends StatefulWidget {
+  const Cuicuisine({Key? key}) : super(key: key);
+
+  @override
+  State<Cuicuisine> createState() => _CuicuisineState();
+
+  static _CuicuisineState? of(BuildContext context) => context.findAncestorStateOfType<_CuicuisineState>();
+}
+
+class _CuicuisineState extends State<Cuicuisine> {
+  bool isInitialized = false;
+
+  // Handle local switch
+  Locale? _locale;
+
+  void changeLocale(String localeCode) {
+    setState(() {
+      _locale = S.delegate.supportedLocales.firstWhere((l) => l.languageCode == localeCode);
+    });
+  }
+
+  String getLocaleCode() {
+    return _locale!.languageCode;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    changeLocale("en");
+
+    init();
+  }
+
+  void init() async {
+    await DatabaseMgr.initialize();
+    
+    String? localeCode = DatabaseMgr.localMgr.loadLocale();
+    if (localeCode != null) {
+      changeLocale(localeCode);
+    }
+
+  //   // load wakelock state
+  //   bool? wakelockState = settingsBox.get('wakelock');
+  //   if (wakelockState != null) {
+  //     wakelockState ? Wakelock.enable() : Wakelock.disable();
+  //   } else {
+  //     settingsBox.put('wakelock', false);
+  //   }
+  //   print("Wakelock state: $wakelockState");
+
+    setState(() {
+      isInitialized = true;
+    });
+  }
+
+
+  @override
+  void dispose() {
+    // Wakelock.disable();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    return !isInitialized ? Container() : DynamicTheme(
+        themeCollection: setThemeCollection(context),
+        defaultThemeId: AppThemes.Dark, // optional, default id is 0
+        builder: (context, theme) {
+          return MaterialApp(
+            theme: theme,
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale!.languageCode &&
+                    supportedLocale.countryCode == locale.countryCode) {
+                  return supportedLocale;
+                }
+              }
+              return supportedLocales.first;
+            },
+            locale: _locale,
+            initialRoute: LogInPage.route,
+            routes: {
+              LogInPage.route: (ctx) => LogInPage(),
+              EmailConnexion.route: (ctx) => EmailConnexion(),
+              EmailRegistration.route: (ctx) => EmailRegistration(),
+              // ForgottenPasswordPage.route: (ctx) => ForgottenPasswordPage(),
+              // HomePage.route: (ctx) => HomePage(),
+              // GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
+              // RemoveAccountPage.route: (ctx) => RemoveAccountPage(),
+              // BookNamePage.route: (ctx) => BookNamePage(),
+              // ItemSelector.route: (ctx) => ItemSelector(),
+              // PageNotFound.route: (ctx) => PageNotFound()
+            },
+            onGenerateRoute: (RouteSettings settings) {
+              // print(settings.name);
+              // // navigate to recipe page
+              // if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
+              //   return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
+              // }
+              // // navigate to recipe name edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
+              //   return MaterialPageRoute(builder: (context) => RecipeNamePage(), settings: settings);
+              // }
+              // // navigate to recipe image edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'images') {
+              //   return MaterialPageRoute(builder: (context) => RecipeImagesEditionPage(), settings: settings);
+              // }
+              // // navigate to recipe time edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'time') {
+              //   return MaterialPageRoute(builder: (context) => RecipeTimeEditionPage(), settings: settings);
+              // }
+              // // navigate to recipe tags edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'tags') {
+              //   return MaterialPageRoute(builder: (context) => RecipeTagEditionPage(), settings: settings);
+              // }
+              // // navigate to recipe tags edition -> new tag page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
+              //     && settings.name!.split('/')[5] == 'tags'
+              //     && settings.name!.split('/').last == 'new') {
+              //   return MaterialPageRoute(builder: (context) => NewTagPage(), settings: settings);
+              // }
+              // // navigate to recipe ingredients edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'ingredients') {
+              //   return MaterialPageRoute(builder: (context) => RecipeIngredientsEditionPage(), settings: settings);
+              // }
+              // // navigate to specific ingredient edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
+              //     && settings.name!.split('/')[5] == 'ingredients'
+              //     && settings.name!.split('/').last == 'edition') {
+              //   return MaterialPageRoute(builder: (context) => IngredientEditionPage(), settings: settings);
+              // }
+              // // navigate to recipe steps edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'steps') {
+              //   return MaterialPageRoute(builder: (context) => RecipeStepsEditionPage(), settings: settings);
+              // }
+              // // navigate to specific step edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
+              //     && settings.name!.split('/')[5] == 'steps'
+              //     && int.tryParse(settings.name!.split('/').last) != null) {
+              //   return MaterialPageRoute(builder: (context) => StepEditionPage(), settings: settings);
+              // }
+
+              // // navigate to book settings page
+              // else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
+              //   return MaterialPageRoute(builder: (context) => BookSettingsPage(), settings: settings);
+              // }
+
+              // // navigate to join book page
+              // else if (settings.name!.contains(BookJoinPage.route)) {
+              //   return MaterialPageRoute(builder: (context) => BookJoinPage(), settings: settings);
+              // }
+
+              // else {
+              //   //404
+              //   return MaterialPageRoute(builder: (context) => PageNotFound());
+              // }
+            },
+          );
+        }
+    );
+  }
+}

@@ -1,0 +1,137 @@
+import '../../generated/l10n.dart';
+import 'model.dart';
+
+Map<String,List<String>> defaultTags = {
+  'en': [
+    'winter', 'spring', 'summer', 'automne',
+    'vegetarian', 'vegan', 'meat', 'fish',
+    'oven', 'bbq', 'steam',
+    'hot', 'spicy',
+    'cold',
+    'salad', 'sandwich',
+    'breakfast', 'aperitif', 'lunch', 'dinner',
+    'drink', 'cocktail', 'beer',
+    'french', 'italian', 'american', 'asian'
+  ],
+  'fr': [
+    'hiver', 'printemps', 'été', 'automne',
+    'végétarien', 'vegan', 'viande', 'poisson',
+    'four', 'bbq', 'vapeur',
+    'piquant', 'épicé',
+    'froid',
+    'salade', 'sandwich',
+    'petit-déjeuner', 'apéro', 'déjeuner', 'dîner',
+    'boisson', 'cocktail', 'bière',
+    'français', 'italien', 'américain', 'asiatique'
+  ]
+};
+
+Map<String,List<String>> defaultIngredients = {
+  'en': [
+    'prime rib', 'rib steak', 'veal rib', 'beefsteak', 'minced steak',
+    'lamb chop', 'lamb shoulder',
+    'sausage', 'merguez',
+    'pork chop', 'ribs', 'bacon', 'lardons', 'cured ham', 'bacon', "pig's trotters",
+    'chicken', 'chicken leg', 'chicken breast',
+    'rabbit',
+    'mozzarella', 'cheddar', 'milk', 'whole milk', 'butter',
+    'T45 flour', 'T65 flour', 'T80 flour', 'T00 flour',
+    "baker's yeast", 'baking powder', 'fresh yeast', 'sourdough',
+    'white sugar', 'cane sugar', 'muscovado',
+    'egg',
+    'water',
+    'olive oil', 'peanut oil',
+    'wine vinegar', 'balsamic vinegar', 'cider vinegar', 'mustard', 'wholegrain mustard',
+    'salt', 'pepper',
+    'cayenne pepper', 'paprika',
+    'yellow curry', 'cumin', 'turmeric', 'saffron', 'nutmeg', 'cinnamon',
+    'chicken stock', 'vegetable stock',
+    'salad', 'rocket', 'spinach', 'chard',
+    'courgette', 'aubergine', 'tomato',
+    'pumpkin', 'butternut',
+    'parsley', 'basil', 'chives', 'chervil', 'coriander',
+    'onion', 'red onion', 'white onion', 'shallot', 'garlic',
+    'dark chocolate',
+    'coconut milk',
+    'pasta', 'tagliatelle', 'spaghetti', 'ravioli', 'basmati rice', 'arborio rice', 'Thai rice',
+    'walnut', 'hazelnut', 'cashew', 'peanut', 'almond',
+    'apple', 'pear', 'banana',
+    'peach', 'nectarine', 'apricot', 'cherry', 'strawberry', 'raspberry', 'redcurrant', 'blackcurrant', 'blueberry', 'blackberry',
+    'orange', 'clementine', 'lemon', 'grapefruit',
+    'lemon peel',
+    'rum planter', 'amber rum', 'whisky', 'bourbon', 'beer', 'amber beer', 'cider', 'calvados', 'cognac', 'armagnac', 'champagne', 'red wine', 'white wine',
+  ],
+  'fr': [
+    'côte de boeuf', 'entrecôte', 'côte de veau', 'beefsteak', 'steak haché',
+    "côte d'agneau", "épaule d'agneau",
+    'chipolata', 'merguez', 'saucisse aux herbes', 'saucisse de Montbéliard', 'saucisse de Morteau', 'saucisse de strasbourg', 'diot',
+    'côte de porc', 'travers de porc', 'lard', 'lardons', 'jambon cru', 'jambon blanc', 'speck', 'mortadelle', 'coppa', 'bacon', 'pied de porc',
+    'poulet', 'cuisse de poulet', 'blanc de poulet',
+    'lapin',
+    'mozzarella', 'comté rapé', 'parmesan', 'crème fraiche', 'lait', 'lait entier', 'beurre',
+    'farine T45', 'farine T65', 'farine T80', 'farine T00',
+    'levure de boulanger', 'levure chimique', 'levure fraiche', 'levain',
+    'sucre blanc', 'sucre de canne', 'muscovado',
+    'oeuf', "blanc d'oeuf", "jaune d'oeuf",
+    'eau',
+    "huile d'olive", "huile d'arachide",
+    'vinaigre de vin', 'vinaigre balsamique', 'vinaigre de cidre', 'moutarde', "moutarde à l'ancienne",
+    'sel', 'poivre',
+    'piment de Cayenne', 'piment oiseau', "piment d'Espelette", 'paprika',
+    'curry jaune', 'cumin', 'curcuma', 'safran', 'noix de muscade', 'cannelle',
+    'fond de volaille', 'bouillon de légume',
+    'salade', 'roquette', 'épinard', 'blette',
+    'courgette', 'aubergine', 'tomate',
+    'carotte', 'poireau', 'pomme de terre', 'navet', 'panais', 'endive', 'céleri rave', 'céleri branche', 'bétrave rouge',
+    'citrouille', 'potiron', 'potimarron', 'butternut',
+    'persil', 'basilic', 'ciboulette', 'cerfeuil', 'coriandre',
+    'oignon', 'oignon rouge', 'oignon blanc', 'échalotte', 'ail',
+    'chocolat noir',
+    'lait de coco',
+    'pâtes', 'tagliatelles', 'spaghetti', 'ravioli', 'riz basmati', 'riz arborio', 'riz thaï',
+    'noix', 'noisette', 'noix de cajou', 'cacahuète', 'amande',
+    'pomme', 'poire', 'banane',
+    'pêche', 'brugnon', 'nectarine', 'abricot', 'cerise', 'fraise', 'framboise', 'groseille', 'cassis', 'myrtille', 'mûre',
+    'orange', 'clémentine', 'citron', 'pamplemousse',
+    'zeste de citron',
+    'rhum planteur', 'rhum ambré', 'whisky', 'bourbon', 'bière', 'bière ambrée', 'cidre', 'calvados', 'cognac', 'armagnac', 'champagne', 'vin rouge', 'vin blanc',
+  ]
+};
+
+Recipe defaultRecipe = Recipe(
+  name: S.current.new_recipe_name,
+  preparationTime: 0,
+  cookingTime: 0,
+  waitingTime: 0,
+  tags: [],
+  persons: 2,
+  recipeIngredients: [],
+  steps: [RecipeStep(step: S.current.new_recipe_step)],
+  creationDate: DateTime.now()
+);
+
+Recipe tutorialRecipe = Recipe(
+  name: S.current.tutorial_recipe_name,
+  preparationTime: 15,
+  cookingTime: 120,
+  waitingTime: 0,
+  tags: [S.current.tutorial_recipe_tag1, S.current.tutorial_recipe_tag2, S.current.tutorial_recipe_tag3],
+  persons: 6,
+  recipeIngredients: [
+    Ingredient(name: "Poule", quantity: 1, unit: "none"),
+    Ingredient(name: "Poireau", quantity: 4, unit: "none"),
+    Ingredient(name: "Carotte", quantity: 8, unit: "none"),
+    Ingredient(name: "Navet", quantity: 8, unit: "none"),
+    Ingredient(name: "Oignon", quantity: 1, unit: "none"),
+    Ingredient(name: "Bouquet garni", quantity: 1, unit: "none"),
+    Ingredient(name: "Brin de persil", quantity: 6, unit: "none"),
+    Ingredient(name: "Clous de girofle", quantity: 3, unit: "none"),
+    Ingredient(name: "Eau", quantity: 1.5, unit: "L"),
+  ],
+  steps: [
+    RecipeStep(step: S.current.tutorial_recipe_step1),
+    RecipeStep(step: S.current.tutorial_recipe_step2),
+    RecipeStep(step: S.current.tutorial_recipe_step3),
+  ],
+  creationDate: DateTime.now()
+);

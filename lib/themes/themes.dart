@@ -1,0 +1,138 @@
+import 'package:dynamic_themes/dynamic_themes.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'colors.dart';
+
+class AppThemes {
+  static const int Dark = 0;
+  static const int Light = 1;
+  static const List<String> themes = ['Dark', 'Light'];
+}
+
+ThemeCollection setThemeCollection(context) {
+  return ThemeCollection(
+    themes: {
+      AppThemes.Dark: ThemeData(
+        useMaterial3: true,
+
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: DarkColors.accentColor,
+          secondary: DarkColors.menuColor,
+          background: DarkColors.backgroundColor,
+          brightness: Brightness.light,
+        ),
+
+        appBarTheme: AppBarTheme(
+          color: DarkColors.accentColor,
+          titleTextStyle: TextStyle(
+            color: DarkColors.writingColor,
+            fontSize: 20,
+            fontFamily: GoogleFonts.comfortaa().fontFamily
+          ),
+          iconTheme: const IconThemeData(
+            color: DarkColors.writingColor,
+            size: 20
+          )
+        ),
+
+        bottomAppBarTheme: const BottomAppBarTheme(
+          color: DarkColors.accentColor
+        ),
+
+        fontFamily: GoogleFonts.comfortaa().fontFamily,
+        scaffoldBackgroundColor: DarkColors.backgroundColor,
+        canvasColor: DarkColors.backgroundColor,
+        primaryColorDark: DarkColors.menuColor,
+        cardColor: DarkColors.tileBackgroundColor,
+        listTileTheme: const ListTileThemeData(
+          textColor: DarkColors.writingColor,
+          iconColor: DarkColors.writingColor
+        ),
+        chipTheme: Theme.of(context).chipTheme.copyWith(backgroundColor: DarkColors.blackColor, deleteIconColor: DarkColors.writingColor),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            splashColor: DarkColors.writingColor,
+            backgroundColor: DarkColors.menuColor
+        ),
+        textTheme: const TextTheme(
+
+          bodyLarge: TextStyle(color: DarkColors.writingColor, fontSize: 14),
+          bodyMedium: TextStyle(color: DarkColors.secondaryWritingColor, fontSize: 14),
+          displayLarge: TextStyle(color: DarkColors.writingColor, fontSize: 24, fontWeight: FontWeight.bold),
+          displayMedium: TextStyle(color: DarkColors.writingColor, fontSize: 17),
+          displaySmall: TextStyle(color: DarkColors.writingColor, fontSize: 15)
+        ),
+        iconTheme: const IconThemeData(color: DarkColors.writingColor, size: 20),
+        hintColor: DarkColors.notificationColor,
+        dividerColor: DarkColors.secondaryWritingColor,
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            shape: const StadiumBorder(),
+            side: const BorderSide(width: 1, color: DarkColors.writingColor),
+            textStyle: const TextStyle(color: DarkColors.writingColor),
+          ),
+        )
+      ),
+      AppThemes.Light: ThemeData(
+        useMaterial3: true,
+
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: LightColors.accentColor,
+          secondary: LightColors.menuColor,
+          background: LightColors.backgroundColor,
+          brightness: Brightness.light,
+        ),
+
+        appBarTheme: AppBarTheme(
+          color: DarkColors.accentColor,
+          titleTextStyle: TextStyle(
+            color: DarkColors.writingColor,
+            fontSize: 20,
+            fontFamily: GoogleFonts.comfortaa().fontFamily
+          ),
+          iconTheme: const IconThemeData(
+            color: DarkColors.writingColor,
+            size: 20
+          )
+        ),
+
+        bottomAppBarTheme: const BottomAppBarTheme(
+          color: LightColors.accentColor
+        ),
+
+        fontFamily: GoogleFonts.comfortaa().fontFamily,
+        scaffoldBackgroundColor: LightColors.backgroundColor,
+        canvasColor: LightColors.backgroundColor,
+        primaryColorDark: LightColors.menuColor,
+        cardColor: LightColors.tileBackgroundColor,
+        listTileTheme: const ListTileThemeData(
+            textColor: LightColors.writingColor,
+            iconColor: LightColors.writingColor
+        ),
+        chipTheme: Theme.of(context).chipTheme.copyWith(backgroundColor: LightColors.backgroundColor, deleteIconColor: LightColors.writingColor),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+            splashColor: LightColors.writingColor,
+            backgroundColor: LightColors.menuColor
+        ),
+        textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: LightColors.writingColor, fontSize: 14),
+            bodyMedium: TextStyle(color: LightColors.secondaryWritingColor, fontSize: 14),
+            displayLarge: TextStyle(color: LightColors.writingColor, fontSize: 24, fontWeight: FontWeight.bold),
+            displayMedium: TextStyle(color: LightColors.writingColor, fontSize: 17),
+            displaySmall: TextStyle(color: LightColors.writingColor, fontSize: 15)
+        ),
+        iconTheme: const IconThemeData(color: LightColors.writingColor, size: 20),
+        hintColor: LightColors.notificationColor,
+        dividerColor: LightColors.secondaryWritingColor,
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            shape: const StadiumBorder(),
+            side: const BorderSide(width: 1, color: LightColors.writingColor),
+            textStyle: const TextStyle(color: LightColors.writingColor),
+          ),
+        )
+      )
+    },
+    fallbackTheme: ThemeData.dark(),
+  );
+}

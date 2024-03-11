@@ -1,0 +1,185 @@
+{
+  "@@locale": "fr",
+  "title": "Recette de famille",
+  "book_choice": "Choisis un livre !",
+  "no_recipe": "Aucune recette disponible",
+  "add_book": "Ajoute un livre !",
+  "loading_error": "Erreur de chargement",
+
+  "filter_fav": "Favoris",
+  "filter_time": "Temps",
+  "filter_ingredients": "Ingrédients",
+  "filter_tags": "Tags",
+  "filter_apply": "Appliquer",
+
+  "bottom_bar_sort_alpha": "Alphabet",
+  "bottom_bar_sort_time": "Temps",
+
+  "add_button": "Ajouter",
+  "new_button": "Nouveau",
+  "join_button": "Rejoindre",
+
+  "search": "Recherche",
+
+  "shopping_list": "Liste des courses",
+  "settings": "Paramètres",
+
+  "time_widget_text": "Temps",
+  "time_widget_preparation": "Préparation",
+  "time_widget_waiting": "Attente",
+  "time_widget_cooking": "Cuisson",
+  "time_minutes_abr": "min",
+
+  "ingredient_widget_title": "Ingrédients",
+  "ingredient_widget_quantity_type": "Personnes",
+  "ingredient_quantity_type_dialog_name": "Type de quantité",
+  "ingredient_quantity_type_dialog_label": "Type",
+
+  "ingredient_proportion_coeff": "Coefficient multiplicateur",
+
+  "recipe_menu_share": "Copier le lien",
+  "recipe_menu_cart": "Ajouter au panier",
+  "recipe_menu_copy_to_book": "Copier dans",
+  "recipe_menu_remove": "Supprimer",
+  "new_recipe_name": "Nouvelle recette",
+  "new_recipe_step": "Nouvelle étape",
+  "tutorial_recipe_name": "Poule au pot",
+  "tutorial_recipe_step1": "<div>Éplucher et découper en gros morceaux les carottes, les navets et les poireaux. Piquer les clous de girofle sur l'oignon.</div>",
+  "tutorial_recipe_step2": "<div>Remplir une cocotte d'eau sur environ 10 cm. Plonger le bouquet garni et l'oignon. Saler et poivrer. Placer la poule dans la cocotte. Faire cuire à couvert durant 2 heures. 20 minutes avant la fin de la cuisson, ajouter les légumes.</div>",
+  "tutorial_recipe_step3": "<div>Hacher le persil. Découper la poule au pot. Placer les morceaux de poule, les légumes et le jus dans un grand plat. Parsemer de persil. Servir chaud.</div>",
+  "tutorial_recipe_tag1": "hiver",
+  "tutorial_recipe_tag2": "viande",
+  "tutorial_recipe_tag3": "français",
+
+  "steps_widget_title": "Étapes",
+  "steps_widget_step": "Étape",
+
+  "unit_tsp": "cac",
+  "unit_tbs": "cas",
+  "unit_cup": "tasse",
+  "unit_cap": "bouchon",
+  "unit_pinch": "pincée",
+  "unit_drop": "goutte",
+
+  "general_settings_theme": "Changer de thème",
+  "general_settings_language": "Changer la langue",
+  "general_settings_awake": "Garder l'écran allumé",
+  "general_settings_signout": "Déconnexion",
+  "general_settings_export": "Exporter mes livres",
+  "general_settings_import": "Importer des livres",
+
+  "remove_account": "Supprimer mon compte",
+  "remove_button": "Supprimer",
+  "remove_account_method": "Confirme ton email afin de supprimer ton compte définitivement.",
+  "remove_account_agreement": "En cliquant sur le bouton ci-dessous vous acceptez la suppression définitive de toutes vos données, aussi bien locales que cloud. Les personnes avec qui vous partagez vos livres n'y auront plus accès.",
+
+  "sign_out_popup_title": "Déconnexion",
+  "sign_out_popup_description": "Veux-tu vraiment te déconnecter ?",
+
+  "auth_email_label": "e-mail",
+  "auth_password_label": "Mot de passe",
+  "auth_password_requirements": "6 caractères minimum",
+  "auth_connexion": "Connexion",
+  "auth_register": "Pas encore de compte ?",
+  "auth_register_name": "Prénom",
+  "auth_register_lastname": "Nom",
+  "auth_forgotten_password": "Mot de passe oublié",
+  "auth_forgotten_password_method": "Entre ton email pour obtenir le lien de renouvellement du mot de passe",
+  "auth_renewal_link": "Obtenir le lien",
+  "auth_renewal_email_sent": "Email envoyé",
+
+  "cancel": "Annuler",
+  "disable": "Désactiver",
+  "ok": "OK",
+  "understood": "J'ai compris",
+  "remind_me": "Me le rappeler",
+
+  "popup_delete_title": "Supprimer",
+  "popup_delete_description_as_owner": "Veux-tu vraiment supprimer ",
+  "popup_delete_ownership_warning": "Tu n'es pas propriétaire du livre.",
+  "popup_delete_description_as_collaborator": "Es-tu sûr de vouloir supprimer ",
+  "popup_delete_description_user_warning": " pour tous les utilisateurs ?",
+  "popup_delete_for_all": " ainsi que toutes ses recettes pour tous les utilisateurs ?",
+  "popup_quit_title": "Quitter",
+  "popup_quit_description": "Veux-tu vraiment quitter ",
+  "popup_remove_user_title": "Retirer",
+  "popup_remove_user_description": "Veux-tu vraiment retirer l'accès à ",
+  "popup_remove_image_description": "Veux-tu vraiment supprimer cette image ?",
+  "popup_loose_data_title": "Quitter sans sauvegarder",
+  "popup_loose_data_1": "Tu pourrais perdre des données. Merci d'utiliser le bouton",
+  "popup_loose_data_2": "pour sauvegarder ton travail.\n",
+  "popup_loose_data_3": "Veux tu vraiment quitter sans sauvegarder ?",
+
+  "info_share_book_title": "Partager un livre",
+  "info_share_book_description1": "Tu t'apprêtes à partager ce livre.",
+  "info_share_book_description2": "Par défaut, les collaborateurs pourront seulement voir les recettes.",
+  "info_share_book_description_owner": "Tu peux leur accorder plus de droits ou leurs retirer l'accès à tout moment depuis les paramètres utilisateurs ci-dessous.",
+  "info_share_book_description_collaborator": "Le propriétaire du livre peut leur accorder plus de droits ou leurs retirer l'accès à tout moment.",
+
+  "book_creation_title": "Nouveau livre",
+  "book_creation_name": "Nom",
+
+  "book_join_title": "Rejoindre un livre",
+  "book_join_uid": "ID du livre",
+  "book_already_accessible": "Livre est déjà accessible",
+
+  "book_rename_title": "Renommer le livre",
+
+  "book_settings_page_title": "Paramètres du livre",
+  "book_settings_rename": "Renommer",
+  "book_settings_share": "Partager",
+  "book_settings_remove": "Supprimer",
+  "book_settings_quit": "Quitter",
+  "book_settings_users": "Utilisateurs",
+  "book_settings_share_content1": "Ajoute le livre ",
+  "book_settings_share_content2": " à ",
+
+  "recipe_page_book_picker_title": "Quels livres",
+
+  "recipe_edition_update": "Mise à jour",
+
+  "recipe_edition_time_title": "Édition du temps",
+  "recipe_edition_tags_title": "Édition des tags",
+  "recipe_edition_ingredients_title": "Édition des ingrédients",
+  "recipe_edition_new_name": "Nouveau nom",
+
+  "ingredient_quantity_edition": "qté",
+
+  "new_tag_title": "Nouveau tag",
+  "new_tag_name": "Nom",
+  "no_tag": "notag",
+
+  "new_ingredient_title": "Nouvel ingrédient",
+  "ingredient_edition_title": "Ingrédient",
+  "ingredient_name": "Nom",
+  "ingredient_density": "Densité",
+  "ingredient_advanced": "Avancé",
+  "ingredient_quantity": "Quantité",
+  "ingredient_unit": "Unité",
+  "ingredient_density_updated": "Densité de l'ingrédient mise à jour",
+
+  "steps_edition_title": "Étapes",
+  "step_edition_title": "Étape",
+  "step_edition_hint": "Décris l'étape ici...",
+
+  "images_edition_title": "Photos",
+
+  "error_name_empty": "Le nom est vide",
+
+  "book_add_dialog_title": "Nouveau livre",
+  "book_add_dialog_description": "Veux-tu créer un nouveau livre ou rejoindre un existant ?",
+
+  "variant_widget_title": "Variantes",
+  "variant_widget_new": "Nouvelle variante",
+  "variant_remove_description": "Veux-tu vraiment supprimer cette variante ?",
+  "variant_remove_title": "Supprimer une variante",
+
+  "registration": "Inscription",
+  "wrong_password": "Mauvais mot de passe",
+  "wrong_user": "Utilisateur non reconnu",
+  "existing_user": "Utilisateur déjà existant",
+  "weak_password": "Mot de passe trop simple",
+  "lost_password": "J'ai perdu mon mot de passe",
+
+  "page_not_found": "Page introuvable"
+}
