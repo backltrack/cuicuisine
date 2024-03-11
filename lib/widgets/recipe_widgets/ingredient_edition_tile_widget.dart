@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../models/model.dart';
+import '../../themes/theme_mgr.dart';
+import '../../utilities/string_functions.dart';
+import '../../widgets/core_widgets/my_icon_button.dart';
+
+class IngredientEditionTile extends StatefulWidget {
+  final Ingredient ingredient;
+  final String locale;
+  final Function()? onEdit;
+  final Function()? onRemove;
+
+  const IngredientEditionTile({
+    Key? key,
+    required this.ingredient,
+    required this.locale,
+    this.onEdit,
+    this.onRemove
+  }) : super(key: key);
+
+  @override
+  _IngredientEditionTileState createState() => _IngredientEditionTileState();
+}
+
+class _IngredientEditionTileState extends State<IngredientEditionTile> {
+  late Ingredient ingredient;
+  late Unit unitMgr;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      ingredient = widget.ingredient;
+      unitMgr = Unit(widget.locale);
+    });
+  }
+
+  String parseQuantity(double quantity) {
+    if (quantity.round().toDouble() == quantity) return quantity.round().toString();
+    else if ((quantity * 10).round().toDouble() == quantity * 10) return quantity.toStringAsFixed(1);
+    else if ((quantity * 100).round().toDouble() == quantity * 100) return quantity.toStringAsFixed(2);
+    else return quantity.toStringAsFixed(3);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double quantity = double.parse(ingredient.quantity.toString());
+
+    return Container(
+        decoration: BoxDecoration(
+            color: ThemeMgr.getTheme(context)!.colorScheme.background,
+            borderRadius: BorderRadius.circular(4)
+        ),
+        margin: EdgeInsets.symmetric(vertical: 4),
+        padding: EdgeInsets.only(left: 12),
+        height: 45,
+        child: Row(
+          children: [
+            Container(
+                width: MediaQuery.of(context).size.width / 5,
+                child: Text([
+                  parseQuantity(quantity),
+                  if (ingredient.unit != "none" && ingredient.unit != "quantity") ingredient.unit
+                ].join(" "), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge)
+            ),
+            Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text(beautifyName(ingredient.name), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                )
+            ),
+            MyIconButton(
+              icon: FaIcon(FontAwesomeIcons.pen, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+              onPressed: widget.onEdit,
+            ),
+            MyIconButton(
+              icon: FaIcon(FontAwesomeIcons.solidTrashAlt, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+              onPressed: widget.onRemove
+            ),
+          ],
+        )
+    );
+  }
+}

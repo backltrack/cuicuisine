@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+import '../../themes/theme_mgr.dart';
+import '../../utilities/time_functions.dart';
+import '../../generated/l10n.dart';
+
+class RecipeTimeWidget extends StatelessWidget {
+  final int preparationTime;
+  final int waitingTime;
+  final int cookingTime;
+
+  const RecipeTimeWidget({Key? key, required this.preparationTime, required this.waitingTime, required this.cookingTime}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final int _totalTime = preparationTime + waitingTime + cookingTime;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: ThemeMgr.getTheme(context)!.cardColor,
+        borderRadius: BorderRadius.circular(12)
+      ),
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(left: 8, top: 8, right: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Container(
+            child: Column(
+              children: [
+                Text(
+                    S.of(context).time_widget_text,
+                    style: ThemeMgr.getTheme(context)!.textTheme.headline2
+                ),
+                SizedBox(height: 4),
+                Text(
+                    minutesToTime(_totalTime),
+                    style: ThemeMgr.getTheme(context)!.textTheme.headline1
+                )
+              ],
+            ),
+          ),
+
+          Container(
+            height: 50,
+            child: VerticalDivider(
+              color: ThemeMgr.getTheme(context)!.colorScheme.background,
+              thickness: 2,
+              width: 12,
+            ),
+          ),
+
+          Container(
+            //width: double.infinity,
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(S.of(context).time_widget_preparation),
+                      Text(S.of(context).time_widget_waiting),
+                      Text(S.of(context).time_widget_cooking),
+                    ],
+                  ),
+                  SizedBox(
+                    width: 48,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(minutesToTime(preparationTime)),
+                      Text(minutesToTime(waitingTime)),
+                      Text(minutesToTime(cookingTime)),
+                    ],
+                  )
+                ],
+              )
+          )
+        ],
+      ),
+    );
+  }
+}

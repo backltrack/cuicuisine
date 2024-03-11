@@ -70,3 +70,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+# generated content
+*/generated/
+*.g.dart
+
+# unwanted platforms
+ios
+macos
+linux
+windows

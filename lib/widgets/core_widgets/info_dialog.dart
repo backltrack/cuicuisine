@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+import '../../generated/l10n.dart';
+
+Future<bool?> showInfoDialog({required context, required String title, Widget? description}) async {
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: Text(title),
+      content: description != null ? description : null,
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(S.of(context).remind_me),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(S.of(context).understood),
+        ),
+      ],
+    ),
+  );
+}

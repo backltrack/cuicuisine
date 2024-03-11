@@ -1,0 +1,111 @@
+import 'package:flutter/material.dart';
+import '../../utilities/custom_enum.dart';
+import '../../widgets/recipe_widgets/quantity_selector_widget.dart';
+
+import '../core_widgets/calculation_button.dart';
+
+class QuantityEditorWidget extends StatefulWidget {
+  final int quantity;
+  final String quantityType;
+  final double multiplier;
+  final Function(int)? onQuantityChanged;
+  final Function(String)? onTypeChanged;
+  final Function(double)? onMultiplierChanged;
+  final SimpleAlignment location;
+  final bool isEdition;
+  final bool showQuantityMultiplier;
+
+  const QuantityEditorWidget({Key? key, required this.quantity, required this.quantityType, this.multiplier=1, this.onQuantityChanged, this.onTypeChanged, this.onMultiplierChanged, this.location=SimpleAlignment.left, this.isEdition=false, this.showQuantityMultiplier=true}) : super(key: key);
+
+  @override
+  _QuantityEditorWidgetState createState() => _QuantityEditorWidgetState();
+}
+
+class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
+  int _quantity = 0;
+  String _quantityType = "";
+  double _multiplier = 1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    setState(() {
+      _quantity = widget.quantity;
+      _quantityType = widget.quantityType;
+      _multiplier = widget.multiplier;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          if (widget.location == SimpleAlignment.left)
+            ...[
+              SizedBox(
+                child: QuantitySelectorWidget(
+                  quantity: _quantity,
+                  quantityType: _quantityType,
+                  isEdition: widget.isEdition,
+                  onTypeChanged: (String newType) {
+                    setState(() {
+                      _quantityType = newType;
+                    });
+                    if (widget.onTypeChanged != null) widget.onTypeChanged!(_quantityType);
+                  },
+                  onQuantityChanged: (int newQuantity) {
+                    setState(() {
+                      _quantity = newQuantity;
+                    });
+                    if (widget.onQuantityChanged != null) widget.onQuantityChanged!(_quantity);
+                  },
+                )
+              ),
+
+              Spacer(),
+
+              if (widget.showQuantityMultiplier && !widget.isEdition)
+                CalculationButtonWidget(
+                value: _multiplier,
+                onValueChanged: (double value) {
+                  setState(() {
+                    _multiplier = value;
+                  });
+                  if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
+                },
+              )
+            ]
+          else
+            ...[
+              if (widget.showQuantityMultiplier && !widget.isEdition)
+                CalculationButtonWidget(
+                value: _multiplier,
+                onValueChanged: (double value) {
+                  setState(() {
+                    _multiplier = value;
+                  });
+                  if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
+                },
+              ),
+              Spacer(),
+              QuantitySelectorWidget(
+                quantity: _quantity,
+                quantityType: _quantityType,
+                onTypeChanged: (String newType) {
+                  setState(() {
+                    _quantityType = newType;
+                  });
+                },
+                onQuantityChanged: (int newQuantity) {
+                  setState(() {
+                    _quantity = newQuantity;
+                  });
+                },
+              )
+            ]
+        ]
+    );
+  }
+}
