@@ -21,8 +21,9 @@ class DatabaseMgr {
     localMgr = HiveConnector();
     await localMgr.initialize();
 
-    const String defaultServer = 'http://192.168.223.248:8000';
+    // const String defaultServer = 'http://192.168.223.248:8000';
     // const String defaultServer = 'http://192.168.1.15:8000';
+    const String defaultServer = 'http://192.168.1.28:8000';
     
     String? uri = localMgr.getServerUri();
 

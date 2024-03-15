@@ -5,7 +5,7 @@ import 'package:hive/hive.dart';
 @HiveType(typeId: 0)
 class AppUser extends HiveObject {
   @HiveField(0)
-  final String uid;
+  final String id;
   @HiveField(1)
   String name;
   @HiveField(2)
@@ -16,7 +16,7 @@ class AppUser extends HiveObject {
   DateTime? lastUpdate;
 
   AppUser({
-    this.uid = '',
+    this.id = '',
     required this.name,
     required this.email,
     this.favoriteRecipes = const [],
@@ -27,7 +27,7 @@ class AppUser extends HiveObject {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': uid,
+      'id': id,
       'name': name,
       'email': email,
       'favoriteRecipes': favoriteRecipes,
@@ -42,7 +42,7 @@ class AppUser extends HiveObject {
       snapFav.add(recipeUid);
     }
     return AppUser(
-      uid: json['_id'],
+      id: json['id'],
       name: json['name'],
       email: json['email'],
       favoriteRecipes: snapFav,
@@ -54,7 +54,7 @@ class AppUser extends HiveObject {
 @HiveType(typeId: 1)
 class Book extends HiveObject {
   @HiveField(0)
-  final String uid;
+  final String id;
   @HiveField(1)
   String name;
   @HiveField(2)
@@ -71,7 +71,7 @@ class Book extends HiveObject {
   DateTime? lastUpdate;
 
   Book({
-    required this.uid,
+    required this.id,
     required this.name,
     required this.recipeUids,
     required this.users,
@@ -93,7 +93,7 @@ class Book extends HiveObject {
     };
   }
 
-  factory Book.fromJson(Map<String, dynamic> data, {uid=""}) {
+  factory Book.fromJson(Map<String, dynamic> data, {id=""}) {
     // parse access
     Map<String, int> access = {};
     for (String userUid in data['access'].keys.toList()) {
@@ -101,7 +101,7 @@ class Book extends HiveObject {
     }
 
     return Book(
-      uid: uid,
+      id: id,
       name: data['name'],
       users: List.generate(data['users'].length, (index) => data['users'][index] as String),
       access: access,
@@ -114,7 +114,7 @@ class Book extends HiveObject {
 @HiveType(typeId: 2)
 class Recipe extends HiveObject {
   @HiveField(0)
-  final String uid;
+  final String id;
   @HiveField(1)
   String name;
   @HiveField(2)
@@ -144,7 +144,7 @@ class Recipe extends HiveObject {
 
   Recipe(
   {
-    this.uid="",
+    this.id="",
     required this.name,
     this.pictures=const [],
     required this.preparationTime,
@@ -164,10 +164,10 @@ class Recipe extends HiveObject {
 
   // factory Recipe.fromDocument(DocumentSnapshot snapshot) {
   //   Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-  //   return Recipe.fromJson(data, uid: snapshot.id);
+  //   return Recipe.fromJson(data, id: snapshot.id);
   // }
 
-  factory Recipe.fromJson(Map<String, dynamic> data, {String uid=""}) {
+  factory Recipe.fromJson(Map<String, dynamic> data, {String id=""}) {
     // parse ingredients
     List<Ingredient> snapIngredients = [];
     for (Map<String, dynamic> ingredient in data['recipeIngredients']) {
@@ -204,7 +204,7 @@ class Recipe extends HiveObject {
     }
 
     return Recipe(
-      uid: uid,
+      id: id,
       pictures: List.generate(data['pictures'].length, (index) => data['pictures'][index] as String),
       name: data['name'],
       preparationTime: data['preparationTime'],

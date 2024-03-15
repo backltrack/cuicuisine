@@ -11,9 +11,7 @@ class HiveConnector {
   late Box<dynamic> _bookBox;
   late Box<dynamic> _recipeBox;
 
-  HiveConnector() {
-    initialize();
-  }
+  HiveConnector();
 
   Future<void> initialize() async {
     if (!kIsWeb) {
@@ -54,6 +52,8 @@ class HiveConnector {
     if (themeId is int) {
       return themeId;
     }
+
+    return null;
   }
 
   void saveLocale(String locale) {
@@ -65,6 +65,21 @@ class HiveConnector {
     if (locale is String) {
       return locale;
     }
+
+    return null;
+  }
+
+  void saveWakelock(bool activated) {
+    _settingBox.put('wakelock', activated);
+  }
+
+  bool? loadWakelock() {
+    var activated = _settingBox.get('wakelock');
+    if (activated is bool) {
+      return activated;
+    }
+
+    return null;
   }
 
   // SERVER
@@ -113,7 +128,7 @@ class HiveConnector {
   AppUser? getUser() {
     try {
       if (_userBox.length > 0) {
-        var appUser = _userBox!.getAt(0);
+        var appUser = _userBox.getAt(0);
         if (appUser is AppUser) {
           return appUser;
         }
@@ -136,7 +151,7 @@ class HiveConnector {
   String? getUserUid() {
     AppUser? user = getUser();
     if (user != null) {
-      return user.uid;
+      return user.id;
     }
     return null;
   }
@@ -202,9 +217,9 @@ class HiveConnector {
     }
   }
 
-  void deleteBook(String uid) {
+  void deleteBook(String id) {
     try {
-      _bookBox.delete(uid);
+      _bookBox.delete(id);
     } on Exception catch(e) {
       throw Exception(e);
     }
@@ -250,9 +265,9 @@ class HiveConnector {
     }
   }
 
-  void deleteRecipe(String uid) {
+  void deleteRecipe(String id) {
     try {
-      _recipeBox.delete(uid);
+      _recipeBox.delete(id);
     } on Exception catch(e) {
       throw Exception(e);
     }

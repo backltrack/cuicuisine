@@ -23,6 +23,8 @@ class _EmailConnexionState extends State<EmailConnexion> {
   String _email = "";
   String _password = "";
 
+  bool showRegisterButton = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,39 +64,24 @@ class _EmailConnexionState extends State<EmailConnexion> {
             SocialButton(
               // email sign in button
               onPressed: isEmailValid(_email) && _password.length >= 6 ? () async {
-                await DatabaseMgr.remoteMgr.ConnectWithEmail(_email, _password, 
+                await DatabaseMgr.remoteMgr.connectWithEmail(_email, _password, 
                   onInvalidEmail: () {
-                    Navigator.pushNamed(context, EmailRegistration.route);
+                    setState(() {
+                      showRegisterButton = true;
+                    });
                     Fluttertoast.showToast(msg: "Invalid email, do you want to register?");
                   },
-                  onInvalidPassword: () {}
+                  onInvalidPassword: () {
+                    Fluttertoast.showToast(msg: "Invalid passward, try again!");
+                  }
                 );
-                // try {
-                //   // sign in
-                //   await FirebaseAuth.instance.signInWithEmailAndPassword(
-                //       email: _email,
-                //       password: _password
-                //   );
-
-                // } on FirebaseAuthException catch (e) {
-                //   if (e.code == 'user-not-found') {
-                //     Fluttertoast.showToast(msg: S.of(context).wrong_user, gravity: ToastGravity.CENTER);
-                //     print('No user found for that email.');
-                //   } else if (e.code == 'wrong-password') {
-                //     Fluttertoast.showToast(msg: S.of(context).wrong_password, gravity: ToastGravity.CENTER);
-                //     print('Wrong password provided for that user.');
-                //   } else {
-                //     print(e);
-                //   }
-                // } catch (e) {
-                //   print(e);
-                // }
               } : null,
               // email sign in button
               child: Text(S.of(context).auth_connexion),
             ),
 
             // registration
+            !showRegisterButton ? const SizedBox() : 
             SocialButton(
               // email sign in button
               child: Text(S.of(context).auth_register),
@@ -104,13 +91,13 @@ class _EmailConnexionState extends State<EmailConnexion> {
             ),
 
             // forgotten password
-            SocialButton(
-              // email sign in button
-              child: Text(S.of(context).auth_forgotten_password),
-              onPressed: () async {
-                Navigator.pushNamed(context, ForgottenPasswordPage.route);
-              },
-            ),
+            // SocialButton(
+            //   // email sign in button
+            //   child: Text(S.of(context).auth_forgotten_password),
+            //   onPressed: () async {
+            //     Navigator.pushNamed(context, ForgottenPasswordPage.route);
+            //   },
+            // ),
           ]),
         )
       )

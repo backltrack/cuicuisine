@@ -93,11 +93,30 @@ class MongoConnector {
       String? savedCredentials = DatabaseMgr.localMgr.getCredentials();
       if (savedCredentials != null) {
         client = OAuth2Connexion.createClientFromCredentials(savedCredentials: savedCredentials);
-        DatabaseMgr.isOnline = true;
-        return await fetchUser();
-      }
 
-    } on SocketException catch (e) {
+        try {
+          return await fetchUser();
+        }
+        catch (e) {
+          print('lv1');
+          print(e);
+          try {
+            oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client);
+            if (newClient != null) {
+              client = newClient;
+              DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
+              return await fetchUser();
+            }
+          }
+          catch (e) {
+            print('lv2');
+            print(e);
+          }
+        }
+        
+      }
+    }
+    on SocketException catch (e) {
       DatabaseMgr.isOnline = false;
       print('toast timeout');
     } on TimeoutException catch (e) {
@@ -108,9 +127,12 @@ class MongoConnector {
     return null;
   }
 
-  Future<AppUser?> ConnectWithEmail(String email, String password, {Function? onInvalidEmail, Function? onInvalidPassword}) async {
+  Future<AppUser?> connectWithEmail(String email, String password, {Function? onInvalidEmail, Function? onInvalidPassword}) async {
     try {
-      await OAuth2Connexion.createClientFromPassword(serverUri: server, email: email, password: password);
+      oauth2.Client? _client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: email, password: password);
+      if (_client != null) {
+        client = _client;
+      }
     }
     on InvalidEmailException catch (e) {
       print(e);
@@ -128,8 +150,31 @@ class MongoConnector {
     return null;
   }
 
-  Future<AppUser?> RegisterWithEmail(String email, String password) async {
+  Future<AppUser?> registerWithEmail(String email, String password, {Function(AppUser)? onSuccess, Function(String)? onFailure}) async {
+    try {
+      oauth2.Client? _client = await OAuth2Connexion.createClientFromPassword(serverUri: server, email: email, password: password);
+      if (_client != null) {
+        client = _client;
+        print(client.credentials.accessToken);
 
+        AppUser _user = await fetchUser();
+
+        onSuccess??(_user);
+        return _user;
+      }
+    }
+    on IncorrectPasswordException catch(e) {
+      print(e);
+      onFailure??("Incorrect password");
+    }
+    on EmailAlreadyExistsException catch(e) {
+      onFailure??("Email already exists");
+    }
+    catch (e) {
+      print(e);
+    }
+    
+    return null;
   }
 
 
@@ -142,6 +187,8 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
+      print('HELLO');
+      print(jsonDecode(response.body));
       return AppUser.fromJson(jsonDecode(response.body));
     } else {
       // If the server did not return a 200 OK response,

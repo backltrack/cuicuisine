@@ -18,6 +18,20 @@ class InvalidPasswordException implements Exception {
   }
 }
 
+class IncorrectPasswordException implements Exception {
+  @override
+  String toString() {
+    return "IncorrectPasswordException: Password doesn't satisfy security contraints.";
+  }
+}
+
+class EmailAlreadyExistsException implements Exception {
+  @override
+  String toString() {
+    return "EmailAlreadyExistsException: An account using this email already exists.";
+  }
+}
+
 
 class OAuth2Connexion {
 
@@ -31,11 +45,10 @@ class OAuth2Connexion {
     return oauth2.Client(credentials);
   }
 
-  static Future<oauth2.Client?> createClientFromPassword({required String serverUri, required String email, required String password}) async {
+  static Future<oauth2.Client?> connectFromPassword({required String serverUri, required String email, required String password}) async {
 
     try {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/token"), email, password);
-      print(client.credentials.toJson());
 
       DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
       
@@ -48,6 +61,33 @@ class OAuth2Connexion {
       }
       else if (e.toString().contains("Incorrect password")) {
         throw InvalidPasswordException();
+      }
+      else {
+        print(e);
+      }
+    }
+    
+    return null;
+  }
+
+  static Future<oauth2.Client?> createClientFromPassword({required String serverUri, required String email, required String password}) async {
+
+    try {
+      oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/register"), email, password);
+      print(client.credentials.toJson());
+
+      DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
+      
+      return client;
+
+    } on Exception catch(e) {
+      if (e.toString().contains("Incorrect password")) {
+
+        throw IncorrectPasswordException();
+      }
+      else if (e.toString().contains("Email already exists")) {
+
+        throw EmailAlreadyExistsException();
       }
       else {
         print(e);
