@@ -95,7 +95,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
             SocialButton(
               // email sign in button
               onPressed: areAllFieldsValid() ? () async {
-                await DatabaseMgr.remoteMgr.registerWithEmail(_email, _password, 
+                await DatabaseMgr().remoteMgr.registerWithEmail(_email, _password, 
                   onSuccess: (AppUser user) {
                     Fluttertoast.showToast(msg: user.email);
                   },

@@ -30,11 +30,11 @@ class MongoConnector {
         headers: headers);
       return response;
     } on TimeoutException catch(_) {
-      DatabaseMgr.isOnline = false;
-      throw TimeoutException;
+      DatabaseMgr().isOnline = false;
+      // throw TimeoutException;
     } on SocketException catch(_) {
-      DatabaseMgr.isOnline = false;
-      throw SocketException;
+      DatabaseMgr().isOnline = false;
+      // throw SocketException;
     }
   }
 
@@ -45,10 +45,10 @@ class MongoConnector {
   //         .delete(Uri.parse(url));
   //   } on TimeoutException catch(e) {
   //     // add pop up "check server connexion"
-  //     DatabaseMgr.isOnline = false;
+  //     DatabaseMgr().isOnline = false;
   //     throw Exception(e);
   //   } on SocketException catch(e) {
-  //     DatabaseMgr.isOnline = false;
+  //     DatabaseMgr().isOnline = false;
   //     throw Exception(e);
   //   }
   //   return response;
@@ -57,19 +57,46 @@ class MongoConnector {
   Future<dynamic> _securePostRequest(String endpoint, Map<String, dynamic> data) async {
     Uri serverUri = Uri.parse(server);
 
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': client.credentials.accessToken
+    };
+
     try {
-      Response response = await client.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
+      Response response = await client.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+        headers: headers,
         body: data);
       return response;
     } on TimeoutException catch(_) {
-      DatabaseMgr.isOnline = false;
-      throw TimeoutException;
+      DatabaseMgr().isOnline = false;
+      // throw TimeoutException;
     } on SocketException catch(_) {
-      DatabaseMgr.isOnline = false;
-      throw SocketException;
+      DatabaseMgr().isOnline = false;
+      // throw SocketException;
     }
   }
 
+  Future<dynamic> _securePutRequest(String endpoint, Map<String, dynamic> data) async {
+    Uri serverUri = Uri.parse(server);
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': client.credentials.accessToken
+    };
+
+    try {
+      Response response = await client.put(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+        headers: headers,
+        body: data);
+      return response;
+    } on TimeoutException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw TimeoutException;
+    } on SocketException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw SocketException;
+    }
+  }
 
   // Connexion
   Future<bool> testConnexion() async {
@@ -78,34 +105,42 @@ class MongoConnector {
         headers: {
           'accept': 'application/json'
       });
+      DatabaseMgr().isOnline = true;
       return response.body == "true";
     } on SocketException catch (e) {
       print(e);
+      DatabaseMgr().isOnline = false;
       return false;
     } on TimeoutException catch (e) {
       print(e);
+      DatabaseMgr().isOnline = false;
       return false;
     }
   }
 
   Future<AppUser?> tryReconnect() async {
     try {
-      String? savedCredentials = DatabaseMgr.localMgr.getCredentials();
+      String? savedCredentials = DatabaseMgr().localMgr.getCredentials();
       if (savedCredentials != null) {
         client = OAuth2Connexion.createClientFromCredentials(savedCredentials: savedCredentials);
 
         try {
-          return await fetchUser();
+          AppUser user = await fetchUser();
+          await DatabaseMgr().localMgr.setUser(user);
+          return user;
         }
         catch (e) {
-          print('lv1');
+          print('token expired');
           print(e);
           try {
             oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client);
             if (newClient != null) {
               client = newClient;
-              DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
-              return await fetchUser();
+              DatabaseMgr().localMgr.saveCredentials(client.credentials.toJson());
+              
+              AppUser user = await fetchUser();
+              await DatabaseMgr().localMgr.setUser(user);
+              return user;
             }
           }
           catch (e) {
@@ -117,10 +152,10 @@ class MongoConnector {
       }
     }
     on SocketException catch (e) {
-      DatabaseMgr.isOnline = false;
+      DatabaseMgr().isOnline = false;
       print('toast timeout');
     } on TimeoutException catch (e) {
-      DatabaseMgr.isOnline = false;
+      DatabaseMgr().isOnline = false;
       print('other exception');
     }
 
@@ -132,6 +167,11 @@ class MongoConnector {
       oauth2.Client? _client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: email, password: password);
       if (_client != null) {
         client = _client;
+
+        AppUser user = await fetchUser();
+        await DatabaseMgr().localMgr.setUser(user);
+
+        return user;
       }
     }
     on InvalidEmailException catch (e) {
@@ -157,10 +197,11 @@ class MongoConnector {
         client = _client;
         print(client.credentials.accessToken);
 
-        AppUser _user = await fetchUser();
+        AppUser user = await fetchUser();
+        await DatabaseMgr().localMgr.setUser(user);
 
-        onSuccess??(_user);
-        return _user;
+        onSuccess??(user);
+        return user;
       }
     }
     on IncorrectPasswordException catch(e) {
@@ -187,7 +228,6 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print('HELLO');
       print(jsonDecode(response.body));
       return AppUser.fromJson(jsonDecode(response.body));
     } else {
@@ -197,16 +237,80 @@ class MongoConnector {
     }
   }
 
-  // Future<AppUser> createUser(AppUser newUser) async {
+  Future<bool> updateUser(AppUser user) async {
+    final response = await _securePostRequest('/users/me/update', 
+      {
 
-  //   final response = await _securePostRequest(_concatServerUrl(['add_user']), newUser.toJson());
-    
-  //   if (response != null && response.statusCode == 201) {
-  //     return AppUser.fromJson(jsonDecode(response.body));
-  //   } else {
-  //     throw Exception('Failed to create user');
-  //   }
-  // }
+      }
+    );
+
+    return true;
+  }
+
+
+
+  Future<Book> fetchBook(String bookId) async {
+    final response = await _secureGetRequest('/books/get/$bookId');
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      print(jsonDecode(response.body));
+      return Book.fromJson(jsonDecode(response.body));
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to fetch book');
+    } 
+  }
+
+  Future<bool> createBook(Book book) async {
+    final response = await _securePutRequest('/books/create', 
+      {
+        'name': book.name
+      }
+    );
+
+    if (response != null && response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      try {
+        dynamic data = jsonDecode(response.body);
+        print(data);
+        Book newBook = Book.fromJson(data);
+
+        DatabaseMgr().localMgr.addBook(newBook, addToQueue: false);
+        DatabaseMgr().localMgr.deleteBook(book.id);
+
+        return true;
+      }
+      catch (e) {
+        print(e);
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+
+
+  Future<Recipe> fetchRecipe(String recipeId) async {
+    final response = await _secureGetRequest('/recipes/get/$recipeId');
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      print(jsonDecode(response.body));
+      return Recipe.fromJson(jsonDecode(response.body));
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to fetch recipe');
+    } 
+  }
+
+
 
   // Future<DateTime> getUserLastUpdate() async {
   //   final response = await _secureGetRequest('get_user_last_update');

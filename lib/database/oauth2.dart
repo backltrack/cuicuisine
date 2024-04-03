@@ -50,7 +50,7 @@ class OAuth2Connexion {
     try {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/token"), email, password);
 
-      DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
+      DatabaseMgr().localMgr.saveCredentials(client.credentials.toJson());
       
       return client;
 
@@ -76,7 +76,7 @@ class OAuth2Connexion {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/register"), email, password);
       print(client.credentials.toJson());
 
-      DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
+      DatabaseMgr().localMgr.saveCredentials(client.credentials.toJson());
       
       return client;
 
@@ -96,14 +96,6 @@ class OAuth2Connexion {
     
     return null;
   }
-
-  // Future<String> getUser(oauth2.Client client) async {
-  //   var response = await client.get(Uri(scheme: serverUri.split(':')[0], host: serverUri.split('//')[1].split(':')[0], port: int.parse(serverUri.split(':')[2]), path: '/users/me'), headers: {
-  //     'accept': 'application/json',
-  //     'Authorization': client.credentials.accessToken
-  //   });
-  //   return response.body;
-  // }
 
   static Future<oauth2.Client?> refreshToken({required String serverUri, required oauth2.Client client}) async {
     Uri server = Uri.parse(serverUri);
@@ -127,7 +119,7 @@ class OAuth2Connexion {
     );
     oauth2.Client newclient = oauth2.Client(newCred);
 
-    DatabaseMgr.localMgr.saveCredentials(client.credentials.toJson());
+    DatabaseMgr().localMgr.saveCredentials(client.credentials.toJson());
 
     return newclient;
   }

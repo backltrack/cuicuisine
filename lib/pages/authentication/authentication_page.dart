@@ -8,6 +8,7 @@ import '../../themes/theme_mgr.dart';
 import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
 // import '../home_page.dart';
+import '../test.dart';
 import 'email_connexion.dart';
 
 class LogInPage extends StatefulWidget {
@@ -45,7 +46,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     animationOpacity = Tween(begin: 0.0, end: 1.0).animate(controllerOpacity!);
 
 
-    // DatabaseMgr.remoteMgr.tryReconnect();
+    // DatabaseMgr().remoteMgr.tryReconnect();
 
     // Firebase auth event
     // auth.authStateChanges()
@@ -78,12 +79,12 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     //           else {
     //             // fireUser filled: ready to connect or create account
     //             // check Hive current user
-    //             AppUser? appUser = DatabaseMgr.hiveConnector.getUser();
+    //             AppUser? appUser = DatabaseMgr().hiveConnector.getUser();
     //             if (appUser != null && appUser.firebaseId == fireUser!.uid) {
     //               // already loaded, try to sync Hive
-    //               bool serverConnected = await DatabaseMgr.mongoConnector.testServerAccess();
+    //               bool serverConnected = await DatabaseMgr().mongoConnector.testServerAccess();
     //               if (serverConnected) {
-    //                 await DatabaseMgr.synchronization.syncAll();
+    //                 await DatabaseMgr().synchronization.syncAll();
     //               }
     //               else {
     //                 print('timeout, offline');
@@ -95,21 +96,21 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     //               // Check internet connexion
 
     //               // Need to check MongoDB user inexistance then sync user
-    //               bool existance = await DatabaseMgr.mongoConnector.userExsits(fireUser!.uid);
+    //               bool existance = await DatabaseMgr().mongoConnector.userExsits(fireUser!.uid);
     //               AppUser appUser;
     //               if (existance) {
     //                 // retrieve user
-    //                 appUser = await DatabaseMgr.mongoConnector.fetchUser(fireUser.uid);
+    //                 appUser = await DatabaseMgr().mongoConnector.fetchUser(fireUser.uid);
     //               }
     //               else {
     //                 // create user
-    //                 appUser = await DatabaseMgr.mongoConnector.createUser(AppUser(firebaseId: fireUser.uid, name: fireUser.displayName!, email: fireUser.email!));
+    //                 appUser = await DatabaseMgr().mongoConnector.createUser(AppUser(firebaseId: fireUser.uid, name: fireUser.displayName!, email: fireUser.email!));
     //               }
     //               // clear Hive
-    //               DatabaseMgr.hiveConnector.clearAll();
+    //               DatabaseMgr().hiveConnector.clearAll();
     //               // update hive data
-    //               DatabaseMgr.hiveConnector.setUser(appUser);
-    //               await DatabaseMgr.synchronization.fetchAll();
+    //               DatabaseMgr().hiveConnector.setUser(appUser);
+    //               await DatabaseMgr().synchronization.fetchAll();
     //               // goto HomePage
     //               if (this.mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
     //             }
@@ -120,14 +121,18 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
   }
 
   void init() async {
-    DatabaseMgr.isOnline = await DatabaseMgr.remoteMgr.testConnexion();
-    if (DatabaseMgr.isOnline) {
-      AppUser? user = await DatabaseMgr.remoteMgr.tryReconnect();
+    await DatabaseMgr().remoteMgr.testConnexion();
+    if (DatabaseMgr().isOnline) {
+      AppUser? user = await DatabaseMgr().remoteMgr.tryReconnect();
       if (user != null) {
         print('synch + goto homepage');
+        print("Pending operations in queue: ${DatabaseMgr().localMgr.getQueueLength()}");
+        print("Operations: ${DatabaseMgr().localMgr.getOperationLength()}");
         // synchronize
+        await DatabaseMgr().synchronization.sync();
         // goto home page
         //if (this.mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
       }
       else {
         print('need to register');
@@ -136,6 +141,16 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     }
     else {
       print('offline switch to local mode');
+      AppUser? user =  DatabaseMgr().localMgr.getUser();
+      if (user != null) {        
+        print("Start offline");
+        print("Pending operations : ${DatabaseMgr().localMgr.getQueueLength()}");
+        print("Operations: ${DatabaseMgr().localMgr.getOperationLength()}");
+        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
+      }
+      else {
+        print("need internet connexion for registration");
+      }
     }
 
     setState(() {
@@ -210,11 +225,11 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                         height: 10,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: DatabaseMgr.isOnline ? Colors.green : Colors.red
+                          color: DatabaseMgr().isOnline ? Colors.green : Colors.red
                         )
                       ),
                       Text(
-                        DatabaseMgr.isOnline ? "Server online" : "Server offline",
+                        DatabaseMgr().isOnline ? "Server online" : "Server offline",
                         style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
                       )
                     ],

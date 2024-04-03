@@ -14,14 +14,14 @@ class LocaleMgr {
   LocaleMgr._();
 
   static void setLocale(String code, BuildContext context) {
-    DatabaseMgr.localMgr.saveLocale(code);
+    DatabaseMgr().localMgr.saveLocale(code);
     print('Save locale $code');
 
     Cuicuisine.of(context)!.changeLocale(code);
   }
 
   static void loadLocale(BuildContext context) {
-    String? localeCode = DatabaseMgr.localMgr.loadLocale();
+    String? localeCode = DatabaseMgr().localMgr.loadLocale();
     if (localeCode != null) {
       Cuicuisine.of(context)!.changeLocale(localeCode);
     } 

@@ -7,6 +7,7 @@ import '../../widgets/core_widgets/social_button.dart';
 
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
+import '../test.dart';
 import 'email_registration.dart';
 import 'forgotten_password.dart';
 
@@ -64,7 +65,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
             SocialButton(
               // email sign in button
               onPressed: isEmailValid(_email) && _password.length >= 6 ? () async {
-                await DatabaseMgr.remoteMgr.connectWithEmail(_email, _password, 
+                await DatabaseMgr().remoteMgr.connectWithEmail(_email, _password, 
                   onInvalidEmail: () {
                     setState(() {
                       showRegisterButton = true;
@@ -75,6 +76,8 @@ class _EmailConnexionState extends State<EmailConnexion> {
                     Fluttertoast.showToast(msg: "Invalid passward, try again!");
                   }
                 );
+
+                if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
               } : null,
               // email sign in button
               child: Text(S.of(context).auth_connexion),

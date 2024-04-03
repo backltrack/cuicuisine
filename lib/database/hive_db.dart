@@ -1,7 +1,11 @@
+import 'dart:ffi';
+
+import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:uuid/uuid.dart';
 import '../../models/model.dart';
 
 class HiveConnector {
@@ -10,6 +14,8 @@ class HiveConnector {
   late Box<dynamic> _userBox;
   late Box<dynamic> _bookBox;
   late Box<dynamic> _recipeBox;
+  late Box<dynamic> _queueBox;
+  late Box<dynamic> _queueOperationBox;
 
   HiveConnector();
 
@@ -20,11 +26,14 @@ class HiveConnector {
         ..init(appDocumentDir.path)
         ..registerAdapter(AppUserAdapter())
         ..registerAdapter(BookAdapter())
-        ..registerAdapter(RecipeAdapter())
         ..registerAdapter(VariantAdapter())
-        ..registerAdapter(RecipeStepAdapter())
         ..registerAdapter(IngredientAdapter())
-        ..registerAdapter(TagAdapter());
+        ..registerAdapter(TagAdapter())
+        ..registerAdapter(RecipeStepAdapter())
+        ..registerAdapter(RecipeAdapter())
+        ..registerAdapter(OperationTypeAdapter())
+        ..registerAdapter(OperationAdapter())
+        ..registerAdapter(OperationQueueAdapter());
     }
 
     _settingBox = await Hive.openBox('settings');
@@ -32,6 +41,12 @@ class HiveConnector {
     _userBox = await Hive.openBox('user');
     _bookBox = await Hive.openBox('books');
     _recipeBox = await Hive.openBox('recipes');
+    _queueBox = await Hive.openBox('queue');
+    _queueOperationBox = await Hive.openBox('queueOperations');
+
+    if (_queueBox.isEmpty) {
+      _queueBox.add(OperationQueue());
+    }
     if (kDebugMode) print('Hive initialized');
   }
 
@@ -82,6 +97,19 @@ class HiveConnector {
     return null;
   }
 
+  void saveDefaultBook(String id) {
+    _settingBox.put('defaultBook', id);
+  }
+
+  String? loadDefaultBook() {
+    var defaultBook = _settingBox.get('defaultBook');
+    if (defaultBook is String) {
+      return defaultBook;
+    }
+
+    return null;
+  }
+
   // SERVER
   void saveServerUri(String uri) {
     try {
@@ -116,10 +144,10 @@ class HiveConnector {
   }
   
   // USER //
-  void setUser(AppUser appUser) {
+  Future<void> setUser(AppUser appUser) async {
     try {
-      _userBox.clear();
-      _userBox.add(appUser);
+      await _userBox.clear();
+      await _userBox.add(appUser);
     } on Exception catch(e) {
       throw Exception(e);
     }
@@ -201,9 +229,13 @@ class HiveConnector {
     }
   }
 
-  void addBook(Book book) {
+  void addBook(Book book, {bool addToQueue=true}) {
     try {
       _bookBox.add(book);
+
+      if (addToQueue) {
+        addQueueOperation(type: OperationType.create, object: book);
+      }
     } on Exception catch(e) {
       throw Exception(e);
     }
@@ -219,7 +251,8 @@ class HiveConnector {
 
   void deleteBook(String id) {
     try {
-      _bookBox.delete(id);
+      _bookBox.values.firstWhere((book) => book.id == id)
+        .delete();
     } on Exception catch(e) {
       throw Exception(e);
     }
@@ -280,4 +313,72 @@ class HiveConnector {
       throw Exception(e);
     }
   }
+
+  // QUEUE //
+
+  Operation? getOperationFromId(String id) {
+    Operation? ope;
+    int index = 0;
+    for (Operation item in _queueOperationBox.values) {
+      if (item.id == id) {
+        ope = item;
+        break;
+      }
+      index += 1;
+    }
+
+    if (ope != null) {
+      _queueOperationBox.deleteAt(index);
+      return ope;
+    }
+
+    return null;
+  }
+
+  void addQueueOperation({required OperationType type, required DatabaseObject object, bool pushAfter=true}) {
+    OperationQueue queue = _queueBox.getAt(0);
+
+    Operation ope = Operation(id: const Uuid().v4(), type: type, object: object);
+    _queueOperationBox.add(ope);
+
+    queue.addOperation(ope.id);
+
+    if (DatabaseMgr().isOnline) {
+      if (pushAfter) {
+        DatabaseMgr().synchronization.pushQueue();
+      }
+    }
+  }
+
+  Operation? getFirstOperation() {
+    OperationQueue queue = _queueBox.getAt(0);
+    String? operationId = queue.getFirstOperationId();
+
+    if (operationId != null) {
+      print(operationId);
+      Operation? ope = getOperationFromId(operationId);
+      if (ope != null) {
+        return ope;
+      }
+    }
+
+    return null;
+  }
+
+  int getQueueLength() {
+    OperationQueue queue = _queueBox.getAt(0);
+    return queue.length();
+  }
+
+
+  int getOperationLength() {
+    return _queueOperationBox.length;
+  }
+
+
+
+  int getBooksNum() {
+    return _bookBox.length;
+  }
+
 }

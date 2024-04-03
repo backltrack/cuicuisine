@@ -3,24 +3,137 @@ import 'package:cuicuisine/models/model.dart';
 
 import './hive_db.dart';
 import './mongodb_connector.dart';
+
+
 class Synchronization {
-  final MongoConnector _remoteMgr = DatabaseMgr.remoteMgr;
-  final HiveConnector _localMgr = DatabaseMgr.localMgr;
+  final MongoConnector _remoteMgr = DatabaseMgr().remoteMgr;
+  final HiveConnector _localMgr = DatabaseMgr().localMgr;
 
   Synchronization();
 
-// Fetch
-  Future<void> fetchAll() async {
-    // user uid must be already set
-    // retrieve all user relative data from MongoDB
-    // clear and populate Hive
+  Future<bool> pushQueue() async {
+    // Push Queue
+    // create operation -> push
+    // delete operation -> check last update
+      // Queue document more recent -> push
+      // server document more recent -> conflict
+    // update operation -> check last update 
+      // Queue document more recent -> push
+      // server document more recent -> conflict
     
-    // _localMgr.clearAll();
+    print(_localMgr.getQueueLength());
+    Operation? ope = _localMgr.getFirstOperation();
+    print(_localMgr.getQueueLength());
+    List<Operation> failedOperations = [];
 
-    // await fetchUser();
-    // await fetchUserBooks();
-    // await fetchUserBooksRecipes();
+    while (ope != null) {
+      bool success = false;
+      switch (ope.type) {
+        case OperationType.create:
+          success = await createObject(ope.getTypedObject());
+          print(success);
+        case OperationType.update:
+          success = await updateObject(ope.getTypedObject());
+        case OperationType.delete:
+          success = await deleteObject(ope.getTypedObject());
+      }
+      if (!success) {
+        failedOperations.add(ope);
+      }
+
+      print(_localMgr.getQueueLength());
+      ope = _localMgr.getFirstOperation();
+      print(_localMgr.getQueueLength());
+    }
+
+    if (failedOperations.isEmpty) {
+      return true;
+    }
+    else {
+      for (Operation ope in failedOperations) {
+        _localMgr.addQueueOperation(type: ope.type, object: ope.object);
+      }
+      return false;
+    }
   }
+
+  Future<bool> sync() async {
+    // send all local document type, id, last update
+    // server sends back all new or updated documents
+    // refresh UI
+
+    //push queue
+    return await pushQueue();
+  }
+
+  Future<bool> createObject(object) async {
+    if (object is Book) {
+      return await _remoteMgr.createBook(object);
+    }
+    else if (object is Recipe) {
+
+    }
+
+    return false;
+  }
+
+  Future<bool> updateObject(object) async {
+    if (object is AppUser) {
+
+    }
+    else if (object is Book) {
+
+    }
+    else if (object is Recipe) {
+
+    }
+
+    return true;
+  }
+
+  Future<bool> deleteObject(object) async {
+    if (object is AppUser) {
+
+    }
+    else if (object is Book) {
+
+    }
+    else if (object is Recipe) {
+
+    }
+
+    return true;
+  }
+
+
+    
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Fetch
+  // Future<void> fetchAll() async {
+  //   // user uid must be already set
+  //   // retrieve all user relative data from MongoDB
+  //   // clear and populate Hive
+    
+  //   _localMgr.clearAll();
+
+  //   await fetchUser();
+  //   await fetchUserBooks();
+  //   await fetchUserBooksRecipes();
+  // }
 
   // Future<void> fetchUser() async {
   //   // user uid must be already set
