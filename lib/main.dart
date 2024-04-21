@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
+import 'package:cuicuisine/pages/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'database/database_mgr.dart';
 import 'generated/l10n.dart';
@@ -18,6 +19,7 @@ void main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
+  await DatabaseMgr().initialize();
 
   runApp(const Cuicuisine());
 }
@@ -32,8 +34,6 @@ class Cuicuisine extends StatefulWidget {
 }
 
 class _CuicuisineState extends State<Cuicuisine> {
-  bool isInitialized = false;
-
   // Handle local switch
   Locale? _locale;
 
@@ -51,31 +51,23 @@ class _CuicuisineState extends State<Cuicuisine> {
   void initState() {
     super.initState();
 
-    changeLocale("en");
-
-    init();
-  }
-
-  void init() async {
-    await DatabaseMgr.initialize();
-    
-    String? localeCode = DatabaseMgr.localMgr.loadLocale();
+    String? localeCode = DatabaseMgr().localMgr.loadLocale();
     if (localeCode != null) {
       changeLocale(localeCode);
     }
+    else {
+      changeLocale("en");
+    }
 
-  //   // load wakelock state
-  //   bool? wakelockState = settingsBox.get('wakelock');
-  //   if (wakelockState != null) {
-  //     wakelockState ? Wakelock.enable() : Wakelock.disable();
-  //   } else {
-  //     settingsBox.put('wakelock', false);
-  //   }
-  //   print("Wakelock state: $wakelockState");
+    // load wakelock state
+    bool? wakelockState = DatabaseMgr().localMgr.loadWakelock();
+    if (wakelockState != null) {
+      wakelockState ? WakelockPlus.enable() : WakelockPlus.disable();
+    } else {
+      DatabaseMgr().localMgr.saveWakelock(false);
+    }
+    print("Wakelock state: $wakelockState");
 
-    setState(() {
-      isInitialized = true;
-    });
   }
 
 
@@ -88,7 +80,7 @@ class _CuicuisineState extends State<Cuicuisine> {
   @override
   Widget build(BuildContext context) {
 
-    return !isInitialized ? Container() : DynamicTheme(
+    return DynamicTheme(
         themeCollection: setThemeCollection(context),
         defaultThemeId: AppThemes.Dark, // optional, default id is 0
         builder: (context, theme) {
@@ -124,6 +116,7 @@ class _CuicuisineState extends State<Cuicuisine> {
               // BookNamePage.route: (ctx) => BookNamePage(),
               // ItemSelector.route: (ctx) => ItemSelector(),
               // PageNotFound.route: (ctx) => PageNotFound()
+              TestPage.route: (ctx) => TestPage()
             },
             onGenerateRoute: (RouteSettings settings) {
               // print(settings.name);

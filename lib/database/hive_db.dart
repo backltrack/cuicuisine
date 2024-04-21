@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -97,14 +95,14 @@ class HiveConnector {
     return null;
   }
 
-  void saveDefaultBook(String id) {
-    _settingBox.put('defaultBook', id);
+  void saveCurrentBook(String id) {
+    _settingBox.put('currentBook', id);
   }
 
-  String? loadDefaultBook() {
-    var defaultBook = _settingBox.get('defaultBook');
-    if (defaultBook is String) {
-      return defaultBook;
+  String? loadCurrentBook() {
+    var currentBook = _settingBox.get('currentBook');
+    if (currentBook is String) {
+      return currentBook;
     }
 
     return null;
@@ -205,6 +203,7 @@ class HiveConnector {
         final List<Book> userBooks = [];
         _bookBox.values.forEach((book) {
           if (book is Book) {
+            print(book.users);
             if (book.users.contains(userUid)) {
               if (getOwnedOnly) {
                 if (book.access[userUid] != null && book.access[userUid]! > 1) {
@@ -229,9 +228,19 @@ class HiveConnector {
     }
   }
 
+  void addNewBook(String name) {
+    AppUser? user = getUser();
+    if (user == null) {
+      return;
+    }
+    Book book = Book(id: Uuid().v4(), name: name, recipeUids: [], users: [user.id], access: {user.id: 2});
+    addBook(book);
+  }
+
   void addBook(Book book, {bool addToQueue=true}) {
     try {
       _bookBox.add(book);
+      saveCurrentBook(book.id);
 
       if (addToQueue) {
         addQueueOperation(type: OperationType.create, object: book);
@@ -266,28 +275,82 @@ class HiveConnector {
     }
   }
 
-  // addUserToBook
+  void updateBookId(String id, String newId) {
+    Book book = _bookBox.values.firstWhere((book) => book.id == id);
+    book.id = newId;
+    book.save();
+
+    String? currentBookId = loadCurrentBook();
+    if (currentBookId != null && currentBookId == id) {
+      saveCurrentBook(newId);
+    }
+  }
 
   // RECIPE //
   Recipe? getRecipe(String recipeUid) {
-    try {
-      Recipe? recipe = _bookBox.get(recipeUid);
-      if (recipe != null) {
-        return recipe;
-      }
-    } on Exception catch(e) {
-      throw Exception(e);
+    Recipe? recipe = _bookBox.get(recipeUid);
+    if (recipe != null) {
+      return recipe;
     }
 
     return null;
   }
 
-  void addRecipe(Recipe recipe) {
+  List<Recipe> getRecipesFromBook(String bookUid) {
+    List<Recipe> recipes = [];
+
+    Book? book = getBook(bookUid);
+    if (book != null) {
+      for (String recipeUid in book.recipeUids) {
+        Recipe? recipe = getRecipe(recipeUid);
+        if (recipe != null) {
+          recipes.add(recipe);
+        }
+      }
+    }
+
+    return recipes;
+  }
+
+  List<Recipe> getAllRecipes() {
+    List<Recipe> recipes = [];
+
+    for (Recipe recipe in _recipeBox.values) {
+      recipes.add(recipe);
+    }
+
+    return recipes;
+  }
+
+  void addRecipe({String name="", bool addToQueue=true}) {
     try {
+      Recipe recipe = Recipe(id: Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
       _recipeBox.add(recipe);
+
+      if (addToQueue) {
+        addQueueOperation(type: OperationType.create, object: recipe);
+      }
     } on Exception catch(e) {
       throw Exception(e);
     }
+  }
+
+  void updateRecipe(String id, Recipe newRecipe, {bool addToQueue=true}) {
+    Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
+    recipe.copy(newRecipe);
+    recipe.save();
+
+    if (addToQueue) {
+      addQueueOperation(type: OperationType.update, object: recipe);
+    }
+  }
+
+  void updateRecipeId(String id, String newId) {
+    print(id);
+    print(newId);
+    Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
+    recipe.id = newId;
+    recipe.save();
   }
 
   void saveRecipe(Recipe recipe) {
@@ -300,7 +363,8 @@ class HiveConnector {
 
   void deleteRecipe(String id) {
     try {
-      _recipeBox.delete(id);
+      _recipeBox.values.firstWhere((recipe) => recipe.id == id)
+        .delete();
     } on Exception catch(e) {
       throw Exception(e);
     }

@@ -76,7 +76,7 @@ class MongoConnector {
     }
   }
 
-  Future<dynamic> _securePutRequest(String endpoint, Map<String, dynamic> data) async {
+  Future<dynamic> _securePutRequest(String endpoint, Object data) async {
     Uri serverUri = Uri.parse(server);
 
     var headers = {
@@ -239,15 +239,28 @@ class MongoConnector {
 
   Future<bool> updateUser(AppUser user) async {
     final response = await _securePostRequest('/users/me/update', 
-      {
-
-      }
+      user.toFormField()
     );
 
-    return true;
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        dynamic data = jsonDecode(response.body);
+        print(data);
+
+        return true;
+      }
+      catch (e) {
+        print(e);
+        return false;
+      }
+    }
+    return false;
   }
 
 
+  // Book
 
   Future<Book> fetchBook(String bookId) async {
     final response = await _secureGetRequest('/books/get/$bookId');
@@ -279,8 +292,7 @@ class MongoConnector {
         print(data);
         Book newBook = Book.fromJson(data);
 
-        DatabaseMgr().localMgr.addBook(newBook, addToQueue: false);
-        DatabaseMgr().localMgr.deleteBook(book.id);
+        DatabaseMgr().localMgr.updateBookId(book.id, data['id']);
 
         return true;
       }
@@ -292,6 +304,33 @@ class MongoConnector {
 
     return false;
   }
+
+  Future<bool> updateBook(Book book) async {
+    print(book.toFormField());
+    final response = await _securePostRequest('/books/update', 
+      book.toFormField()
+    );
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        dynamic data = jsonDecode(response.body);
+        print(data);
+
+        return true;
+      }
+      catch (e) {
+        print(e);
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+
+  // Recipe
 
 
 
@@ -310,7 +349,64 @@ class MongoConnector {
     } 
   }
 
+  Future<bool> createRecipe(Recipe recipe) async {
+    print(DatabaseMgr().localMgr.loadCurrentBook());
+    final response = await _securePutRequest('/recipes/create', 
+      {
+        'name': recipe.name,
+        'bookId': DatabaseMgr().localMgr.loadCurrentBook()
+      }
+    );
 
+    if (response != null && response.statusCode == 201) {
+      // If the server did return a 201 CREATED response,
+      // then parse the JSON.
+      try {
+        dynamic data = jsonDecode(response.body);
+        print(data);
+
+        DatabaseMgr().localMgr.updateRecipeId(recipe.id, data['id']);
+
+        return true;
+      }
+      catch (e) {
+        print(e);
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  Future<bool> updateRecipe(Recipe recipe) async {
+    print(recipe.toFormField());
+    final response = await _securePostRequest('/recipes/update', 
+      // recipe.toFormField()
+      {
+        'id': recipe.id,
+        'name': recipe.name,
+        'preparationTime': recipe.preparationTime.toString(),
+        // 'tags': recipe.tags.toString()
+      }
+    );
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        dynamic data = jsonDecode(response.body);
+        print(data);
+
+        return true;
+      }
+      catch (e) {
+        print(e);
+        return false;
+      }
+    }
+
+    return false;
+  }
 
   // Future<DateTime> getUserLastUpdate() async {
   //   final response = await _secureGetRequest('get_user_last_update');

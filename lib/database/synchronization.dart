@@ -51,7 +51,7 @@ class Synchronization {
     }
     else {
       for (Operation ope in failedOperations) {
-        _localMgr.addQueueOperation(type: ope.type, object: ope.object);
+        _localMgr.addQueueOperation(type: ope.type, object: ope.object, pushAfter: false);
       }
       return false;
     }
@@ -71,7 +71,7 @@ class Synchronization {
       return await _remoteMgr.createBook(object);
     }
     else if (object is Recipe) {
-
+      return await _remoteMgr.createRecipe(object);
     }
 
     return false;
@@ -79,13 +79,13 @@ class Synchronization {
 
   Future<bool> updateObject(object) async {
     if (object is AppUser) {
-
+      
     }
     else if (object is Book) {
 
     }
     else if (object is Recipe) {
-
+      return await _remoteMgr.updateRecipe(object);
     }
 
     return true;

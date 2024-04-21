@@ -101,6 +101,12 @@ class AppUser extends HiveObject implements DatabaseObject {
     };
   }
 
+  Map<String, String> toFormField() => {
+    'name': name,
+    'email': email,
+    'favoriteRecipes': favoriteRecipes.toString()
+  };
+
   factory AppUser.fromJson(Map<String, dynamic> json) {
     // send the DocumentSnapshot of the current user
     final List<String> snapFav = [];
@@ -120,7 +126,7 @@ class AppUser extends HiveObject implements DatabaseObject {
 @HiveType(typeId: 1)
 class Book extends HiveObject implements DatabaseObject {
   @HiveField(0)
-  final String id;
+  String id;
   @HiveField(1)
   String name;
   @HiveField(2)
@@ -152,12 +158,20 @@ class Book extends HiveObject implements DatabaseObject {
   Map<String,dynamic> toJson() {
     return {
       'name': name,
-      'recipes': [],
+      'recipes': recipeUids,
       'access': access,
       'users': users,
       'lastUpdate': lastUpdate.toString()
     };
   }
+
+  Map<String,String> toFormField() => {
+    'id': id,
+    'name': name,
+    'recipes': recipeUids.toString(),
+    'access': access.toString(),
+    'users': users.toString()
+  };
 
   factory Book.fromJson(Map<String, dynamic> data, {id=""}) {
     // parse access
@@ -180,7 +194,7 @@ class Book extends HiveObject implements DatabaseObject {
 @HiveType(typeId: 2)
 class Recipe extends HiveObject implements DatabaseObject {
   @HiveField(0)
-  final String id;
+  String id;
   @HiveField(1)
   String name;
   @HiveField(2)
@@ -210,7 +224,7 @@ class Recipe extends HiveObject implements DatabaseObject {
 
   Recipe(
   {
-    this.id="",
+    required this.id,
     required this.name,
     this.pictures=const [],
     required this.preparationTime,
@@ -282,8 +296,8 @@ class Recipe extends HiveObject implements DatabaseObject {
       recipeIngredients: snapIngredients,
       steps: snapSteps,
       variants: List.generate(data['variants'].length, (index) => Variant.fromDocument(data['variants'][index])),
-      creationDate: DateTime.parse(data['creationDate'].toDate().toString()),
-      lastUpdate: DateTime.parse(data['lastUpdate'].toDate().toString()),
+      creationDate: DateTime.parse(data['creationDate']),
+      lastUpdate: DateTime.parse(data['lastUpdate']),
     );
   }
 
@@ -303,21 +317,34 @@ class Recipe extends HiveObject implements DatabaseObject {
     'lastUpdate': lastUpdate
   };
 
-  Map<String, dynamic> toPureJson() => {
+  Map<String,String> toFormField() => {
+    'id': id,
     'name': name,
-    'pictures': pictures,
-    'preparationTime': preparationTime,
-    'cookingTime': cookingTime,
-    'waitingTime': waitingTime,
-    'tags': tags,
-    'quantity': quantity,
+    'pictures': pictures.toString(),
+    'preparationTime': preparationTime.toString(),
+    'cookingTime': cookingTime.toString(),
+    'waitingTime': waitingTime.toString(),
+    'tags': tags.toString(),
+    'quantity': quantity.toString(),
     'quantityType': quantityType,
-    'recipeIngredients': List<Map>.generate(recipeIngredients.length, (index) => recipeIngredients[index].toJson()),
-    'steps': List<Map>.generate(steps.length, (index) => steps[index].toJson()),
-    'variants': variants,
-    'creationDate': creationDate.toString(),
-    'lastUpdate': lastUpdate.toString()
+    'recipeIngredients': List<Map>.generate(recipeIngredients.length, (index) => recipeIngredients[index].toJson()).toString(),
+    'steps': List<Map>.generate(steps.length, (index) => steps[index].toJson()).toString(),
+    'variants': variants.toString()
   };
+
+  void copy(Recipe recipe) {
+    pictures = recipe.pictures;
+    name = recipe.name;
+    preparationTime = recipe.preparationTime;
+    cookingTime = recipe.cookingTime;
+    waitingTime = recipe.waitingTime;
+    tags = recipe.tags;
+    quantity = recipe.quantity;
+    quantityType = recipe.quantityType;
+    recipeIngredients = recipe.recipeIngredients;
+    steps = recipe.steps;
+    variants = recipe.variants;
+  }
 
   int getTotalTime() {
     return preparationTime + cookingTime + waitingTime;

@@ -14,14 +14,14 @@ class ThemeMgr {
   ThemeMgr._();
 
   static Future<void> setTheme(context, int themeId) async {
-    DatabaseMgr.localMgr.saveTheme(themeId);
+    DatabaseMgr().localMgr.saveTheme(themeId);
     print('Save theme $themeId');
 
     await DynamicTheme.of(context)?.setTheme(themeId);
   }
 
   static Future<void> loadTheme(context) async {
-    int? themeId = DatabaseMgr.localMgr.loadTheme();
+    int? themeId = DatabaseMgr().localMgr.loadTheme();
     if (themeId != null) {
       await DynamicTheme.of(context)?.setTheme(themeId);
     }

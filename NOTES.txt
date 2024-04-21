@@ -1,0 +1,90 @@
+HIVE - REMOTE DB SYNC
+
+WHEN
+- every hive read/write triggers sync trial of needed fragments
+- try sync all db at sign in
+
+WHERE
+- manually sync from settings + server status
+- pull to refresh ??
+
+HOW
+- sync all db
+last update key stored in recipes and books
+last update date comparison
+
+- sync single element
+
+
+DATABASE MODEL
+Recipe:
+- rename persons in quantity
+- add property quantityType : 'persons' by default
+
+Tag: ?
+- new class
+- add index
+=> drawback: ensure valid order. maybe better to keep a list
+
+
+LIFE CYCLE
+
+- Init db connectors (firebase auth, mongodb, hive)
+- connexion (firebase) -> firebase uid
+- check if same as current user in hive
+    > FALSE #INTERNET NECESSARY
+        - clear hive
+        - check if firebase user exists in mongodb
+            > FALSE
+                - create mongodb user
+        - download all mongo user data
+        - goto homepage
+
+    > TRUE #NO INTERNET REQUIREMENT
+        - sync db (update hive for more recent fragments)
+        - goto homepage
+
+
+
+EVENTS
+- create user
+    impact: books, user collection
+
+- update user
+    impact: user
+
+- remove user
+    impact: books, user collection
+
+- create book
+    impact: book collection
+
+- update book
+    impact: book
+
+- remove book
+    impact: book collection
+
+- create recipe
+    impact: recipe collection, book
+
+- update recipe
+    impact: recipe
+
+- remove recipe
+    impact: recipe collection, book
+
+on event:
+- modify hive
+- make dirty fragments
+- try sync
+    - success
+        remove dirty
+        notify success
+    - failure
+        notify failure
+
+SYNC
+Attention au problème de suppression:
+sync additive (local vers remote et remote vers local)
+-> pas de suppression possible
