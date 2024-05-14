@@ -1,6 +1,7 @@
 
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/model.dart';
+import 'package:cuicuisine/models/update_models.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -89,9 +90,8 @@ class _TestPage extends State<TestPage> {
                 onPressed: () {
                   setState(() {
                     List<Recipe> recipes = DatabaseMgr().localMgr.getAllRecipes();
-                    Recipe recipe = Recipe(id: Uuid().v4(), name: 'test', preparationTime: 2, cookingTime: 10, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [Ingredient(name: 'carotte', quantity: 10, unit: "")], steps: [RecipeStep(step: "<p>bla bla</p>", time: 10)], creationDate: DateTime.now());
-                    DatabaseMgr().localMgr.updateRecipe(recipes.last.id, recipe);
-                    txt = recipe.id;
+                    RecipeUpdate recipeUpdate = RecipeUpdate(id: recipes.last.id, name: 'test', preparationTime: 2, cookingTime: 10, quantity: 2, recipeIngredients: [Ingredient(name: 'carotte', quantity: 10, unit: "")], steps: [RecipeStep(step: "<p>bla bla</p>", time: 10)]);
+                    DatabaseMgr().localMgr.updateRecipe(recipes.last.id, recipeUpdate);
                   });
                 },
                 child: const Text("Update recipe")
@@ -104,6 +104,16 @@ class _TestPage extends State<TestPage> {
                   });
                 },
                 child: const Text("Get recipes")
+              ),
+
+              ElevatedButton(
+                onPressed: () async {
+                  bool result = await DatabaseMgr().remoteMgr.test();
+                  setState(() {
+                    txt = result.toString();
+                  });
+                },
+                child: const Text("Test")
               ),
 
               Text(txt)

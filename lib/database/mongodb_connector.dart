@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cuicuisine/database/database_mgr.dart';
+import 'package:cuicuisine/models/update_models.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -54,18 +55,43 @@ class MongoConnector {
   //   return response;
   // }
 
-  Future<dynamic> _securePostRequest(String endpoint, Map<String, dynamic> data) async {
+  Future<dynamic> _securePostJsonRequest(String endpoint, Map<String, dynamic> data) async {
     Uri serverUri = Uri.parse(server);
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client.credentials.accessToken
+      'Authorization': client.credentials.accessToken,
+      "Content-type": "application/json"
+    };
+
+    try {
+      Response response = await client.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+        headers: headers,
+        body: jsonEncode(data));
+      return response;
+    } on TimeoutException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw TimeoutException;
+    } on SocketException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw SocketException;
+    }
+  }
+
+  Future<dynamic> _securePostFormRequest(String endpoint, Map<String, dynamic> data) async {
+    Uri serverUri = Uri.parse(server);
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': client.credentials.accessToken,
+      // "Content-type": "application/json"
     };
 
     try {
       Response response = await client.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: data);
+        // body: jsonEncode(data));
       return response;
     } on TimeoutException catch(_) {
       DatabaseMgr().isOnline = false;
@@ -237,9 +263,9 @@ class MongoConnector {
     }
   }
 
-  Future<bool> updateUser(AppUser user) async {
-    final response = await _securePostRequest('/users/me/update', 
-      user.toFormField()
+  Future<bool> updateUser(UserUpdate userUpdate) async {
+    final response = await _securePostJsonRequest('/users/me/update', 
+      userUpdate.toJson()
     );
 
     if (response != null && response.statusCode == 200) {
@@ -305,10 +331,10 @@ class MongoConnector {
     return false;
   }
 
-  Future<bool> updateBook(Book book) async {
-    print(book.toFormField());
-    final response = await _securePostRequest('/books/update', 
-      book.toFormField()
+  Future<bool> updateBook(BookUpdate bookUpdate) async {
+    print(bookUpdate.toJson());
+    final response = await _securePostJsonRequest('/books/update', 
+      bookUpdate.toJson()
     );
 
     if (response != null && response.statusCode == 200) {
@@ -378,16 +404,15 @@ class MongoConnector {
     return false;
   }
 
-  Future<bool> updateRecipe(Recipe recipe) async {
-    print(recipe.toFormField());
-    final response = await _securePostRequest('/recipes/update', 
-      // recipe.toFormField()
-      {
-        'id': recipe.id,
-        'name': recipe.name,
-        'preparationTime': recipe.preparationTime.toString(),
-        // 'tags': recipe.tags.toString()
-      }
+  Future<bool> updateRecipe(RecipeUpdate recipeUpdate) async {
+    print(recipeUpdate.toJson());
+    final response = await _securePostJsonRequest('/recipes/update', 
+      // {
+      //   'id': recipeUpdate.id,
+      //   'name': recipeUpdate.name,
+      //   'preparationTime': recipeUpdate.preparationTime.toString()
+      // }
+      recipeUpdate.toJson()
     );
 
     if (response != null && response.statusCode == 200) {
@@ -403,6 +428,24 @@ class MongoConnector {
         print(e);
         return false;
       }
+    }
+
+    return false;
+  }
+
+
+  // Tests
+  Future<bool> test() async {
+    final response = await _securePostJsonRequest('/test', 
+      // recipe.toFormField()
+      {
+        'tags': ["test", "bonjour"],
+        'opt': 8
+      }
+    );
+    if (response != null && response.statusCode == 200) {
+      print('good');
+      return true;
     }
 
     return false;
@@ -427,7 +470,7 @@ class MongoConnector {
 
   // Future<bool> updateUser(AppUser user) async {
 
-  //   final response = await _securePostRequest(_concatServerUrl(['update_user']), user.toJson());
+  //   final response = await _securePostFormRequest(_concatServerUrl(['update_user']), user.toJson());
     
   //   if (response != null && response.statusCode == 201) {
   //     if (jsonDecode(response.body) is bool) {
@@ -510,7 +553,7 @@ class MongoConnector {
 
   // Future<Book> createBook(Book newBook) async {
 
-  //   final response = await _securePostRequest(_concatServerUrl(['add_book']), newBook.toJson());
+  //   final response = await _securePostFormRequest(_concatServerUrl(['add_book']), newBook.toJson());
     
   //   if (response != null && response.statusCode == 201) {
   //     return Book.fromJson(jsonDecode(response.body));
@@ -535,7 +578,7 @@ class MongoConnector {
 
   // Future<bool> updateBook(Book book) async {
 
-  //   final response = await _securePostRequest(_concatServerUrl(['update_book']), book.toJson());
+  //   final response = await _securePostFormRequest(_concatServerUrl(['update_book']), book.toJson());
     
   //   if (response != null && response.statusCode == 201) {
   //     if (jsonDecode(response.body) is bool) {
@@ -618,7 +661,7 @@ class MongoConnector {
 
   // Future<Recipe> createRecipe(Recipe newRecipe) async {
 
-  //   final response = await _securePostRequest(_concatServerUrl(['add_recipe']), newRecipe.toJson());
+  //   final response = await _securePostFormRequest(_concatServerUrl(['add_recipe']), newRecipe.toJson());
     
   //   if (response != null && response.statusCode == 201) {
   //     return Recipe.fromJson(jsonDecode(response.body));
@@ -643,7 +686,7 @@ class MongoConnector {
 
   // Future<bool> updateRecipe(Recipe recipe) async {
 
-  //   final response = await _securePostRequest(_concatServerUrl(['update_recipe']), recipe.toJson());
+  //   final response = await _securePostFormRequest(_concatServerUrl(['update_recipe']), recipe.toJson());
     
   //   if (response != null && response.statusCode == 201) {
   //     if (jsonDecode(response.body) is bool) {

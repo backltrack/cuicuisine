@@ -1,5 +1,6 @@
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/model.dart';
+import 'package:cuicuisine/models/update_models.dart';
 
 import './hive_db.dart';
 import './mongodb_connector.dart';
@@ -78,17 +79,17 @@ class Synchronization {
   }
 
   Future<bool> updateObject(object) async {
-    if (object is AppUser) {
-      
+    if (object is UserUpdate) {
+      return await _remoteMgr.updateUser(object);
     }
-    else if (object is Book) {
-
+    else if (object is BookUpdate) {
+      return await _remoteMgr.updateBook(object);
     }
-    else if (object is Recipe) {
+    else if (object is RecipeUpdate) {
       return await _remoteMgr.updateRecipe(object);
     }
 
-    return true;
+    return false;
   }
 
   Future<bool> deleteObject(object) async {

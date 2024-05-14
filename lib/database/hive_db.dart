@@ -1,4 +1,5 @@
 import 'package:cuicuisine/database/database_mgr.dart';
+import 'package:cuicuisine/models/update_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
@@ -335,13 +336,16 @@ class HiveConnector {
     }
   }
 
-  void updateRecipe(String id, Recipe newRecipe, {bool addToQueue=true}) {
+  void updateRecipe(String id, RecipeUpdate recipeUpdate, {bool addToQueue=true}) async {
     Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
-    recipe.copy(newRecipe);
-    recipe.save();
+    
+    recipe.copyFromUpdate(recipeUpdate);
+    print('is it ok?');
+    print(recipe.toJson());
+    await recipe.save();
 
     if (addToQueue) {
-      addQueueOperation(type: OperationType.update, object: recipe);
+      addQueueOperation(type: OperationType.update, object: recipeUpdate);
     }
   }
 
