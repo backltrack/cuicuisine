@@ -1,11 +1,13 @@
-import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/models/update_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:uuid/uuid.dart';
-import '../../models/model.dart';
+
+import '../models/data_model.dart';
+import '../models/update_model.dart';
+import '../models/sync_model.dart';
+import './database_mgr.dart';
 
 class HiveConnector {
   late Box<dynamic> _settingBox;
@@ -30,6 +32,9 @@ class HiveConnector {
         ..registerAdapter(TagAdapter())
         ..registerAdapter(RecipeStepAdapter())
         ..registerAdapter(RecipeAdapter())
+        ..registerAdapter(UserUpdateAdapter())
+        ..registerAdapter(BookUpdateAdapter())
+        ..registerAdapter(RecipeUpdateAdapter())
         ..registerAdapter(OperationTypeAdapter())
         ..registerAdapter(OperationAdapter())
         ..registerAdapter(OperationQueueAdapter());

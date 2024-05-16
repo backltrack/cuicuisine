@@ -1,9 +1,18 @@
-import 'model.dart';
+import 'package:hive/hive.dart';
 
+import 'data_model.dart';
+
+  part 'update_model.g.dart';
+
+@HiveType(typeId: 10)
 class UserUpdate implements DatabaseObject {
+  @HiveField(0)
   String id;
+  @HiveField(1)
   String? name;
+  @HiveField(2)
   String? email;
+  @HiveField(3)
   List<String>? favoriteRecipes;
 
   UserUpdate({
@@ -32,13 +41,21 @@ class UserUpdate implements DatabaseObject {
   }
 }
 
+@HiveType(typeId: 11)
 class BookUpdate implements DatabaseObject {
+  @HiveField(0)
   String id;
+  @HiveField(1)
   String? name;
+  @HiveField(2)
   List<String>? recipeUids;
+  @HiveField(3)
   List<String>? users;
+  @HiveField(4)
   Map<String, int>? access;
+  @HiveField(5)
   List<String>? bookIngredients;
+  @HiveField(6)
   List<String>? tags;
 
   BookUpdate({
@@ -73,18 +90,31 @@ class BookUpdate implements DatabaseObject {
   }
 }
 
+@HiveType(typeId: 12)
 class RecipeUpdate implements DatabaseObject {
+  @HiveField(0)
   String id;
+  @HiveField(1)
   String? name;
+  @HiveField(2)
   List<String>? pictures;
+  @HiveField(3)
   int? preparationTime;
+  @HiveField(4)
   int? cookingTime;
+  @HiveField(5)
   int? waitingTime;
+  @HiveField(6)
   List<String>? tags;
+  @HiveField(7)
   int? quantity;
+  @HiveField(8)
   String? quantityType;
+  @HiveField(9)
   List<Ingredient>? recipeIngredients;
+  @HiveField(10)
   List<RecipeStep>? steps;
+  @HiveField(11)
   List<Variant>? variants;
 
   RecipeUpdate({
@@ -107,7 +137,7 @@ class RecipeUpdate implements DatabaseObject {
       'id': id
     };
 
-    if (name != null) {
+    if (name != null && name != "") {
       json['name'] = name!;
     }
     if (pictures != null) {
@@ -128,7 +158,7 @@ class RecipeUpdate implements DatabaseObject {
     if (quantity != null) {
       json['quantity'] = quantity!;
     }
-    if (quantityType != null) {
+    if (quantityType != null && quantityType != "") {
       json['quantityType'] = quantityType!;
     }
     if (recipeIngredients != null) {

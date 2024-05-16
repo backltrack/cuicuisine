@@ -1,9 +1,8 @@
 
 import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/models/model.dart';
-import 'package:cuicuisine/models/update_models.dart';
+import 'package:cuicuisine/models/data_model.dart';
+import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
 class TestPage extends StatefulWidget {
   static const String route = '/test';
@@ -90,7 +89,7 @@ class _TestPage extends State<TestPage> {
                 onPressed: () {
                   setState(() {
                     List<Recipe> recipes = DatabaseMgr().localMgr.getAllRecipes();
-                    RecipeUpdate recipeUpdate = RecipeUpdate(id: recipes.last.id, name: 'test', preparationTime: 2, cookingTime: 10, quantity: 2, recipeIngredients: [Ingredient(name: 'carotte', quantity: 10, unit: "")], steps: [RecipeStep(step: "<p>bla bla</p>", time: 10)]);
+                    RecipeUpdate recipeUpdate = RecipeUpdate(id: recipes.last.id, name: 'test', preparationTime: 2, cookingTime: 10, quantity: 2, recipeIngredients: [Ingredient(name: 'carotte', quantity: 10, unit: "kg")], steps: [RecipeStep(step: "<p>bla bla</p>", time: 10)]);
                     DatabaseMgr().localMgr.updateRecipe(recipes.last.id, recipeUpdate);
                   });
                 },

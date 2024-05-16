@@ -1,6 +1,7 @@
-import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/models/model.dart';
-import 'package:cuicuisine/models/update_models.dart';
+import './database_mgr.dart';
+import '../models/data_model.dart';
+import '../models/update_model.dart';
+import '../models/sync_model.dart';
 
 import './hive_db.dart';
 import './mongodb_connector.dart';

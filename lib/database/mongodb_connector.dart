@@ -2,14 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/models/update_models.dart';
+import 'package:cuicuisine/models/update_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
 import 'oauth2.dart';
-import '../models/model.dart';
+import '../models/data_model.dart';
 
 class MongoConnector {
   String server = '';
@@ -440,6 +440,7 @@ class MongoConnector {
       // recipe.toFormField()
       {
         'tags': ["test", "bonjour"],
+        'new': [{'test': 'hello'}],
         'opt': 8
       }
     );

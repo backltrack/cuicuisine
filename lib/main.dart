@@ -25,7 +25,7 @@ void main() async {
 }
 
 class Cuicuisine extends StatefulWidget {
-  const Cuicuisine({Key? key}) : super(key: key);
+  const Cuicuisine({super.key});
 
   @override
   State<Cuicuisine> createState() => _CuicuisineState();

@@ -1,4 +1,4 @@
-import 'model.dart';
+import 'data_model.dart';
 
 // Units and measures
 class MassUnit {

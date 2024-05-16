@@ -1,10 +1,10 @@
-import 'package:cuicuisine/widgets/core_widgets/circular_button.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
-import '../../models/model.dart';
+import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
+import '../../widgets/core_widgets/circular_button.dart';
 import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
 // import '../home_page.dart';

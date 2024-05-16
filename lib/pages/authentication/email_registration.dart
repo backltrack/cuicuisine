@@ -1,8 +1,9 @@
-import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/models/model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../../database/database_mgr.dart';
+import '../../models/data_model.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/social_button.dart';
 
