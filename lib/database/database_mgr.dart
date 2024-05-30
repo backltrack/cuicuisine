@@ -30,7 +30,7 @@ class DatabaseMgr with ChangeNotifier {
     await localMgr.initialize();
 
     // const String defaultServer = 'http://192.168.223.248:8000';
-    const String defaultServer = 'http://192.168.95.248:8000';
+    const String defaultServer = 'http://192.168.82.248:8000';
     // const String defaultServer = 'http://192.168.1.15:8000';
     // const String defaultServer = 'http://192.168.1.28:8000';
     

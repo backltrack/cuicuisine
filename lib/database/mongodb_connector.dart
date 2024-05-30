@@ -407,11 +407,6 @@ class MongoConnector {
   Future<bool> updateRecipe(RecipeUpdate recipeUpdate) async {
     print(recipeUpdate.toJson());
     final response = await _securePostJsonRequest('/recipes/update', 
-      // {
-      //   'id': recipeUpdate.id,
-      //   'name': recipeUpdate.name,
-      //   'preparationTime': recipeUpdate.preparationTime.toString()
-      // }
       recipeUpdate.toJson()
     );
 

@@ -51,6 +51,12 @@ class AppUser extends HiveObject implements DatabaseObject {
       lastUpdate: DateTime.parse(json['lastUpdate'])
     );
   }
+
+  void copyFromUpdate(UserUpdate userUpdate) {
+    name = userUpdate.name ?? name;
+    email = userUpdate.email ?? email;
+    favoriteRecipes = userUpdate.favoriteRecipes != null ? [...userUpdate.favoriteRecipes!] : favoriteRecipes;
+  }
 }
 
 @HiveType(typeId: 1)
@@ -108,6 +114,13 @@ class Book extends HiveObject implements DatabaseObject {
       recipeUids: List.generate(data['recipeUids'].length, (index) => data['recipeUids'][index] as String),
       lastUpdate: DateTime.parse(data['lastUpdate'])
     );
+  }
+
+  void copyFromUpdate(BookUpdate bookUpdate) {
+    name = bookUpdate.name ?? name;
+    recipeUids = bookUpdate.recipeUids != null ? [...bookUpdate.recipeUids!] : recipeUids;
+    access = bookUpdate.access ?? access;
+    users = bookUpdate.users != null ? [...bookUpdate.users!] : users;
   }
 }
 

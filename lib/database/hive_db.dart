@@ -172,6 +172,34 @@ class HiveConnector {
     return null;
   }
 
+  void updateUser({String? name, String? email, List<String>? favoriteRecipes, bool addToQueue=true}) async {
+    AppUser? user = getUser();
+
+    if (user != null) {
+      if (name != null || email != null || favoriteRecipes != null) {
+        UserUpdate userUpdate = UserUpdate(id: user.id);
+        if (name != null) {
+          userUpdate.name = name;
+          user.name = name;
+        }
+        if (email != null) {
+          userUpdate.email = email;
+          user.email = email;
+        }
+        if (favoriteRecipes != null) {
+          userUpdate.favoriteRecipes = favoriteRecipes;
+          user.favoriteRecipes = favoriteRecipes;
+        }
+
+        await user.save();
+
+        if (addToQueue) {
+          addQueueOperation(type: OperationType.update, object: userUpdate);
+        }
+      }
+    }
+  }
+
   String getUserName() {
     AppUser? user = getUser();
     if (user != null) {
@@ -253,6 +281,18 @@ class HiveConnector {
       }
     } on Exception catch(e) {
       throw Exception(e);
+    }
+  }
+
+  void updateBook(String id, BookUpdate bookUpdate, {bool addToQueue=true}) async {
+    Book book = _bookBox.values.firstWhere((book) => book.id == id);
+
+    book.copyFromUpdate(bookUpdate);
+    print(book.toJson());
+    await book.save();
+
+    if (addToQueue) {
+      addQueueOperation(type: OperationType.update, object: bookUpdate);
     }
   }
 

@@ -22,8 +22,8 @@ class UserUpdate implements DatabaseObject {
     this.favoriteRecipes
   });
 
-  Map<String, String> toJson() {
-    Map<String, String> json = {
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {
       'id': id
     };
 
@@ -34,7 +34,7 @@ class UserUpdate implements DatabaseObject {
       json['email'] = email!;
     }
     if (favoriteRecipes != null) {
-      json['favoriteRecipes'] = favoriteRecipes!.toString();
+      json['favoriteRecipes'] = favoriteRecipes!;
     }
 
     return json;
@@ -68,8 +68,8 @@ class BookUpdate implements DatabaseObject {
     this.tags
   });
 
-  Map<String, String> toJson() {
-    Map<String, String> json = {
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {
       'id': id
     };
 
@@ -77,13 +77,13 @@ class BookUpdate implements DatabaseObject {
       json['name'] = name!;
     }
     if (recipeUids != null) {
-      json['recipeUids'] = recipeUids!.toString();
+      json['recipeUids'] = recipeUids!;
     }
     if (access != null) {
-      json['access'] = access!.toString();
+      json['access'] = access!;
     }
     if (users != null) {
-      json['users'] = users!.toString();
+      json['users'] = users!;
     }
 
     return json;

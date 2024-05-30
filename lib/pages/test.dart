@@ -61,10 +61,25 @@ class _TestPage extends State<TestPage> {
               ),
               ElevatedButton(
                 onPressed: () async {
+                  DatabaseMgr().localMgr.updateUser(name: "Sug'");
+
+                },
+                child: const Text("Update User") 
+              ),
+              ElevatedButton(
+                onPressed: () async {
                   DatabaseMgr().localMgr.addNewBook('test from app');
 
                 },
                 child: const Text("Add Book") 
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  List<Book> books = DatabaseMgr().localMgr.getUserBooks();
+                  BookUpdate bookUpdate = BookUpdate(id: books.last.id, name: "super book", users: [...books.last.users, "fake user id"]);
+                  DatabaseMgr().localMgr.updateBook(books.last.id, bookUpdate);
+                },
+                child: const Text("Update Book") 
               ),
               ElevatedButton(
                 onPressed: () {
