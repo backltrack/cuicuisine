@@ -154,6 +154,10 @@ class Recipe extends HiveObject implements DatabaseObject {
   DateTime creationDate;
   @HiveField(13)
   DateTime? lastUpdate;
+  @HiveField(14)
+  bool isDirty;
+  @HiveField(15)
+  String? initId;
 
   Recipe(
   {
@@ -170,9 +174,11 @@ class Recipe extends HiveObject implements DatabaseObject {
     required this.steps,
     this.variants=const [],
     required this.creationDate,
-    this.lastUpdate
+    this.lastUpdate,
+    this.isDirty=true
   }) {
     lastUpdate ??= DateTime.now();
+    initId = id;
   }
 
   // factory Recipe.fromDocument(DocumentSnapshot snapshot) {
@@ -230,7 +236,7 @@ class Recipe extends HiveObject implements DatabaseObject {
       steps: snapSteps,
       variants: List.generate(data['variants'].length, (index) => Variant.fromDocument(data['variants'][index])),
       creationDate: DateTime.parse(data['creationDate']),
-      lastUpdate: DateTime.parse(data['lastUpdate']),
+      lastUpdate: DateTime.parse(data['lastUpdate'])
     );
   }
 

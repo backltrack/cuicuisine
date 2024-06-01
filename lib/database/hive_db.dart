@@ -216,6 +216,15 @@ class HiveConnector {
     return null;
   }
 
+  void updateUserLastUpdate(String id, DateTime lastUpdate) {
+    AppUser? user = getUser();
+
+    if (user != null) {
+      user.lastUpdate = lastUpdate; 
+      user.save();
+    }
+  }
+
   // BOOK //
   Book? getBook(String bookUid) {
     try {
@@ -332,6 +341,13 @@ class HiveConnector {
     }
   }
 
+  void updateBookLastUpdate(String id, DateTime lastUpdate) {
+    Book book = _bookBox.values.firstWhere((book) => book.id == id);
+    book.lastUpdate = lastUpdate;
+    book.save();
+  }
+
+
   // RECIPE //
   Recipe? getRecipe(String recipeUid) {
     Recipe? recipe = _bookBox.get(recipeUid);
@@ -368,7 +384,7 @@ class HiveConnector {
     return recipes;
   }
 
-  void addRecipe({String name="", bool addToQueue=true}) {
+  Recipe addRecipe({String name="", bool addToQueue=true}) {
     try {
       Recipe recipe = Recipe(id: Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
       _recipeBox.add(recipe);
@@ -376,18 +392,33 @@ class HiveConnector {
       if (addToQueue) {
         addQueueOperation(type: OperationType.create, object: recipe);
       }
+
+      return recipe;
     } on Exception catch(e) {
       throw Exception(e);
     }
   }
 
   void updateRecipe(String id, RecipeUpdate recipeUpdate, {bool addToQueue=true}) async {
-    Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
-    
-    recipe.copyFromUpdate(recipeUpdate);
-    print('is it ok?');
-    print(recipe.toJson());
-    await recipe.save();
+    try {
+      Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
+      recipe.copyFromUpdate(recipeUpdate);
+      print(recipe.toJson());
+      await recipe.save();
+    }
+    catch (e) {
+      try {
+        Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.initId == id);
+        recipe.copyFromUpdate(recipeUpdate);
+        recipeUpdate.id = recipe.id;
+        print(recipe.toJson());
+        await recipe.save();
+      }
+      catch (e) {
+        print(e);
+        return;
+      }
+    }
 
     if (addToQueue) {
       addQueueOperation(type: OperationType.update, object: recipeUpdate);
@@ -399,6 +430,13 @@ class HiveConnector {
     print(newId);
     Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
     recipe.id = newId;
+    recipe.isDirty = false;
+    recipe.save();
+  }
+
+  void updateRecipeLastUpdate(String id, DateTime lastUpdate) {
+    Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
+    recipe.lastUpdate = lastUpdate;
     recipe.save();
   }
 

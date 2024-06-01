@@ -275,7 +275,12 @@ class MongoConnector {
         dynamic data = jsonDecode(response.body);
         print(data);
 
-        return true;
+        if (data['result']) {
+          DatabaseMgr().localMgr.updateRecipeLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
+          return true;
+        }
+
+        return false;
       }
       catch (e) {
         print(e);
@@ -344,7 +349,12 @@ class MongoConnector {
         dynamic data = jsonDecode(response.body);
         print(data);
 
-        return true;
+        if (data['result']) {
+          DatabaseMgr().localMgr.updateRecipeLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
+          return true;
+        }
+
+        return false;
       }
       catch (e) {
         print(e);
@@ -376,11 +386,12 @@ class MongoConnector {
   }
 
   Future<bool> createRecipe(Recipe recipe) async {
-    print(DatabaseMgr().localMgr.loadCurrentBook());
+    String bookId = DatabaseMgr().localMgr.loadCurrentBook()!;
+
     final response = await _securePutRequest('/recipes/create', 
       {
         'name': recipe.name,
-        'bookId': DatabaseMgr().localMgr.loadCurrentBook()
+        'bookId': bookId
       }
     );
 
@@ -392,6 +403,8 @@ class MongoConnector {
         print(data);
 
         DatabaseMgr().localMgr.updateRecipeId(recipe.id, data['id']);
+
+        fetchBook(bookId);
 
         return true;
       }
@@ -416,8 +429,12 @@ class MongoConnector {
       try {
         dynamic data = jsonDecode(response.body);
         print(data);
+        if (data['result']) {
+          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
+          return true;
+        }
 
-        return true;
+        return false;
       }
       catch (e) {
         print(e);
