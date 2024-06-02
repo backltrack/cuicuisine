@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
@@ -12,11 +14,12 @@ import './database_mgr.dart';
 class HiveConnector {
   late Box<dynamic> _settingBox;
   late Box<dynamic> _serverBox;
-  late Box<dynamic> _userBox;
-  late Box<dynamic> _bookBox;
-  late Box<dynamic> _recipeBox;
-  late Box<dynamic> _queueBox;
-  late Box<dynamic> _queueOperationBox;
+  late Box<AppUser> _userBox;
+  late Box<Book> _bookBox;
+  late Box<Recipe> _recipeBox;
+  late Box<OperationQueue> _queueBox;
+  late Box<Operation> _queueOperationBox;
+  late Box<String> _changeBox;
 
   HiveConnector();
 
@@ -47,6 +50,7 @@ class HiveConnector {
     _recipeBox = await Hive.openBox('recipes');
     _queueBox = await Hive.openBox('queue');
     _queueOperationBox = await Hive.openBox('queueOperations');
+    _changeBox = await Hive.openBox('changes');
 
     if (_queueBox.isEmpty) {
       _queueBox.add(OperationQueue());
@@ -276,7 +280,7 @@ class HiveConnector {
     if (user == null) {
       return;
     }
-    Book book = Book(id: Uuid().v4(), name: name, recipeUids: [], users: [user.id], access: {user.id: 2});
+    Book book = Book(id: const Uuid().v4(), name: name, recipeUids: [], users: [user.id], access: {user.id: 2});
     addBook(book);
   }
 
@@ -302,14 +306,6 @@ class HiveConnector {
 
     if (addToQueue) {
       addQueueOperation(type: OperationType.update, object: bookUpdate);
-    }
-  }
-
-  void saveBook(Book book) {
-    try {
-      book.save();
-    } on Exception catch(e) {
-      throw Exception(e);
     }
   }
 
@@ -341,6 +337,28 @@ class HiveConnector {
     }
   }
 
+  void updateBookFromDict(Map<String, dynamic> data) {
+    Book book = _bookBox.values.firstWhere((book) => book.id == data['id']);
+
+    if (data.keys.contains('name')) {
+      book.name = data['name'];
+    }
+    if (data.keys.contains('recipeUids')) {
+      book.recipeUids = List<String>.from(data['recipeUids']);
+    }
+    if (data.keys.contains('users')) {
+      book.users = List<String>.from(data['users']);
+    }
+    if (data.keys.contains('access')) {
+      book.access = Map<String, int>.from(data['access']);
+    }
+    if (data.keys.contains('lastUpdate')) {
+      book.lastUpdate = DateTime.parse(data['lastUpdate']);
+    }
+    
+    book.save();
+  }
+
   void updateBookLastUpdate(String id, DateTime lastUpdate) {
     Book book = _bookBox.values.firstWhere((book) => book.id == id);
     book.lastUpdate = lastUpdate;
@@ -350,7 +368,7 @@ class HiveConnector {
 
   // RECIPE //
   Recipe? getRecipe(String recipeUid) {
-    Recipe? recipe = _bookBox.get(recipeUid);
+    Recipe? recipe = _recipeBox.get(recipeUid);
     if (recipe != null) {
       return recipe;
     }
@@ -386,7 +404,7 @@ class HiveConnector {
 
   Recipe addRecipe({String name="", bool addToQueue=true}) {
     try {
-      Recipe recipe = Recipe(id: Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
+      Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
       _recipeBox.add(recipe);
 
       if (addToQueue) {
@@ -423,6 +441,45 @@ class HiveConnector {
     if (addToQueue) {
       addQueueOperation(type: OperationType.update, object: recipeUpdate);
     }
+  }
+
+  void updateRecpeFromDict(Map<String, dynamic> data) {
+    Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == data['id']);
+    if (data.keys.contains('name')) {
+      recipe.name = data['name'];
+    }
+    if (data.keys.contains('pictures')) {
+      recipe.pictures = List<String>.from(data['pictures']);
+    }
+    if (data.keys.contains('preparationTime')) {
+      recipe.preparationTime = data['preparationTime'];
+    }
+    if (data.keys.contains('cookingTime')) {
+      recipe.cookingTime = data['cookingTime'];
+    }
+    if (data.keys.contains('waitingTime')) {
+      recipe.waitingTime = data['waitingTime'];
+    }
+    if (data.keys.contains('tags')) {
+      recipe.tags = List<String>.from(data['tags']);
+    }
+    if (data.keys.contains('quantity')) {
+      recipe.quantity = data['quantity'];
+    }
+    if (data.keys.contains('quantityType')) {
+      recipe.quantityType = data['quantityType'];
+    }
+    if (data.keys.contains('steps')) {
+      recipe.steps = List<RecipeStep>.from(data['steps']);
+    }
+    if (data.keys.contains('variants')) {
+      recipe.variants = List<Variant>.from(data['variants']);
+    }
+    if (data.keys.contains('lastUpdate')) {
+      recipe.lastUpdate = DateTime.parse(data['lastUpdate']);
+    }
+    
+    recipe.save();
   }
 
   void updateRecipeId(String id, String newId) {
@@ -487,7 +544,7 @@ class HiveConnector {
   }
 
   void addQueueOperation({required OperationType type, required DatabaseObject object, bool pushAfter=true}) {
-    OperationQueue queue = _queueBox.getAt(0);
+    OperationQueue queue = _queueBox.getAt(0)!;
 
     Operation ope = Operation(id: const Uuid().v4(), type: type, object: object);
     _queueOperationBox.add(ope);
@@ -502,7 +559,7 @@ class HiveConnector {
   }
 
   Operation? getFirstOperation() {
-    OperationQueue queue = _queueBox.getAt(0);
+    OperationQueue queue = _queueBox.getAt(0)!;
     String? operationId = queue.getFirstOperationId();
 
     if (operationId != null) {
@@ -517,19 +574,36 @@ class HiveConnector {
   }
 
   int getQueueLength() {
-    OperationQueue queue = _queueBox.getAt(0);
+    OperationQueue queue = _queueBox.getAt(0)!;
     return queue.length();
   }
-
 
   int getOperationLength() {
     return _queueOperationBox.length;
   }
 
-
-
   int getBooksNum() {
     return _bookBox.length;
   }
 
+  // Changes
+  String createChange() {
+    String change = const Uuid().v4();
+    return change;
+  }
+
+  void addChange(String change) {
+    _changeBox.add(change);
+  }
+
+  String? getLastChange() {
+    int lastIndex = _changeBox.length - 1;
+    if (lastIndex >= 0) {
+      String? lastChange = _changeBox.getAt(lastIndex);
+      if (lastChange != null){
+        return lastChange;
+      }
+    }
+    return null;
+  }
 }

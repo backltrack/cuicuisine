@@ -116,6 +116,14 @@ class Book extends HiveObject implements DatabaseObject {
     );
   }
 
+  void copyFromBook(Book book) {
+    name = book.name;
+    users = [...book.users];
+    recipeUids = [...book.recipeUids];
+    access = book.access;
+    lastUpdate = book.lastUpdate;
+  }
+
   void copyFromUpdate(BookUpdate bookUpdate) {
     name = bookUpdate.name ?? name;
     recipeUids = bookUpdate.recipeUids != null ? [...bookUpdate.recipeUids!] : recipeUids;
@@ -254,6 +262,21 @@ class Recipe extends HiveObject implements DatabaseObject {
     'steps': List<Map>.generate(steps.length, (index) => steps[index].toJson()).toString(),
     'variants': variants.toString()
   };
+
+  void copyFromRecipe(Recipe recipe) {
+    pictures = [...recipe.pictures];
+    name = recipe.name;
+    preparationTime = recipe.preparationTime;
+    cookingTime = recipe.cookingTime;
+    waitingTime = recipe.waitingTime;
+    tags = [...recipe.tags];
+    quantity = recipe.quantity;
+    quantityType = recipe.quantityType;
+    recipeIngredients = [...recipe.recipeIngredients];
+    steps = [...recipe.steps];
+    variants = [...recipe.variants];
+    lastUpdate = recipe.lastUpdate;
+  }
 
   void copyFromUpdate(RecipeUpdate recipeUpdate) {
     pictures = recipeUpdate.pictures != null ? [...recipeUpdate.pictures!] : pictures;

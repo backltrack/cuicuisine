@@ -273,11 +273,22 @@ class MongoConnector {
       // then parse the JSON.
       try {
         dynamic data = jsonDecode(response.body);
-        print(data);
 
         if (data['result']) {
-          DatabaseMgr().localMgr.updateRecipeLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
-          return true;
+          String change = DatabaseMgr().localMgr.createChange();
+          
+          final changeResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': change,
+            'objectType': 'user',
+            'objectId': userUpdate.id
+          });
+          
+          if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+            
+            DatabaseMgr().localMgr.updateUserLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
+            return true;
+          }
         }
 
         return false;
@@ -321,11 +332,26 @@ class MongoConnector {
       try {
         dynamic data = jsonDecode(response.body);
         print(data);
-        Book newBook = Book.fromJson(data);
+        if (data != null) {
 
-        DatabaseMgr().localMgr.updateBookId(book.id, data['id']);
+          DatabaseMgr().localMgr.updateBookId(book.id, data['id']);
+          DatabaseMgr().localMgr.updateBookFromDict(data);
 
-        return true;
+          String change = DatabaseMgr().localMgr.createChange();
+          
+          final changeResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': change,
+            'objectType': 'book',
+            'objectId': data['id']
+          });
+          
+          if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+            return true;
+          }
+        }
+
+        return false;
       }
       catch (e) {
         print(e);
@@ -350,8 +376,20 @@ class MongoConnector {
         print(data);
 
         if (data['result']) {
-          DatabaseMgr().localMgr.updateRecipeLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
-          return true;
+          String change = DatabaseMgr().localMgr.createChange();
+          
+          final changeResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': change,
+            'objectType': 'book',
+            'objectId': bookUpdate.id
+          });
+          
+          if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+
+            DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
+            return true;
+          }
         }
 
         return false;
@@ -402,9 +440,41 @@ class MongoConnector {
         dynamic data = jsonDecode(response.body);
         print(data);
 
-        DatabaseMgr().localMgr.updateRecipeId(recipe.id, data['id']);
+        if (data != null) {
+          DatabaseMgr().localMgr.updateRecipeId(recipe.id, data['id']);
 
-        fetchBook(bookId);
+          Book? book = DatabaseMgr().localMgr.getBook(bookId);
+          if (book != null) {
+            Book newBook = await fetchBook(bookId);
+            book.copyFromBook(newBook);
+            book.save();
+          }
+          
+          // change recipe
+          String changeRecipe = DatabaseMgr().localMgr.createChange();
+          
+          final changeRecipeResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': changeRecipe,
+            'objectType': 'recipe',
+            'objectId': data['id']
+          });
+
+          // change book
+          String changeBook = DatabaseMgr().localMgr.createChange();
+          
+          final changeBookResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': changeBook,
+            'objectType': 'book',
+            'objectId': data['id']
+          });
+          
+          if (bool.parse(changeRecipeResponse.body) && bool.parse(changeBookResponse.body)){
+            DatabaseMgr().localMgr.addChange(changeRecipe);
+            DatabaseMgr().localMgr.addChange(changeBook);
+            return true;
+          }
+        }
+
 
         return true;
       }
@@ -430,8 +500,20 @@ class MongoConnector {
         dynamic data = jsonDecode(response.body);
         print(data);
         if (data['result']) {
-          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
-          return true;
+          String change = DatabaseMgr().localMgr.createChange();
+          
+          final changeResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': change,
+            'objectType': 'recipe',
+            'objectId': recipeUpdate.id
+          });
+          
+          if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+
+            DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
+            return true;
+          }
         }
 
         return false;

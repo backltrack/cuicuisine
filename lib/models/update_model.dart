@@ -4,7 +4,7 @@ import 'data_model.dart';
 
   part 'update_model.g.dart';
 
-@HiveType(typeId: 10)
+@HiveType(typeId: 7)
 class UserUpdate implements DatabaseObject {
   @HiveField(0)
   String id;
@@ -41,7 +41,7 @@ class UserUpdate implements DatabaseObject {
   }
 }
 
-@HiveType(typeId: 11)
+@HiveType(typeId: 8)
 class BookUpdate implements DatabaseObject {
   @HiveField(0)
   String id;
@@ -90,7 +90,7 @@ class BookUpdate implements DatabaseObject {
   }
 }
 
-@HiveType(typeId: 12)
+@HiveType(typeId: 9)
 class RecipeUpdate implements DatabaseObject {
   @HiveField(0)
   String id;
