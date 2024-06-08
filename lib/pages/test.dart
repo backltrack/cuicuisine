@@ -94,7 +94,7 @@ class _TestPage extends State<TestPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    DatabaseMgr().localMgr.addRecipe(name: 'toUpdate');
+                    DatabaseMgr().localMgr.addNewRecipe(name: 'toUpdate');
                     // txt = .id;
                   });
                 },
@@ -118,16 +118,6 @@ class _TestPage extends State<TestPage> {
                   });
                 },
                 child: const Text("Get recipes")
-              ),
-
-              ElevatedButton(
-                onPressed: () async {
-                  bool result = await DatabaseMgr().remoteMgr.test();
-                  setState(() {
-                    txt = result.toString();
-                  });
-                },
-                child: const Text("Test")
               ),
 
               Text(txt)

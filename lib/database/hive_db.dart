@@ -249,7 +249,6 @@ class HiveConnector {
       try {
         final List<Book> userBooks = [];
         _bookBox.values.forEach((book) {
-          if (book is Book) {
             print(book.users);
             if (book.users.contains(userUid)) {
               if (getOwnedOnly) {
@@ -261,7 +260,6 @@ class HiveConnector {
                 userBooks.add(book);
               }
             }
-          }
         });
 
         return userBooks;
@@ -287,6 +285,7 @@ class HiveConnector {
   void addBook(Book book, {bool addToQueue=true}) {
     try {
       _bookBox.add(book);
+      //to remove
       saveCurrentBook(book.id);
 
       if (addToQueue) {
@@ -402,19 +401,21 @@ class HiveConnector {
     return recipes;
   }
 
-  Recipe addRecipe({String name="", bool addToQueue=true}) {
+  void addRecipe(Recipe recipe, {bool addToQueue=true}) {
     try {
-      Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
       _recipeBox.add(recipe);
 
       if (addToQueue) {
         addQueueOperation(type: OperationType.create, object: recipe);
       }
-
-      return recipe;
     } on Exception catch(e) {
       throw Exception(e);
     }
+  }
+
+  void addNewRecipe({String name=""}) {
+    Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
+    addRecipe(recipe);
   }
 
   void updateRecipe(String id, RecipeUpdate recipeUpdate, {bool addToQueue=true}) async {

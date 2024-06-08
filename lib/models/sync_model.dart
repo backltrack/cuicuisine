@@ -25,31 +25,6 @@ class Operation extends HiveObject {
   DatabaseObject object;
 
   Operation({required this.type, required this.object, required this.id});
-
-  dynamic getTypedObject() {
-    if (type == OperationType.update) {
-      if (object is UserUpdate) {
-        return object as UserUpdate;
-      }
-      else if (object is BookUpdate) {
-        return object as BookUpdate;
-      }
-      else if (object is RecipeUpdate) {
-        return object as RecipeUpdate;
-      }
-    }
-    else {
-      if (object is AppUser) {
-        return object as AppUser;
-      }
-      else if (object is Book) {
-        return object as Book;
-      }
-      else if (object is Recipe) {
-        return object as Recipe;
-      }
-    }
-  }
 }
 
 
@@ -79,5 +54,17 @@ class OperationQueue extends HiveObject {
 
   int length() {
     return queue.length;
+  }
+}
+
+class MongoChange {
+  String changeId;
+  String objectType;
+  String objectId;
+
+  MongoChange(this.changeId, this.objectType, this.objectId);
+
+  factory MongoChange.fromJson(Map<String, dynamic> data) {
+    return MongoChange(data['changeId'], data['objectType'], data['objectId']);
   }
 }

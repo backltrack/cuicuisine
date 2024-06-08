@@ -32,12 +32,12 @@ class Synchronization {
       bool success = false;
       switch (ope.type) {
         case OperationType.create:
-          success = await createObject(ope.getTypedObject());
+          success = await createObject(ope.object);
           print(success);
         case OperationType.update:
-          success = await updateObject(ope.getTypedObject());
+          success = await updateObject(ope.object);
         case OperationType.delete:
-          success = await deleteObject(ope.getTypedObject());
+          success = await deleteObject(ope.object);
       }
       if (!success) {
         failedOperations.add(ope);
@@ -59,13 +59,30 @@ class Synchronization {
     }
   }
 
+  Future<bool> fetchNew() async {
+    String? lastChange = DatabaseMgr().localMgr.getLastChange();
+    print(lastChange);
+
+    if (lastChange != null) {
+      await DatabaseMgr().remoteMgr.getLatestChanges(lastChange);
+    }
+    else {
+      print("fetch all");
+      await DatabaseMgr().remoteMgr.fetchAllFromUser();
+    }
+    return true;
+  }
+
   Future<bool> sync() async {
     // send all local document type, id, last update
     // server sends back all new or updated documents
     // refresh UI
+    await fetchNew();
 
     //push queue
-    return await pushQueue();
+    await pushQueue();
+
+    return true;
   }
 
   Future<bool> createObject(object) async {
@@ -178,7 +195,7 @@ class Synchronization {
   // Future<void> fetchRecipe(String id) async {
   //   Recipe mongoRecipe = await _remoteMgr.fetchRecipe(id);        
   //   _localMgr.deleteRecipe(id);
-  //   _localMgr.addRecipe(mongoRecipe);
+  //   _localMgr.addNewRecipe(mongoRecipe);
   // }
 
   // Future<void> fetchBookRecipes(String id) async {
@@ -190,12 +207,12 @@ class Synchronization {
   //       if (hiveRecipe.lastUpdate!.compareTo(recipe.lastUpdate!) < 0) {
   //         // update only if newer from MongoDB
   //         _localMgr.deleteRecipe(recipe.uid);
-  //         _localMgr.addRecipe(recipe);
+  //         _localMgr.addNewRecipe(recipe);
   //       }
   //     }
   //     else {
   //       // add if doesn't exists in Hive
-  //       _localMgr.addRecipe(recipe);
+  //       _localMgr.addNewRecipe(recipe);
   //     }
   //   }
   // }

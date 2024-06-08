@@ -52,6 +52,12 @@ class AppUser extends HiveObject implements DatabaseObject {
     );
   }
 
+  void copyFromUser(AppUser user) {
+    name = user.name;
+    email = user.email;
+    favoriteRecipes = [...user.favoriteRecipes];
+  }
+
   void copyFromUpdate(UserUpdate userUpdate) {
     name = userUpdate.name ?? name;
     email = userUpdate.email ?? email;
