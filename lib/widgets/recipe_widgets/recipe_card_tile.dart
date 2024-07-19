@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/model.dart';
+import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
 
 class RecipeCardTile extends StatefulWidget {

@@ -6,7 +6,7 @@ import '../../widgets/core_widgets/my_icon_button.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
-import '../../models/model.dart';
+import '../../models/data_model.dart';
 
 class RecipeStepsWidget extends StatefulWidget {
   final List<RecipeStep> steps;

@@ -1,5 +1,5 @@
 import '../../generated/l10n.dart';
-import 'model.dart';
+import 'data_model.dart';
 
 Map<String,List<String>> defaultTags = {
   'en': [
@@ -98,40 +98,40 @@ Map<String,List<String>> defaultIngredients = {
   ]
 };
 
-Recipe defaultRecipe = Recipe(
-  name: S.current.new_recipe_name,
-  preparationTime: 0,
-  cookingTime: 0,
-  waitingTime: 0,
-  tags: [],
-  persons: 2,
-  recipeIngredients: [],
-  steps: [RecipeStep(step: S.current.new_recipe_step)],
-  creationDate: DateTime.now()
-);
+// Recipe defaultRecipe = Recipe(
+//   name: S.current.new_recipe_name,
+//   preparationTime: 0,
+//   cookingTime: 0,
+//   waitingTime: 0,
+//   tags: [],
+//   persons: 2,
+//   recipeIngredients: [],
+//   steps: [RecipeStep(step: S.current.new_recipe_step)],
+//   creationDate: DateTime.now()
+// );
 
-Recipe tutorialRecipe = Recipe(
-  name: S.current.tutorial_recipe_name,
-  preparationTime: 15,
-  cookingTime: 120,
-  waitingTime: 0,
-  tags: [S.current.tutorial_recipe_tag1, S.current.tutorial_recipe_tag2, S.current.tutorial_recipe_tag3],
-  persons: 6,
-  recipeIngredients: [
-    Ingredient(name: "Poule", quantity: 1, unit: "none"),
-    Ingredient(name: "Poireau", quantity: 4, unit: "none"),
-    Ingredient(name: "Carotte", quantity: 8, unit: "none"),
-    Ingredient(name: "Navet", quantity: 8, unit: "none"),
-    Ingredient(name: "Oignon", quantity: 1, unit: "none"),
-    Ingredient(name: "Bouquet garni", quantity: 1, unit: "none"),
-    Ingredient(name: "Brin de persil", quantity: 6, unit: "none"),
-    Ingredient(name: "Clous de girofle", quantity: 3, unit: "none"),
-    Ingredient(name: "Eau", quantity: 1.5, unit: "L"),
-  ],
-  steps: [
-    RecipeStep(step: S.current.tutorial_recipe_step1),
-    RecipeStep(step: S.current.tutorial_recipe_step2),
-    RecipeStep(step: S.current.tutorial_recipe_step3),
-  ],
-  creationDate: DateTime.now()
-);
+// Recipe tutorialRecipe = Recipe(
+//   name: S.current.tutorial_recipe_name,
+//   preparationTime: 15,
+//   cookingTime: 120,
+//   waitingTime: 0,
+//   tags: [S.current.tutorial_recipe_tag1, S.current.tutorial_recipe_tag2, S.current.tutorial_recipe_tag3],
+//   persons: 6,
+//   recipeIngredients: [
+//     Ingredient(name: "Poule", quantity: 1, unit: "none"),
+//     Ingredient(name: "Poireau", quantity: 4, unit: "none"),
+//     Ingredient(name: "Carotte", quantity: 8, unit: "none"),
+//     Ingredient(name: "Navet", quantity: 8, unit: "none"),
+//     Ingredient(name: "Oignon", quantity: 1, unit: "none"),
+//     Ingredient(name: "Bouquet garni", quantity: 1, unit: "none"),
+//     Ingredient(name: "Brin de persil", quantity: 6, unit: "none"),
+//     Ingredient(name: "Clous de girofle", quantity: 3, unit: "none"),
+//     Ingredient(name: "Eau", quantity: 1.5, unit: "L"),
+//   ],
+//   steps: [
+//     RecipeStep(step: S.current.tutorial_recipe_step1),
+//     RecipeStep(step: S.current.tutorial_recipe_step2),
+//     RecipeStep(step: S.current.tutorial_recipe_step3),
+//   ],
+//   creationDate: DateTime.now()
+// );

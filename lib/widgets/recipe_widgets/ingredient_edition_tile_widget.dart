@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../models/model.dart';
+import '../../models/data_model.dart';
+import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/my_icon_button.dart';
@@ -38,10 +39,18 @@ class _IngredientEditionTileState extends State<IngredientEditionTile> {
   }
 
   String parseQuantity(double quantity) {
-    if (quantity.round().toDouble() == quantity) return quantity.round().toString();
-    else if ((quantity * 10).round().toDouble() == quantity * 10) return quantity.toStringAsFixed(1);
-    else if ((quantity * 100).round().toDouble() == quantity * 100) return quantity.toStringAsFixed(2);
-    else return quantity.toStringAsFixed(3);
+    if (quantity.round().toDouble() == quantity) {
+      return quantity.round().toString();
+    } 
+    else if ((quantity * 10).round().toDouble() == quantity * 10) {
+      return quantity.toStringAsFixed(1);
+    }
+    else if ((quantity * 100).round().toDouble() == quantity * 100) {
+      return quantity.toStringAsFixed(2);
+    }
+    else {
+      return quantity.toStringAsFixed(3);
+    }
   }
 
   @override
@@ -53,12 +62,12 @@ class _IngredientEditionTileState extends State<IngredientEditionTile> {
             color: ThemeMgr.getTheme(context)!.colorScheme.background,
             borderRadius: BorderRadius.circular(4)
         ),
-        margin: EdgeInsets.symmetric(vertical: 4),
-        padding: EdgeInsets.only(left: 12),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.only(left: 12),
         height: 45,
         child: Row(
           children: [
-            Container(
+            SizedBox(
                 width: MediaQuery.of(context).size.width / 5,
                 child: Text([
                   parseQuantity(quantity),

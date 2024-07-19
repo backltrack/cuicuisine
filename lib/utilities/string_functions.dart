@@ -4,7 +4,13 @@ String getInitials(String name) {
   final List<String> splitName = name.split(' ');
   final String firstName = splitName[0];
   final String lastName = splitName.sublist(1).join('').trim();
-  return firstName[0] + lastName[0];
+  if (lastName != "") {
+    return firstName[0] + lastName[0];
+  } else if (firstName != "") {
+    return firstName[0];
+  } else {
+    return "";
+  }
 }
 
 String getRandomChar(int length){

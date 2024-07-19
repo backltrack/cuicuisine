@@ -1,0 +1,62 @@
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../generated/l10n.dart';
+import '../../utilities/string_functions.dart';
+import '../../widgets/core_widgets/my_text_field.dart';
+
+class RecipeNamePage extends StatefulWidget {
+  const RecipeNamePage({Key? key}) : super(key: key);
+
+  @override
+  _RecipeNamePageState createState() => _RecipeNamePageState();
+}
+
+class _RecipeNamePageState extends State<RecipeNamePage> {
+  TextEditingController _controller = TextEditingController();
+  bool argsLoaded = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // load params
+    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    String currentName = routeArgs['currentName']!;
+
+    if (!argsLoaded) {
+      _controller.text = currentName;
+      argsLoaded = true;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(S.of(context).recipe_edition_new_name),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(16),
+        child: MyTextField(
+          textEditingController: _controller,
+          maxLength: 60,
+          autofocus: true,
+          icon: FontAwesomeIcons.fileAlt,
+          label: S.of(context).book_creation_name,
+        )
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        label: Text(S.of(context).book_settings_rename),
+        onPressed: () async {
+          if (_controller.text != "" && _controller.text != currentName) {
+            Navigator.pop(context, beautifyName(_controller.text));
+          } else {
+            Navigator.pop(context);
+          }
+        },
+      ),
+    );
+  }
+}

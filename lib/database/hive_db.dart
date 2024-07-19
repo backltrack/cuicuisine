@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
@@ -20,6 +18,7 @@ class HiveConnector {
   late Box<OperationQueue> _queueBox;
   late Box<Operation> _queueOperationBox;
   late Box<String> _changeBox;
+  late Box<dynamic> _contextBox;
 
   HiveConnector();
 
@@ -51,6 +50,7 @@ class HiveConnector {
     _queueBox = await Hive.openBox('queue');
     _queueOperationBox = await Hive.openBox('queueOperations');
     _changeBox = await Hive.openBox('changes');
+    _contextBox = await Hive.openBox('context');
 
     if (_queueBox.isEmpty) {
       _queueBox.add(OperationQueue());
@@ -118,6 +118,19 @@ class HiveConnector {
     return null;
   }
 
+  void saveBookSharingAgreement(bool isValid) {
+    _settingBox.put('bookSharing', isValid);
+  }
+
+  bool? loadBookSharingAgreement() {
+    var isValid = _settingBox.get('bookSharing');
+    if (isValid is bool) {
+      return isValid;
+    }
+
+    return null;
+  }
+
   // SERVER
   void saveServerUri(String uri) {
     try {
@@ -149,6 +162,10 @@ class HiveConnector {
     } on Exception {
       return null;
     }
+  }
+
+  void deleteCredentials() {
+    _serverBox.delete('credentials');
   }
   
   // USER //
@@ -212,7 +229,7 @@ class HiveConnector {
     return '';
   }
 
-  String? getUserUid() {
+  String? getUserId() {
     AppUser? user = getUser();
     if (user != null) {
       return user.id;
@@ -230,29 +247,25 @@ class HiveConnector {
   }
 
   // BOOK //
-  Book? getBook(String bookUid) {
+  Book? getBook(String bookId) {
     try {
-      Book? book = _bookBox.get(bookUid);
-      if (book != null) {
-        return book;
-      }
-    } on Exception catch(e) {
-      throw Exception(e);
+      Book? book = _bookBox.values.firstWhere((book) => book.id == bookId);
+      return book;
+    } on Exception {
+      return null;
     }
-
-    return null;
   }
 
   List<Book> getUserBooks({bool getOwnedOnly = false}) {
-    String? userUid = getUserUid();
-    if (userUid != null) {
+    String? userId = getUserId();
+    if (userId != null) {
       try {
         final List<Book> userBooks = [];
         _bookBox.values.forEach((book) {
             print(book.users);
-            if (book.users.contains(userUid)) {
+            if (book.users.contains(userId)) {
               if (getOwnedOnly) {
-                if (book.access[userUid] != null && book.access[userUid]! > 1) {
+                if (book.access[userId] != null && book.access[userId]! >= 1) {
                   userBooks.add(book);
                 }
               }
@@ -273,13 +286,15 @@ class HiveConnector {
     }
   }
 
-  void addNewBook(String name) {
+  String? addNewBook(String name) {
     AppUser? user = getUser();
     if (user == null) {
-      return;
+      return null;
     }
-    Book book = Book(id: const Uuid().v4(), name: name, recipeUids: [], users: [user.id], access: {user.id: 2});
+    Book book = Book(id: const Uuid().v4(), name: name, recipeIds: [], users: [user.id], access: {user.id: 2});
     addBook(book);
+
+    return book.id;
   }
 
   void addBook(Book book, {bool addToQueue=true}) {
@@ -308,13 +323,62 @@ class HiveConnector {
     }
   }
 
-  void deleteBook(String id) {
-    try {
-      _bookBox.values.firstWhere((book) => book.id == id)
-        .delete();
-    } on Exception catch(e) {
-      throw Exception(e);
+  int getUserAccess(String bookId) {
+    Book? book = getBook(bookId);
+    if (book != null) {
+      int? access = book.access[getUserId()];
+      if (access != null) {
+        return access;
+      }
     }
+    return 0;
+  }
+
+  void updateTagsAndIngredients() {
+    List<String> tags = [];
+    List<String> ingredients = [];
+
+    String? currentBookId = loadCurrentBook();
+    if (currentBookId != null) {
+      Book? book = getBook(currentBookId);
+      if (book != null) {
+        List<String> recipeIds = book.recipeIds;
+        for (String recipeId in recipeIds) {
+          Recipe? recipe = getRecipe(recipeId);
+          if (recipe != null) {
+            for (String tag in recipe.tags) {
+              if (!tags.contains(tag)) {
+                tags.add(tag);
+              }
+            }
+            for (Ingredient ingredient in recipe.recipeIngredients) {
+              if (!ingredients.contains(ingredient.name.trim().toLowerCase())) {
+                ingredients.add(ingredient.name.trim().toLowerCase());
+              }
+            }
+          }
+        }
+        _contextBox.clear();
+        _contextBox.put('tags', tags);
+        _contextBox.put('ingredients', ingredients);
+      }
+    }
+  }
+
+  List<String> getBookTags() {
+    var tags = _contextBox.get('tags');
+    if (tags is List<String>) {
+      return tags;
+    }
+    return [];
+  }
+
+  List<String> getBookIngredients() {
+    var ingredients = _contextBox.get('ingredients');
+    if (ingredients is List<String>) {
+      return ingredients;
+    }
+    return [];
   }
 
   Future<void> clearBooks() async {
@@ -342,8 +406,8 @@ class HiveConnector {
     if (data.keys.contains('name')) {
       book.name = data['name'];
     }
-    if (data.keys.contains('recipeUids')) {
-      book.recipeUids = List<String>.from(data['recipeUids']);
+    if (data.keys.contains('recipeIds')) {
+      book.recipeIds = List<String>.from(data['recipeIds']);
     }
     if (data.keys.contains('users')) {
       book.users = List<String>.from(data['users']);
@@ -364,25 +428,99 @@ class HiveConnector {
     book.save();
   }
 
-
-  // RECIPE //
-  Recipe? getRecipe(String recipeUid) {
-    Recipe? recipe = _recipeBox.get(recipeUid);
-    if (recipe != null) {
-      return recipe;
-    }
-
-    return null;
+  void addUserToBook(Book book) {
+    DatabaseMgr().localMgr.updateBook(book.id, 
+      BookUpdate(
+        id: book.id,
+        users: List.from(book.users)..add(DatabaseMgr().localMgr.getUserId()!)
+      )
+    );
   }
 
-  List<Recipe> getRecipesFromBook(String bookUid) {
+  void removeUserFromBook(Book book) {
+    DatabaseMgr().localMgr.updateBook(
+      book.id,
+      BookUpdate(
+        id: book.id,
+        users: List.from(book.users)..remove(DatabaseMgr().localMgr.getUserId()),
+        access: Map.from(book.access)..removeWhere((key, value) => key == DatabaseMgr().localMgr.getUserId())
+      )
+    );
+  }
+
+  bool removeOtherUserFromBook(String userId, Book book) {
+    if (book.access[DatabaseMgr().localMgr.getUserId()] == 2) {
+      DatabaseMgr().localMgr.updateBook(
+        book.id,
+        BookUpdate(
+          id: book.id,
+          users: List.from(book.users)..remove(userId),
+          access: Map.from(book.access)..removeWhere((key, value) => key == userId)
+        )
+      );
+      return true;
+    } 
+    
+    return false;
+  }
+
+  bool updateUserAccess(Book book, String userId, int value) {
+    if (book.access[DatabaseMgr().localMgr.getUserId()] == 2) {
+      Map<String, int> _newAccess = Map.from(book.access);
+      _newAccess[userId] = value;
+
+      DatabaseMgr().localMgr.updateBook(
+        book.id,
+        BookUpdate(
+          id: book.id,
+          access: _newAccess
+        )
+      );
+      return true;
+    } 
+    
+    return false;
+  }
+
+  void deleteBook(String id, {bool addToQueue=true}) {
+    try {
+      Book book = _bookBox.values.firstWhere((book) => book.id == id);
+      Book bookCopy = Book.fromBookCopy(book);
+      book.delete();
+
+      if (addToQueue) {
+        addQueueOperation(type: OperationType.delete, object: bookCopy);
+      }
+
+    } on StateError {
+      print("recipe not found");
+      return;
+    }
+  }
+
+
+  // RECIPE //
+  Recipe? getRecipe(String recipeId) {
+    try {
+      Recipe? recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == recipeId);
+      return recipe;
+    }
+    on StateError {
+      return null;
+    }
+  }
+
+  List<Recipe> getRecipesFromBook(String bookId) {
     List<Recipe> recipes = [];
 
-    Book? book = getBook(bookUid);
+    Book? book = getBook(bookId);
+    print("$bookId => $book");
     if (book != null) {
-      for (String recipeUid in book.recipeUids) {
-        Recipe? recipe = getRecipe(recipeUid);
+      for (String recipeId in book.recipeIds) {
+        Recipe? recipe = getRecipe(recipeId);
+        print("$recipeId is null ?");
         if (recipe != null) {
+          print("Nope, it exists");
           recipes.add(recipe);
         }
       }
@@ -413,9 +551,16 @@ class HiveConnector {
     }
   }
 
-  void addNewRecipe({String name=""}) {
+  String addNewRecipe({String name="", required String bookId}) {
     Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
     addRecipe(recipe);
+
+    Book? book = getBook(bookId);
+    if (book != null) {
+      updateBook(bookId, BookUpdate(id: bookId, recipeIds: [...book.recipeIds, recipe.id]), addToQueue: false);
+    }
+
+    return recipe.id;
   }
 
   void updateRecipe(String id, RecipeUpdate recipeUpdate, {bool addToQueue=true}) async {
@@ -498,29 +643,44 @@ class HiveConnector {
     recipe.save();
   }
 
-  void saveRecipe(Recipe recipe) {
-    try {
-      recipe.save();
-    } on Exception catch(e) {
-      throw Exception(e);
-    }
+  void duplicateRecipe(Recipe recipe, String destinationBookId) {
+    String newRecipeId = addNewRecipe(name: recipe.name, bookId: destinationBookId);
+    updateRecipe(newRecipeId, 
+      RecipeUpdate(
+        id: newRecipeId,
+        name: recipe.name,
+        preparationTime: recipe.preparationTime,
+        waitingTime: recipe.waitingTime,
+        cookingTime: recipe.cookingTime,
+        pictures: recipe.pictures,
+        quantity: recipe.quantity,
+        quantityType: recipe.quantityType,
+        recipeIngredients: recipe.recipeIngredients,
+        steps: recipe.steps,
+        tags: recipe.tags,
+        variants: recipe.variants
+      )
+    );
   }
 
-  void deleteRecipe(String id) {
+  void deleteRecipe(String id, {bool addToQueue=true}) {
     try {
-      _recipeBox.values.firstWhere((recipe) => recipe.id == id)
-        .delete();
-    } on Exception catch(e) {
-      throw Exception(e);
+      Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
+      Recipe recipeCopy = Recipe.fromRecipeCopy(recipe);
+      recipe.delete();
+
+      if (addToQueue) {
+        addQueueOperation(type: OperationType.delete, object: recipeCopy);
+      }
+
+    } on StateError {
+      print("recipe not found");
+      return;
     }
   }
 
   void clearRecipes() {
-    try {
-      _recipeBox.clear();
-    } on Exception catch(e) {
-      throw Exception(e);
-    }
+    _recipeBox.clear();
   }
 
   // QUEUE //

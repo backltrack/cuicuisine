@@ -85,6 +85,10 @@ class _TestPage extends State<TestPage> {
                 onPressed: () {
                   setState(() {
                     List<Book> books = DatabaseMgr().localMgr.getUserBooks();
+                    for (Book book in books) {
+                      print("id: ${book.id}");
+                      print(book.toJson());
+                    }
                     txt = books.isNotEmpty ? "${books.toString()} / ${DatabaseMgr().localMgr.getBooksNum()}" : "not created, 0/${DatabaseMgr().localMgr.getBooksNum()}";
                   });
                 },
@@ -94,7 +98,8 @@ class _TestPage extends State<TestPage> {
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    DatabaseMgr().localMgr.addNewRecipe(name: 'toUpdate');
+                    List<Book> books = DatabaseMgr().localMgr.getUserBooks();
+                    DatabaseMgr().localMgr.addNewRecipe(name: 'toUpdate', bookId: books.last.id);
                     // txt = .id;
                   });
                 },

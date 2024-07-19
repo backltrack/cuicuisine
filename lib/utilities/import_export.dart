@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 
-Future<void> exportAllAsJson(String userUid) async {
+Future<void> exportAllAsJson() async {
   // retrieve all database information to export
   // String data = await getAllUserData();
 
@@ -14,7 +14,7 @@ Future<void> exportAllAsJson(String userUid) async {
   }
 }
 
-Future<void> importJson(userUid) async {
+Future<void> importJson(userId) async {
  // get json file path
   FilePickerResult? selectedFile = await FilePicker.platform.pickFiles(allowMultiple: false, type: FileType.custom, allowedExtensions: ['txt', 'json']);
 

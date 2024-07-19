@@ -48,7 +48,7 @@ class BookUpdate implements DatabaseObject {
   @HiveField(1)
   String? name;
   @HiveField(2)
-  List<String>? recipeUids;
+  List<String>? recipeIds;
   @HiveField(3)
   List<String>? users;
   @HiveField(4)
@@ -61,7 +61,7 @@ class BookUpdate implements DatabaseObject {
   BookUpdate({
     required this.id,
     this.name,
-    this.recipeUids,
+    this.recipeIds,
     this.users,
     this.access,
     this.bookIngredients,
@@ -76,8 +76,8 @@ class BookUpdate implements DatabaseObject {
     if (name != null) {
       json['name'] = name!;
     }
-    if (recipeUids != null) {
-      json['recipeUids'] = recipeUids!;
+    if (recipeIds != null) {
+      json['recipeIds'] = recipeIds!;
     }
     if (access != null) {
       json['access'] = access!;

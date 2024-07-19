@@ -1,3 +1,4 @@
+import 'package:cuicuisine/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -77,7 +78,8 @@ class _EmailConnexionState extends State<EmailConnexion> {
                   }
                 );
 
-                if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
+                await DatabaseMgr().synchronization.sync();
+                if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
               } : null,
               // email sign in button
               child: Text(S.of(context).auth_connexion),

@@ -115,10 +115,10 @@ class Synchronization {
 
     }
     else if (object is Book) {
-
+      _remoteMgr.deleteBook(object);
     }
     else if (object is Recipe) {
-
+      _remoteMgr.deleteRecipe(object);
     }
 
     return true;
@@ -143,7 +143,7 @@ class Synchronization {
 
 // Fetch
   // Future<void> fetchAll() async {
-  //   // user uid must be already set
+  //   // user id must be already set
   //   // retrieve all user relative data from MongoDB
   //   // clear and populate Hive
     
@@ -155,7 +155,7 @@ class Synchronization {
   // }
 
   // Future<void> fetchUser() async {
-  //   // user uid must be already set
+  //   // user id must be already set
   //   // update Hive user from MongoDB data
   //   AppUser? currentHiveUser = _localMgr.getUser();
   //   if (currentHiveUser != null)
@@ -177,11 +177,11 @@ class Synchronization {
 
   // Future<void> fetchUserBooks() async {
   //   // retrieve accessible books for current user 
-  //   String? currentUserUid = _localMgr.getUserUid();
-  //   if (currentUserUid != null)
+  //   String? currentUserId = _localMgr.getUserId();
+  //   if (currentUserId != null)
   //   {
   //     try {
-  //       List<Book> userBooks = await _remoteMgr.getUserBooks(currentUserUid);
+  //       List<Book> userBooks = await _remoteMgr.getUserBooks(currentUserId);
   //       _localMgr.clearBooks();
   //       for (Book book in userBooks) {
   //         _localMgr.addBook(book);
@@ -202,11 +202,11 @@ class Synchronization {
   //   // retrieve all recipes from book id
   //   List<Recipe> recipes = await _remoteMgr.getBookRecipes(id);
   //   for (Recipe recipe in recipes) {
-  //     Recipe? hiveRecipe = _localMgr.getRecipe(recipe.uid);
+  //     Recipe? hiveRecipe = _localMgr.getRecipe(recipe.id);
   //     if (hiveRecipe != null) {
   //       if (hiveRecipe.lastUpdate!.compareTo(recipe.lastUpdate!) < 0) {
   //         // update only if newer from MongoDB
-  //         _localMgr.deleteRecipe(recipe.uid);
+  //         _localMgr.deleteRecipe(recipe.id);
   //         _localMgr.addNewRecipe(recipe);
   //       }
   //     }
@@ -219,13 +219,13 @@ class Synchronization {
 
   // Future<void> fetchUserBooksRecipes() async {
   //   // retrieve all recipes from all user books
-  //   String? currentUserUid = _localMgr.getUserUid();
-  //   if (currentUserUid != null)
+  //   String? currentUserId = _localMgr.getUserId();
+  //   if (currentUserId != null)
   //   {
   //     try {
   //       List<Book> books =_localMgr.getUserBooks();
   //       for (Book book in books) {
-  //         await fetchBookRecipes(book.uid);
+  //         await fetchBookRecipes(book.id);
   //       }
 
   //     } on Exception catch(e) {
@@ -300,13 +300,13 @@ class Synchronization {
 
   // Future<void> syncBooks() async {
   //   List<Book> hiveBooks = _localMgr.getUserBooks();
-  //   List<String> mongoBooksId = await _remoteMgr.getUserBooksId(_localMgr.getUserUid()!);
+  //   List<String> mongoBooksId = await _remoteMgr.getUserBooksId(_localMgr.getUserId()!);
 
   //   // construct list of books (remote + local)
   //   List<String> booksId = [];
 
   //   for (Book book in hiveBooks) {
-  //     booksId.add(book.uid);
+  //     booksId.add(book.id);
   //   }
   //   for (String id in mongoBooksId) {
   //     if (!booksId.contains(id)) {

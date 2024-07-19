@@ -7,7 +7,7 @@ import '../../themes/theme_mgr.dart';
 import '../../utilities/time_functions.dart';
 import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
 
-import '../../models/model.dart';
+import '../../models/data_model.dart';
 import '../core_widgets/circular_button.dart';
 import '../core_widgets/my_outlined_button.dart';
 

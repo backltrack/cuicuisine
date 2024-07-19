@@ -52,14 +52,15 @@ ThemeCollection setThemeCollection(context) {
         chipTheme: Theme.of(context).chipTheme.copyWith(backgroundColor: DarkColors.blackColor, deleteIconColor: DarkColors.writingColor),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
             splashColor: DarkColors.writingColor,
-            backgroundColor: DarkColors.menuColor
+            backgroundColor: DarkColors.menuColor,
+            foregroundColor: DarkColors.writingColor,
+            shape: CircleBorder()
         ),
         textTheme: const TextTheme(
-
           bodyLarge: TextStyle(color: DarkColors.writingColor, fontSize: 14),
           bodyMedium: TextStyle(color: DarkColors.secondaryWritingColor, fontSize: 14),
           displayLarge: TextStyle(color: DarkColors.writingColor, fontSize: 24, fontWeight: FontWeight.bold),
-          displayMedium: TextStyle(color: DarkColors.writingColor, fontSize: 17),
+          displayMedium: TextStyle(color: DarkColors.writingColor, fontSize: 16),
           displaySmall: TextStyle(color: DarkColors.writingColor, fontSize: 15)
         ),
         iconTheme: const IconThemeData(color: DarkColors.writingColor, size: 20),
@@ -71,6 +72,9 @@ ThemeCollection setThemeCollection(context) {
             side: const BorderSide(width: 1, color: DarkColors.writingColor),
             textStyle: const TextStyle(color: DarkColors.writingColor),
           ),
+        ),
+        drawerTheme: const DrawerThemeData(
+          backgroundColor: DarkColors.blackColor
         )
       ),
       AppThemes.Light: ThemeData(

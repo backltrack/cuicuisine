@@ -8,9 +8,24 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'database/database_mgr.dart';
 import 'generated/l10n.dart';
 import 'package:dynamic_themes/dynamic_themes.dart';
+import 'pages/404.dart';
 import 'pages/authentication/authentication_page.dart';
 import 'pages/authentication/email_connexion.dart';
 import 'pages/authentication/email_registration.dart';
+import 'pages/books/book_join_page.dart';
+import 'pages/books/book_settings_page.dart';
+import 'pages/general_settings_page.dart';
+import 'pages/home_page.dart';
+import 'pages/recipes/ingredient_edition_page.dart';
+import 'pages/recipes/new_tag_page.dart';
+// import 'pages/recipes/recipe_images_edition_page.dart';
+import 'pages/recipes/recipe_ingredients_edition_page.dart';
+import 'pages/recipes/recipe_name_page.dart';
+import 'pages/recipes/recipe_page.dart';
+import 'pages/recipes/recipe_step_edition_page.dart';
+import 'pages/recipes/recipe_steps_edition_page.dart';
+import 'pages/recipes/recipe_tag_edition_page.dart';
+import 'pages/recipes/recipe_time_edition_page.dart';
 import 'themes/themes.dart';
 
 void main() async {
@@ -110,77 +125,77 @@ class _CuicuisineState extends State<Cuicuisine> {
               EmailConnexion.route: (ctx) => EmailConnexion(),
               EmailRegistration.route: (ctx) => EmailRegistration(),
               // ForgottenPasswordPage.route: (ctx) => ForgottenPasswordPage(),
-              // HomePage.route: (ctx) => HomePage(),
-              // GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
+              HomePage.route: (ctx) => HomePage(),
+              GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
               // RemoveAccountPage.route: (ctx) => RemoveAccountPage(),
               // BookNamePage.route: (ctx) => BookNamePage(),
               // ItemSelector.route: (ctx) => ItemSelector(),
-              // PageNotFound.route: (ctx) => PageNotFound()
+              PageNotFound.route: (ctx) => PageNotFound(),
               TestPage.route: (ctx) => TestPage()
             },
             onGenerateRoute: (RouteSettings settings) {
-              // print(settings.name);
-              // // navigate to recipe page
-              // if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
-              //   return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
-              // }
-              // // navigate to recipe name edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
-              //   return MaterialPageRoute(builder: (context) => RecipeNamePage(), settings: settings);
-              // }
+              print(settings.name);
+              // navigate to recipe page
+              if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
+                return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
+              }
+              // navigate to recipe name edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
+                return MaterialPageRoute(builder: (context) => RecipeNamePage(), settings: settings);
+              }
               // // navigate to recipe image edition page
               // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'images') {
               //   return MaterialPageRoute(builder: (context) => RecipeImagesEditionPage(), settings: settings);
               // }
-              // // navigate to recipe time edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'time') {
-              //   return MaterialPageRoute(builder: (context) => RecipeTimeEditionPage(), settings: settings);
-              // }
-              // // navigate to recipe tags edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'tags') {
-              //   return MaterialPageRoute(builder: (context) => RecipeTagEditionPage(), settings: settings);
-              // }
-              // // navigate to recipe tags edition -> new tag page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
-              //     && settings.name!.split('/')[5] == 'tags'
-              //     && settings.name!.split('/').last == 'new') {
-              //   return MaterialPageRoute(builder: (context) => NewTagPage(), settings: settings);
-              // }
-              // // navigate to recipe ingredients edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'ingredients') {
-              //   return MaterialPageRoute(builder: (context) => RecipeIngredientsEditionPage(), settings: settings);
-              // }
-              // // navigate to specific ingredient edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
-              //     && settings.name!.split('/')[5] == 'ingredients'
-              //     && settings.name!.split('/').last == 'edition') {
-              //   return MaterialPageRoute(builder: (context) => IngredientEditionPage(), settings: settings);
-              // }
-              // // navigate to recipe steps edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'steps') {
-              //   return MaterialPageRoute(builder: (context) => RecipeStepsEditionPage(), settings: settings);
-              // }
-              // // navigate to specific step edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
-              //     && settings.name!.split('/')[5] == 'steps'
-              //     && int.tryParse(settings.name!.split('/').last) != null) {
-              //   return MaterialPageRoute(builder: (context) => StepEditionPage(), settings: settings);
-              // }
+              // navigate to recipe time edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'time') {
+                return MaterialPageRoute(builder: (context) => RecipeTimeEditionPage(), settings: settings);
+              }
+              // navigate to recipe tags edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'tags') {
+                return MaterialPageRoute(builder: (context) => RecipeTagEditionPage(), settings: settings);
+              }
+              // navigate to recipe tags edition -> new tag page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
+                  && settings.name!.split('/')[5] == 'tags'
+                  && settings.name!.split('/').last == 'new') {
+                return MaterialPageRoute(builder: (context) => NewTagPage(), settings: settings);
+              }
+              // navigate to recipe ingredients edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'ingredients') {
+                return MaterialPageRoute(builder: (context) => RecipeIngredientsEditionPage(), settings: settings);
+              }
+              // navigate to specific ingredient edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
+                  && settings.name!.split('/')[5] == 'ingredients'
+                  && settings.name!.split('/').last == 'edition') {
+                return MaterialPageRoute(builder: (context) => IngredientEditionPage(), settings: settings);
+              }
+              // navigate to recipe steps edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'steps') {
+                return MaterialPageRoute(builder: (context) => RecipeStepsEditionPage(), settings: settings);
+              }
+              // navigate to specific step edition page
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
+                  && settings.name!.split('/')[5] == 'steps'
+                  && int.tryParse(settings.name!.split('/').last) != null) {
+                return MaterialPageRoute(builder: (context) => StepEditionPage(), settings: settings);
+              }
 
-              // // navigate to book settings page
-              // else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
-              //   return MaterialPageRoute(builder: (context) => BookSettingsPage(), settings: settings);
-              // }
+              // navigate to book settings page
+              else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
+                return MaterialPageRoute(builder: (context) => BookSettingsPage(), settings: settings);
+              }
 
-              // // navigate to join book page
-              // else if (settings.name!.contains(BookJoinPage.route)) {
-              //   return MaterialPageRoute(builder: (context) => BookJoinPage(), settings: settings);
-              // }
+              // navigate to join book page
+              else if (settings.name!.contains(BookJoinPage.route)) {
+                return MaterialPageRoute(builder: (context) => BookJoinPage(), settings: settings);
+              }
 
-              // else {
-              //   //404
-              //   return MaterialPageRoute(builder: (context) => PageNotFound());
-              // }
+              else {
+                //404
+                return MaterialPageRoute(builder: (context) => PageNotFound());
+              }
             },
           );
         }

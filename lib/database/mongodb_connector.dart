@@ -40,21 +40,27 @@ class MongoConnector {
     }
   }
 
-  // Future<dynamic> _secureDeleteRequest(String url) async {
-  //   dynamic response;
-  //   try {
-  //     response = await http
-  //         .delete(Uri.parse(url));
-  //   } on TimeoutException catch(e) {
-  //     // add pop up "check server connexion"
-  //     DatabaseMgr().isOnline = false;
-  //     throw Exception(e);
-  //   } on SocketException catch(e) {
-  //     DatabaseMgr().isOnline = false;
-  //     throw Exception(e);
-  //   }
-  //   return response;
-  // }
+  Future<dynamic> _secureDeleteRequest(String endpoint, Object data) async {
+    Uri serverUri = Uri.parse(server);
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': client.credentials.accessToken
+    };
+
+    try {
+      Response response = await client.delete(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+        headers: headers,
+        body: data);
+      return response;
+    } on TimeoutException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw TimeoutException;
+    } on SocketException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw SocketException;
+    }
+  }
 
   Future<dynamic> _securePostJsonRequest(String endpoint, Map<String, dynamic> data) async {
     Uri serverUri = Uri.parse(server);
@@ -243,6 +249,11 @@ class MongoConnector {
     }
     
     return null;
+  }
+
+  void disconnect() {
+    client.close();
+    DatabaseMgr().localMgr.deleteCredentials();
   }
 
 
@@ -490,6 +501,31 @@ class MongoConnector {
     return false;
   }
 
+  Future<bool> deleteBook(Book book) async {
+    final response = await _secureDeleteRequest('/books/delete',
+      book.id
+    );
+
+    if (response != null && response.statusCode == 200) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<Map<String, String>> getBookUserNames(String bookId) async {
+    final response = await _secureGetRequest('/books/get_users/$bookId');
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      print(jsonDecode(response.body));
+      return Map<String, String>.from(jsonDecode(response.body));
+    }
+    
+    return {};
+  }
+
 
   // Recipe
 
@@ -607,6 +643,18 @@ class MongoConnector {
         print(e);
         return false;
       }
+    }
+
+    return false;
+  }
+
+  Future<bool> deleteRecipe(Recipe recipe) async {
+    final response = await _secureDeleteRequest('/recipes/delete',
+      recipe.id
+    );
+
+    if (response != null && response.statusCode == 200) {
+      return true;
     }
 
     return false;

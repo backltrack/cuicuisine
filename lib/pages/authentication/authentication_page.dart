@@ -8,6 +8,7 @@ import '../../widgets/core_widgets/circular_button.dart';
 import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
 // import '../home_page.dart';
+import '../home_page.dart';
 import '../test.dart';
 import 'email_connexion.dart';
 
@@ -80,7 +81,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     //             // fireUser filled: ready to connect or create account
     //             // check Hive current user
     //             AppUser? appUser = DatabaseMgr().hiveConnector.getUser();
-    //             if (appUser != null && appUser.firebaseId == fireUser!.uid) {
+    //             if (appUser != null && appUser.firebaseId == fireUser!.id) {
     //               // already loaded, try to sync Hive
     //               bool serverConnected = await DatabaseMgr().mongoConnector.testServerAccess();
     //               if (serverConnected) {
@@ -96,15 +97,15 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     //               // Check internet connexion
 
     //               // Need to check MongoDB user inexistance then sync user
-    //               bool existance = await DatabaseMgr().mongoConnector.userExsits(fireUser!.uid);
+    //               bool existance = await DatabaseMgr().mongoConnector.userExsits(fireUser!.id);
     //               AppUser appUser;
     //               if (existance) {
     //                 // retrieve user
-    //                 appUser = await DatabaseMgr().mongoConnector.fetchUser(fireUser.uid);
+    //                 appUser = await DatabaseMgr().mongoConnector.fetchUser(fireUser.id);
     //               }
     //               else {
     //                 // create user
-    //                 appUser = await DatabaseMgr().mongoConnector.createUser(AppUser(firebaseId: fireUser.uid, name: fireUser.displayName!, email: fireUser.email!));
+    //                 appUser = await DatabaseMgr().mongoConnector.createUser(AppUser(firebaseId: fireUser.id, name: fireUser.displayName!, email: fireUser.email!));
     //               }
     //               // clear Hive
     //               DatabaseMgr().hiveConnector.clearAll();
@@ -131,8 +132,8 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         // synchronize
         await DatabaseMgr().synchronization.sync();
         // goto home page
-        //if (this.mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
-        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
+        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+        // if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
       }
       else {
         print('need to register');
@@ -146,7 +147,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         print("Start offline");
         print("Pending operations : ${DatabaseMgr().localMgr.getQueueLength()}");
         print("Operations: ${DatabaseMgr().localMgr.getOperationLength()}");
-        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
+        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
       }
       else {
         print("need internet connexion for registration");

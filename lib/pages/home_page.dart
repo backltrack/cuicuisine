@@ -1,0 +1,568 @@
+import 'package:cuicuisine/themes/theme_mgr.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_vibrate/flutter_vibrate.dart';
+
+import '../models/data_model.dart';
+import '../models/default_data.dart';
+import '../database/database_mgr.dart';
+import '../utilities/string_functions.dart';
+import '../themes/themes.dart';
+import '../fonts/custom_icons.dart';
+import '../generated/l10n.dart';
+
+// import '../pages/books/book_name_page.dart';
+// import '../pages/books/book_join_page.dart';
+// import '../pages/books/book_settings_page.dart';
+// import '../pages/general_settings_page.dart';
+import 'books/book_join_page.dart';
+import 'books/book_name_page.dart';
+import 'books/book_settings_page.dart';
+import 'general_settings_page.dart';
+import 'recipes/recipe_page.dart';
+
+import '../widgets/book_widgets/book_new_join_dialog.dart';
+import '../widgets/core_widgets/circular_button.dart';
+import '../widgets/core_widgets/my_outlined_button.dart';
+import '../widgets/core_widgets/search_app_bar.dart';
+import '../widgets/core_widgets/alert_dialog.dart';
+import '../widgets/recipe_widgets/bottom_action_bar.dart';
+import '../widgets/recipe_widgets/recipe_card_tile.dart';
+import '../widgets/recipe_widgets/recipe_list_tile.dart';
+import '../widgets/recipe_widgets/filter_bottom_menu.dart';
+import '../widgets/recipe_widgets/recipe_popup_menu.dart';
+import '../widgets/recipe_widgets/book_picker_popup.dart';
+
+class HomePage extends StatefulWidget {
+  static const String route = '/home';
+  // static List<String> bookIngredients = [];
+  // static List<String> bookTags = [];
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  List<Book>? books;
+  List<Recipe>? recipes;
+  Book? selectedBook;
+  int userAccess = 0;
+
+  // filtering variables
+  bool _displayFavorites = false;
+  int _time = 0;
+  bool _isTimeMax = false;
+  List<String> _mandatoryIngredients = [];
+  List<String> _mandatoryTags = [];
+  
+  // sort and display variables
+  String _sortingMethod = "alphaDown";
+  bool _isListed = true;
+
+  // research variable
+  String _research = "";
+
+  // popup menu position and selection
+  var _tapPosition;
+
+  // vibration access
+  bool canVibrate = false;
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  void init() async {
+
+    // check if vibration available
+    canVibrate = await Vibrate.canVibrate;
+
+    // load books
+    //books = await getUserBooks();
+    books = DatabaseMgr().localMgr.getUserBooks();
+
+    // set default Book
+    String? defaultBook = DatabaseMgr().localMgr.loadCurrentBook();
+
+    // select book and load recipes
+    if (books != null && books!.isNotEmpty) {
+      if (defaultBook != null) {
+        Book? foundBook = findBookFromId(defaultBook);
+        if (foundBook != null) {
+          // set current book
+          selectedBook = foundBook;
+          print("foundbook : ${foundBook.id}");
+          print(foundBook.toJson());
+          //get recipes and set tags and ingredients names to book
+          recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+          print(recipes!.length);
+          DatabaseMgr().localMgr.updateTagsAndIngredients();
+          // get user access
+          userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? 0;
+          // refresh UI
+          setState(() {});
+        }
+        else {
+          await setBookAsDefaultAndRefresh(books![0]);
+        }
+      } else {
+        print(books![0].id);
+        print(books![0].toJson());
+        await setBookAsDefaultAndRefresh(books![0]);
+      }
+    } else {
+      // books is empty or null
+      if (books != null) {
+        // No book available
+        setState(() {
+          // notify that books is empty and not null
+          books = [];
+        });
+        // add new book
+        addNewBook();
+      }
+    }
+  }
+
+  void _showCustomMenu(Recipe recipe) {
+    final RenderObject? overlay = Overlay.of(context).context
+        .findRenderObject();
+
+    if (overlay != null) {
+      showMenu(
+          context: context,
+          items: makeRecipePopupMenu(context, userAccess),
+          position: RelativeRect.fromRect(
+              _tapPosition & const Size(40, 40), // smaller rect, the touch area
+              Offset.zero & overlay.semanticBounds
+                  .size // Bigger rect, the entire screen
+          )
+      )
+      // This is how you handle user selection
+          .then((item) async {
+        // delta would be null if user taps on outside the popup menu
+        // (causing it to close without making selection)
+        if (item == null) return;
+
+        if (item is String) {
+          switch (item) {
+            case "copy_into":
+              return showBookPickerDialog(
+                  context: context,
+                  books: DatabaseMgr().localMgr.getUserBooks(getOwnedOnly: true)
+              ).then((bookId) async {
+                if (bookId != null) {
+                  print("add ${recipe.name} to $bookId");
+                  DatabaseMgr().localMgr.duplicateRecipe(recipe, bookId);
+                  // update books and recipes
+                  books = DatabaseMgr().localMgr.getUserBooks();
+                  recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+                  setState(() {});
+                }
+              });
+            case "remove":
+              return showAlertDialog(
+                  context: context,
+                  title: S.of(context).popup_delete_title,
+                  description: userAccess <= 1 ?
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(S.of(context).popup_delete_ownership_warning, textAlign: TextAlign.center),
+                          Text(S.of(context).popup_delete_description_as_collaborator, textAlign: TextAlign.center),
+                          Text(recipe.name, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                          Text(S.of(context).popup_delete_description_user_warning, textAlign: TextAlign.center)
+                        ],
+                      )
+                      :
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(S.of(context).popup_delete_description_as_owner, textAlign: TextAlign.center),
+                          Text(recipe.name, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                          Text(S.of(context).popup_delete_description_user_warning, textAlign: TextAlign.center)
+                        ],
+                      )
+              ).then((value) async {
+                print(value);
+                if (value != null && value) {
+                  print("delete recipe");
+                  // await removeRecipe(recipe.id, selectedBook!.id);
+                  // update book recipes
+                  recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+                  setState(() {});
+                }
+              });
+            default:
+              throw UnimplementedError();
+          }
+        }
+      });
+    }
+    else {
+      print("Can't show menu");
+    }
+  }
+
+  void _storePosition(TapDownDetails details) {
+    _tapPosition = details.globalPosition;
+  }
+
+  Book? findBookFromId(String bookId) {
+    for (Book book in books!) {
+      if (book.id == bookId) {
+        // set current book
+        return book;
+      }
+    }
+    return null;
+  }
+
+  Future<void> setBookAsDefaultAndRefresh(Book book) async {
+    // set default book to 0
+    selectedBook = book;
+    //get recipes and set tags and ingredients names to book
+    recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
+    DatabaseMgr().localMgr.updateTagsAndIngredients();
+    // get user access
+    userAccess = DatabaseMgr().localMgr.getUserAccess(book.id);
+    // refresh UI
+    setState(() {});
+    // store new default book
+    DatabaseMgr().localMgr.saveCurrentBook(book.id);
+    print("set default book");
+  }
+
+  Future<void> addNewBook() async {
+    await showAddBookDialog(context: context).then((value) {
+      if (value is String && value == "new") {
+        Navigator.of(context).pushNamed(BookNamePage.route, arguments: {
+          'isBookCreation': true
+        }).then((value) async {
+          print('pop');
+          if (value != null) {
+            print(value);
+            if (value is Book?) {
+              Book? newBook = value as Book?;
+              if (newBook != null) {
+                // load future books
+                books = DatabaseMgr().localMgr.getUserBooks();
+                // set new book as selected book
+                await setBookAsDefaultAndRefresh(newBook);
+              }
+            }
+          }
+        });
+      } else if (value is String && value == "join") {
+        Navigator.of(context).pushNamed(BookJoinPage.route).then((value) async {
+          if (value != null) {
+            if (value is Book) {
+              // load future books
+              books = DatabaseMgr().localMgr.getUserBooks();
+              // set new book as selected book
+              await setBookAsDefaultAndRefresh(value);
+            }
+          }
+        });
+      }
+    }
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: SearchAppBar(
+          myTitle: selectedBook != null ? selectedBook!.name : S.of(context).title,
+          onSearchChanged: (String val) {
+            setState(() {
+              _research = val;
+            });
+          },
+        ),
+        drawer: homepageDrawer(DatabaseMgr().localMgr.getUser()),
+        body:
+          selectedBook == null ?
+          ListTile(
+            title: Text(S.of(context).book_choice),
+          ):
+          Builder(
+            builder: (context) {
+              if (recipes != null && recipes!.isNotEmpty) {
+
+                // sort Recipe list
+                List<Recipe> sortedData = List<Recipe>.from(recipes!);
+                if (_sortingMethod == "alphaDown") {
+                  sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+                } else if (_sortingMethod == "alphaUp") {
+                  sortedData.sort((Recipe a, Recipe b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+                } else if (_sortingMethod == "timeDown") {
+                  sortedData.sort((Recipe a, Recipe b) => a.getTotalTime().compareTo(b.getTotalTime()));
+                } else if (_sortingMethod == "timeUp") {
+                  sortedData.sort((Recipe a, Recipe b) => b.getTotalTime().compareTo(a.getTotalTime()));
+                } else if (_sortingMethod == "lastUpdatedDown") {
+                  sortedData.sort((Recipe a, Recipe b) => b.lastUpdate!.compareTo(a.lastUpdate!));
+                } else if (_sortingMethod == "lastUpdatedUp") {
+                  sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
+                }
+
+                return ListView.builder(
+                    key: UniqueKey(),
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    itemCount: sortedData.length + 1,
+                    itemBuilder: (context, index) {
+                      void onTap() async {
+                        // final result = await Navigator.of(context).pushNamed(RecipePage.route + "/" + sortedData[index].id, arguments: {
+                        //   'recipe': sortedData[index]
+                        // });
+                        // if (result != null && result == "reloadRecipes") {
+                        //   print('reload');
+                        //   recipes = await getRecipesAndSetAllTagsAndIngredients();
+                        //   // refresh UI
+                        //   setState(() {});
+                        // } else if (result != null && result == "reloadBooks") {
+                        //   // get user books
+                        //   books = await getUserBooks();
+                        //   setState(() {});
+                        // }
+                      }
+
+                      Widget returnedWidget = const SizedBox();
+
+                      if (index == sortedData.length) {
+                        return const SizedBox(height: 8);
+                      }
+
+                      // tags test
+                      bool tagCondition = true;
+                      for (String tag in _mandatoryTags) {
+                        tagCondition = tagCondition && sortedData[index].tags.contains(tag);
+                      }
+                      // ingredient test
+                      bool ingredientCondition = true;
+                      for (String ingredient in _mandatoryIngredients) {
+                        ingredientCondition =
+                            ingredientCondition && List<String>.generate(sortedData[index].recipeIngredients.length,
+                                (int i) => sortedData[index].recipeIngredients[i].name.toLowerCase().trim()).contains(ingredient.toLowerCase().trim());
+                      }
+
+                      if (_mandatoryTags.isNotEmpty && tagCondition || _mandatoryTags.isEmpty) {
+                        if (_mandatoryIngredients.isNotEmpty && ingredientCondition || _mandatoryIngredients.isEmpty) {
+                          AppUser? _appUser = DatabaseMgr().localMgr.getUser();
+                          if (_displayFavorites && _appUser!.favoriteRecipes.contains(sortedData[index].id) || !_displayFavorites) {
+                            if (_time > 0 && _isTimeMax && sortedData[index].getTotalTime() < _time ||
+                                _time > 0 && !_isTimeMax && sortedData[index].getTotalTime() > _time ||
+                                _time == 0) {
+                              if (_research != "" && sortedData[index].name.toLowerCase().contains(_research.toLowerCase()) || _research == "") {
+                                if (_isListed) {
+                                  returnedWidget = RecipeListTile(
+                                    key: UniqueKey(),
+                                    recipe: sortedData[index],
+                                    onTap: onTap,
+                                    onLongPress: () async {
+                                      if (canVibrate) {
+                                        Vibrate.feedback(FeedbackType.medium);
+                                      }
+                                      _showCustomMenu(sortedData[index]);
+                                    },
+                                    onTapDown: _storePosition,
+                                  );
+                                } else {
+                                  returnedWidget = RecipeCardTile(
+                                    key: UniqueKey(),
+                                    recipe: sortedData[index],
+                                  );
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                      return  returnedWidget;
+                    }
+                );
+              }
+              else if (recipes != null) {
+                return ListTile(
+                  title: Text(S.of(context).no_recipe),
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+
+        floatingActionButton: (selectedBook == null || userAccess == 0) ? null : FloatingActionButton(
+          onPressed: () async {
+            String newRecipeId = DatabaseMgr().localMgr.addNewRecipe(name: "test", bookId: selectedBook!.id);
+            // Edit recipe
+            await Navigator.of(context).pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
+              'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),
+              'isNewRecipe': true
+            });
+            // reload
+            books = DatabaseMgr().localMgr.getUserBooks();
+            // set updated Book
+            Book? foundBook = findBookFromId(selectedBook!.id);
+            if (foundBook != null) {
+              selectedBook = foundBook;
+            }
+            // reload recipes
+            recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+            DatabaseMgr().localMgr.updateTagsAndIngredients();
+            // update UI
+            setState(() {});
+          },
+          child: const Icon(Icons.add),
+          
+
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+        bottomNavigationBar: selectedBook == null ? null : BottomActionBar(
+          currentBook: selectedBook,
+          onCloseFilters: () {
+            setState(() {
+              _displayFavorites = BottomActionBar.displayFavorites;
+              _time = FilterBottomMenu.time;
+              _isTimeMax = FilterBottomMenu.isTimeMax;
+              _mandatoryIngredients = FilterBottomMenu.mandatoryIngredients;
+              _mandatoryTags = FilterBottomMenu.mandatoryTags;
+            });
+          },
+          onResetFilters: () {
+            setState(() {
+              _displayFavorites = BottomActionBar.displayFavorites;
+              _time = FilterBottomMenu.time;
+              _isTimeMax = FilterBottomMenu.isTimeMax;
+              _mandatoryIngredients = FilterBottomMenu.mandatoryIngredients;
+              _mandatoryTags = FilterBottomMenu.mandatoryTags;
+            });
+          },
+          onSortingMethodChanged: () {
+            setState(() {
+              _sortingMethod = BottomActionBar.sortingMethod;
+            });
+          },
+          onChangeDisplay: () {
+            setState(() {
+              _isListed = BottomActionBar.isListed;
+            });
+          },
+        ),
+    );
+  }
+
+  Drawer homepageDrawer(AppUser? appUser) {
+
+    Widget addButton = MyOutlinedButton(
+        text: S.of(context).add_button,
+        icon: FontAwesomeIcons.plus,
+        onPressed: addNewBook
+    );
+
+    return Drawer(
+      child: Column(
+        children: <Widget>[
+          UserAccountsDrawerHeader(
+              accountName: Text(appUser!.name),
+              accountEmail: Text(appUser.email),
+              currentAccountPicture: CircleAvatar(
+                child: Text(getInitials(appUser.name)),
+              ),
+          ),
+
+          if (books != null && books!.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                padding: EdgeInsets.zero,
+                scrollDirection: Axis.vertical,
+                itemCount: books!.length + 1,
+                itemBuilder: (context, int index) {
+                  return index < books!.length  ?
+                    ListTile(
+                      key: UniqueKey(),
+                      leading: FaIcon(books![index].access[DatabaseMgr().localMgr.getUserId()] == 2 ? FontAwesomeIcons.book :
+                                        books![index].access[DatabaseMgr().localMgr.getUserId()] == 1 ? CustomIcons.book_write :
+                                          CustomIcons.book_read),
+                      title: Text(books![index].name),
+                      textColor: selectedBook != null && selectedBook!.id == books![index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
+                      iconColor: selectedBook != null && selectedBook!.id == books![index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
+                      trailing: selectedBook != null && selectedBook!.id == books![index].id ? CircularIconButton(
+                        icon: FaIcon(FontAwesomeIcons.cog, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+                        color: ThemeMgr.getTheme(context)!.cardColor,
+                        onPressed: () {
+                          Navigator.of(context).pushNamed("${BookSettingsPage.route}/${books![index].id}", arguments: {
+                            'book': books![index]
+                          }).then((value) async {
+                            books = DatabaseMgr().localMgr.getUserBooks();
+
+                            if (books != null) {
+                              selectedBook = findBookFromId(selectedBook!.id);
+                              if(selectedBook == null) {
+                                print('deleted');
+                                // current book has been deleted
+                                if (books!.isNotEmpty) {
+                                  print('set first as default');
+                                  selectedBook = books![0];
+                                }
+                                else {
+                                  print('no more book');
+                                }
+                              }
+                              setState(() {});
+                            }
+                          });
+                        },
+                      ) : null,
+                      onTap: () async {
+                        setBookAsDefaultAndRefresh(books![index]);
+                        // pop
+                        Navigator.pop(context);
+                      },
+                    ) :
+                      addButton;
+                      // index == books!.length ?
+                      //   addButton :
+                      //     joinButton;
+                }
+              ),
+            )
+          else if (books != null && books!.isEmpty)
+            ...[
+            addButton,
+            //joinButton,
+            const Spacer()
+            ]
+          else
+            ...[
+              const CircularProgressIndicator(),
+              const Spacer()
+            ],
+
+          /// V1
+          // Divider(),
+          // ListTile(
+          //   title: Text(S.of(context).shopping_list),
+          //   leading: FaIcon(FontAwesomeIcons.shoppingCart),
+          //   onTap: () {
+          //
+          //   },
+          // ),
+          const Divider(),
+          ListTile(
+            title: Text(S.of(context).settings),
+            leading: const FaIcon(FontAwesomeIcons.cog),
+            onTap: () {
+              Navigator.of(context).pushNamed(GeneralSettingsPage.route);
+            }
+          )
+        ],
+      ),
+    );
+  }
+}

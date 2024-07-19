@@ -13,7 +13,7 @@ class LocaleMgr {
 
   LocaleMgr._();
 
-  static void setLocale(String code, BuildContext context) {
+  static void setLocale(BuildContext context, String code) {
     DatabaseMgr().localMgr.saveLocale(code);
     print('Save locale $code');
 

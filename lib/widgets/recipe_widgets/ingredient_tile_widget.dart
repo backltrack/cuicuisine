@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../models/model.dart';
+import '../../models/data_model.dart';
+import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/string_functions.dart';
 
@@ -40,10 +41,18 @@ class _IngredientTileState extends State<IngredientTile> {
   }
 
   String parseQuantity(double quantity) {
-    if (quantity.round().toDouble() == quantity) return quantity.round().toString();
-    else if ((quantity * 10).round().toDouble() == quantity * 10) return quantity.toStringAsFixed(1);
-    else if ((quantity * 100).round().toDouble() == quantity * 100) return quantity.toStringAsFixed(2);
-    else return quantity.toStringAsFixed(3);
+    if (quantity.round().toDouble() == quantity) {
+      return quantity.round().toString();
+    }
+    else if ((quantity * 10).round().toDouble() == quantity * 10) {
+      return quantity.toStringAsFixed(1);
+    }
+    else if ((quantity * 100).round().toDouble() == quantity * 100) {
+      return quantity.toStringAsFixed(2);
+    }
+    else {
+      return quantity.toStringAsFixed(3);
+    }
   }
 
   @override
@@ -61,14 +70,14 @@ class _IngredientTileState extends State<IngredientTile> {
             color: ThemeMgr.getTheme(context)!.colorScheme.background,
             borderRadius: BorderRadius.circular(4)
         ),
-        margin: EdgeInsets.symmetric(vertical: 4),
-        padding: EdgeInsets.only(left: 12),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.only(left: 12),
         height: 45,
         child: Row(
           children: [
             Container(
                 width: MediaQuery.of(context).size.width / 5,
-                child: parseQuantity(quantity) == '0' ? SizedBox() :
+                child: parseQuantity(quantity) == '0' ? const SizedBox() :
                   Text([
                     parseQuantity(quantity),
                     if (ingredient.unit != "none" && ingredient.unit != "quantity") currentUnit
@@ -82,7 +91,7 @@ class _IngredientTileState extends State<IngredientTile> {
             ),
             if (compatibleUnits.length > 1)
               PopupMenuButton(
-                icon: FaIcon(FontAwesomeIcons.balanceScaleRight, size: 20),
+                icon: const FaIcon(FontAwesomeIcons.balanceScaleRight, size: 20),
                 itemBuilder: (context) => List<PopupMenuItem>.generate(compatibleUnits.length, (unitIndex) => PopupMenuItem(
                   child: Text(compatibleUnits[unitIndex], style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
                   onTap: () {

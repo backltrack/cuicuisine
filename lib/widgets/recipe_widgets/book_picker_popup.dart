@@ -1,7 +1,7 @@
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
 import '../../generated/l10n.dart';
-import '../../models/model.dart';
+import '../../models/data_model.dart';
 
 Future<String?> showBookPickerDialog({required context, required List<Book> books}) async {
   return showDialog<String>(
@@ -51,7 +51,7 @@ class _BookPickerDialogState extends State<BookPickerDialog> {
           child: Text(S.of(context).cancel),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context, widget.books[value].uid),
+          onPressed: () => Navigator.pop(context, widget.books[value].id),
           child: Text(S.of(context).ok),
         ),
       ],
