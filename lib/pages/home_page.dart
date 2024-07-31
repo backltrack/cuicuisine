@@ -4,17 +4,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 
 import '../models/data_model.dart';
-import '../models/default_data.dart';
 import '../database/database_mgr.dart';
 import '../utilities/string_functions.dart';
-import '../themes/themes.dart';
 import '../fonts/custom_icons.dart';
 import '../generated/l10n.dart';
 
-// import '../pages/books/book_name_page.dart';
-// import '../pages/books/book_join_page.dart';
-// import '../pages/books/book_settings_page.dart';
-// import '../pages/general_settings_page.dart';
 import 'books/book_join_page.dart';
 import 'books/book_name_page.dart';
 import 'books/book_settings_page.dart';
@@ -317,19 +311,20 @@ class _HomePageState extends State<HomePage> {
                     itemCount: sortedData.length + 1,
                     itemBuilder: (context, index) {
                       void onTap() async {
-                        // final result = await Navigator.of(context).pushNamed(RecipePage.route + "/" + sortedData[index].id, arguments: {
-                        //   'recipe': sortedData[index]
-                        // });
-                        // if (result != null && result == "reloadRecipes") {
-                        //   print('reload');
-                        //   recipes = await getRecipesAndSetAllTagsAndIngredients();
-                        //   // refresh UI
-                        //   setState(() {});
-                        // } else if (result != null && result == "reloadBooks") {
-                        //   // get user books
-                        //   books = await getUserBooks();
-                        //   setState(() {});
-                        // }
+                        final result = await Navigator.of(context).pushNamed("${RecipePage.route}/${sortedData[index].id}", arguments: {
+                          'recipe': sortedData[index]
+                        });
+                        if (result != null && result == "reloadRecipes") {
+                          print('reload');
+                          recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+                          DatabaseMgr().localMgr.updateTagsAndIngredients();
+                          // refresh UI
+                          setState(() {});
+                        } else if (result != null && result == "reloadBooks") {
+                          // get user books
+                          books = DatabaseMgr().localMgr.getUserBooks();
+                          setState(() {});
+                        }
                       }
 
                       Widget returnedWidget = const SizedBox();

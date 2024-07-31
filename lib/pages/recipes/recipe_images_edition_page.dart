@@ -1,0 +1,206 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../utilities/string_functions.dart';
+import '../../models/database.dart';
+import '../../pages/home_page.dart';
+import '../../widgets/recipe_widgets/firebase_image_slideshow.dart';
+
+import 'package:image_picker/image_picker.dart';
+import '../../widgets/recipe_widgets/picture_list_tile_widget.dart';
+import 'package:reorderables/reorderables.dart';
+
+import '../../generated/l10n.dart';
+import '../../models/model.dart';
+import '../../widgets/core_widgets/alert_dialog.dart';
+
+class RecipeImagesEditionPage extends StatefulWidget {
+  const RecipeImagesEditionPage({Key? key}) : super(key: key);
+
+  @override
+  State<RecipeImagesEditionPage> createState() => _RecipeImagesEditionPageState();
+}
+
+class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
+
+  // Create Image picker
+  final ImagePicker _picker = ImagePicker();
+
+  bool isInit = false;
+  late Recipe _recipe;
+
+  int maxPictures = 5;
+
+  void putPictureToStorage(XFile photo, String recipeId) async {
+    final String newName = getRandomChar(8) + ".jpg";
+    final photoRef = storageRef.child("$recipeId/slideshow/$newName");
+    File file = File(photo.path);
+    await photoRef.putFile(file).then((_) async {
+      await updateRecipe(
+          recipeId: recipeId,
+          data: {"pictures": FieldValue.arrayUnion([newName])}
+      );
+    });
+    Recipe? tmp = await getRecipe(recipeId);
+    if (tmp != null) {
+      setState(() {
+        _recipe = tmp;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    // load params
+    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final Recipe recipe = routeArgs['recipe']!;
+
+    // Init
+    if (!isInit) {
+      _recipe = recipe;
+
+      isInit = true;
+    }
+
+    Future<List<String>> pictures = getPictures(_recipe);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(S.of(context).images_edition_title),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        label: Text(S.of(context).recipe_edition_update)
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: Column(
+        children: [
+          FireBaseImageSlideshow(
+            pictures: pictures,
+          ),
+          Container(
+            margin: EdgeInsets.all(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(_recipe.pictures.length.toString() + "/" + maxPictures.toString(), style: getTheme(context)!.textTheme.headline2),
+                Container(
+                  child: Row(
+                    children: [
+                      FloatingActionButton(
+                        backgroundColor: _recipe.pictures.length >= maxPictures ? Colors.grey : getTheme(context)!.primaryColorDark,
+                        onPressed: _recipe.pictures.length >= maxPictures ? null : () async {
+                          // Pick images from gallery
+                          List<XFile>? images = await _picker.pickMultiImage(maxHeight: 720);
+                          // add pictures
+                          if (images != null) {
+                            // check images quantity
+                            if (_recipe.pictures.length + images.length > maxPictures) {
+                              images = images.sublist(0, maxPictures - _recipe.pictures.length);
+                            }
+                            for (XFile photo in images) {
+                              putPictureToStorage(photo, recipe.id);
+                            }
+                          }
+                        },
+                        heroTag: "btnGallery",
+                        child: FaIcon(FontAwesomeIcons.image),
+                      ),
+                      SizedBox(width: 12),
+                      FloatingActionButton(
+                        backgroundColor: _recipe.pictures.length >= maxPictures ? Colors.grey : getTheme(context)!.primaryColorDark,
+                        onPressed: _recipe.pictures.length >= maxPictures ? null : () async {
+                          // take new picture
+                          final XFile? photo = await _picker.pickImage(source: ImageSource.camera, maxHeight: 720);
+                          if (photo != null) {
+                            putPictureToStorage(photo, recipe.id);
+                          }
+                        },
+                        heroTag: "btnPhoto",
+                        child: FaIcon(FontAwesomeIcons.camera),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder(
+              future: pictures,
+              builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                if (!snapshot.hasData)
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                else
+                  return ReorderableColumn(
+                    children: List<Widget>.generate(snapshot.data!.length, (index) {
+                      return PictureListTile(
+                        key: UniqueKey(),
+                        picture: snapshot.data![index],
+                        onRemove: () async {
+                          await showAlertDialog(
+                            context: context,
+                            title: S.of(context).popup_delete_title,
+                            description: Text(S.of(context).popup_remove_image_description)
+                          ).then((value) async {
+                            if (value != null && value) {
+                              removePicture(_recipe, index).then((_) async {
+                                await updateRecipe(
+                                    recipeId: recipe.id,
+                                    data: {"pictures": FieldValue.arrayRemove([_recipe.pictures[index]])}
+                                );
+
+                                Recipe? tmp = await getRecipe(recipe.id);
+                                if (tmp != null) {
+                                  setState(() {
+                                    _recipe = tmp;
+                                  });
+                                }
+                              });
+                            }
+                          });
+                        },
+                      );
+                    }),
+                    onReorder: (int oldIndex, int newIndex) async {
+                      print(oldIndex);
+                      print(newIndex);
+                      // copy pictures
+                      List<String> pictures = [];
+                      pictures.addAll(_recipe.pictures);
+
+                      // move picture location
+                      String movedPicture = pictures[oldIndex];
+                      pictures.removeAt(oldIndex);
+                      pictures.insert(newIndex, movedPicture);
+
+                      // update firebase
+                      await updateRecipe(
+                          recipeId: recipe.id,
+                          data: {"pictures": pictures}
+                      );
+
+                      // reload recipe
+                      Recipe? tmp = await getRecipe(recipe.id);
+                      if (tmp != null) {
+                        setState(() {
+                          _recipe = tmp;
+                        });
+                      }
+                    }
+                  );
+              },
+            )
+          )
+        ],
+      ),
+    );
+  }
+}

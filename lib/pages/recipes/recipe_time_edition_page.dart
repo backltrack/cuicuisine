@@ -1,5 +1,6 @@
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
@@ -52,107 +53,111 @@ class _RecipeTimeEditionPageState extends State<RecipeTimeEditionPage> {
       shouldInit = false;
     }
 
-    return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(S.of(context).recipe_edition_time_title),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(S.of(context).recipe_edition_time_title),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () async {
+            bool returnValue = false;
+            await showAlertDialog(
+              context: context,
+              title: S.of(context).popup_loose_data_title,
+              description: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
+                  Text(S.of(context).recipe_edition_update, style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
+                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
+                ],
+              ),
+            ).then((value) {
+              print(value);
+              if (value != null && value) {
+                returnValue = true;
+              }
+            });
+
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pop(returnValue);
+            });
+          }
         ),
-        body: Column(
-          children: [
-            RecipeTimeWidget(
+      ),
+      body: Column(
+        children: [
+          RecipeTimeWidget(
+              preparationTime: _preparationTime,
+              waitingTime: _waitingTime,
+              cookingTime: _cookingTime
+          ),
+
+          const SizedBox(
+              height: 12
+          ),
+
+          MyTextField(
+            keyboardType: TextInputType.number,
+            textEditingController: preparationTextEditingController,
+            autofocus: true,
+            label: S.of(context).time_widget_preparation,
+            icon: FontAwesomeIcons.clock,
+            suffixText: S.of(context).time_minutes_abr,
+            onChanged: (String val) {
+              int? v = int.tryParse(val);
+              v ??= 0;
+              setState(() {
+                _preparationTime = v!;
+              });
+            },
+          ),
+          MyTextField(
+            keyboardType: TextInputType.number,
+            textEditingController: waitingTextEditingController,
+            label: S.of(context).time_widget_waiting,
+            icon: FontAwesomeIcons.clock,
+            suffixText: S.of(context).time_minutes_abr,
+            onChanged: (String val) {
+              int? v = int.tryParse(val);
+              v ??= 0;
+              setState(() {
+                _waitingTime = v!;
+              });
+            },
+          ),
+          MyTextField(
+            keyboardType: TextInputType.number,
+            textEditingController: cookingTextEditingController,
+            label: S.of(context).time_widget_cooking,
+            icon: FontAwesomeIcons.clock,
+            suffixText: S.of(context).time_minutes_abr,
+            onChanged: (String val) {
+              int? v = int.tryParse(val);
+              v ??= 0;
+              setState(() {
+                _cookingTime = v!;
+              });
+            },
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+          label: Text(S.of(context).recipe_edition_update),
+          onPressed: () async {
+            DatabaseMgr().localMgr.updateRecipe(recipeId,
+              RecipeUpdate(
+                id: recipeId,
                 preparationTime: _preparationTime,
                 waitingTime: _waitingTime,
                 cookingTime: _cookingTime
-            ),
+              )
+            );
 
-            const SizedBox(
-                height: 12
-            ),
-
-            MyTextField(
-              keyboardType: TextInputType.number,
-              textEditingController: preparationTextEditingController,
-              autofocus: true,
-              label: S.of(context).time_widget_preparation,
-              icon: FontAwesomeIcons.clock,
-              suffixText: S.of(context).time_minutes_abr,
-              onChanged: (String val) {
-                int? v = int.tryParse(val);
-                v ??= 0;
-                setState(() {
-                  _preparationTime = v!;
-                });
-              },
-            ),
-            MyTextField(
-              keyboardType: TextInputType.number,
-              textEditingController: waitingTextEditingController,
-              label: S.of(context).time_widget_waiting,
-              icon: FontAwesomeIcons.clock,
-              suffixText: S.of(context).time_minutes_abr,
-              onChanged: (String val) {
-                int? v = int.tryParse(val);
-                v ??= 0;
-                setState(() {
-                  _waitingTime = v!;
-                });
-              },
-            ),
-            MyTextField(
-              keyboardType: TextInputType.number,
-              textEditingController: cookingTextEditingController,
-              label: S.of(context).time_widget_cooking,
-              icon: FontAwesomeIcons.clock,
-              suffixText: S.of(context).time_minutes_abr,
-              onChanged: (String val) {
-                int? v = int.tryParse(val);
-                v ??= 0;
-                setState(() {
-                  _cookingTime = v!;
-                });
-              },
-            )
-          ],
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-            label: Text(S.of(context).recipe_edition_update),
-            onPressed: () async {
-              DatabaseMgr().localMgr.updateRecipe(recipeId,
-                RecipeUpdate(
-                  id: recipeId,
-                  preparationTime: _preparationTime,
-                  waitingTime: _waitingTime,
-                  cookingTime: _cookingTime
-                )
-              );
-
-              Navigator.pop(context, 'update');
-            }
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-    ),
-      onWillPop: () async {
-        bool returnValue = false;
-        await showAlertDialog(
-          context: context,
-          title: S.of(context).popup_loose_data_title,
-          description: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-              Text(S.of(context).recipe_edition_update, style: TextStyle(fontWeight: FontWeight.bold),),
-              Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-              Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
-            ],
-          ),
-        ).then((value) {
-          print(value);
-          if (value != null && value) {
-            returnValue = true;
+            Navigator.pop(context, 'update');
           }
-        });
-        return returnValue;
-      }
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
     );
   }
 }

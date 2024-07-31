@@ -1,5 +1,6 @@
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import '../../generated/l10n.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
@@ -33,77 +34,81 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
       isInit = true;
     }
 
-    return WillPopScope(
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text(S.of(context).steps_edition_title),
-          ),
-          body: SingleChildScrollView(
-              child: Column(
+    return Scaffold(
+        appBar: AppBar(
+          title: Text(S.of(context).steps_edition_title),
+          leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () async {
+            bool returnValue = false;
+            await showAlertDialog(
+              context: context,
+              title: S.of(context).popup_loose_data_title,
+              description: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  RecipeStepsEditionWidget(
-                    key: UniqueKey(),
-                    steps: newSteps,
-                    onStepChanged: (Map<String, dynamic> value) {
-                      setState(() {
-                        print(value['step']);
-                        print(value['index']);
-                        newSteps[value['index']].step = value['step'];
-                      });
-                    },
-                    onAddStep: (RecipeStep newStep) {
-                      setState(() {
-                        newSteps.add(newStep);
-                      });
-                    },
-                    onRemoveStep: (int index) {
-                      setState(() {
-                        newSteps.removeAt(index);
-                      });
-                    },
-                  ),
-                  SizedBox(height: 80)
+                  Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
+                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
+                  Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
+                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
                 ],
-              )
-          ),
-          floatingActionButton: FloatingActionButton.extended(
-              label: Text(S.of(context).recipe_edition_update),
-              onPressed: () async {
-                DatabaseMgr().localMgr.updateRecipe(
-                  recipeId,
-                  RecipeUpdate(
-                    id: recipeId,
-                    steps: steps
-                  )
-                );
-
-                Navigator.pop(context, 'update');
+              ),
+            ).then((value) {
+              print(value);
+              if (value != null && value) {
+                returnValue = true;
               }
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-      ),
-      onWillPop: () async {
-        bool returnValue = false;
-        await showAlertDialog(
-          context: context,
-          title: S.of(context).popup_loose_data_title,
-          description: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-              Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
-              Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-              Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
-            ],
-          ),
-        ).then((value) {
-          print(value);
-          if (value != null && value) {
-            returnValue = true;
+            });
+            
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pop(returnValue);
+            });
           }
-        });
-        return returnValue;
-      }
+        ),
+        ),
+        body: SingleChildScrollView(
+            child: Column(
+              children: [
+                RecipeStepsEditionWidget(
+                  key: UniqueKey(),
+                  steps: newSteps,
+                  onStepChanged: (Map<String, dynamic> value) {
+                    setState(() {
+                      print(value['step']);
+                      print(value['index']);
+                      newSteps[value['index']].step = value['step'];
+                    });
+                  },
+                  onAddStep: (RecipeStep newStep) {
+                    setState(() {
+                      newSteps.add(newStep);
+                    });
+                  },
+                  onRemoveStep: (int index) {
+                    setState(() {
+                      newSteps.removeAt(index);
+                    });
+                  },
+                ),
+                SizedBox(height: 80)
+              ],
+            )
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+            label: Text(S.of(context).recipe_edition_update),
+            onPressed: () async {
+              DatabaseMgr().localMgr.updateRecipe(
+                recipeId,
+                RecipeUpdate(
+                  id: recipeId,
+                  steps: steps
+                )
+              );
+
+              Navigator.pop(context, 'update');
+            }
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
     );
   }
 }

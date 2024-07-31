@@ -1,5 +1,6 @@
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../l10n/localeMgr.dart';
@@ -53,101 +54,105 @@ class _RecipeIngredientsEditionPageState extends State<RecipeIngredientsEditionP
       shouldInit = false;
     }
 
-    return WillPopScope(
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text(S.of(context).recipe_edition_ingredients_title),
-          ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                RecipeIngredientsEditionWidget(
-                  ingredients: ingredients,
-                  defaultQuantity: quantity,
-                  quantityType: quantityType,
-                  onNumberChanged: (int value) {
-                    setState(() {
-                      quantity = value;
-                    });
-                  },
-                  onQuantityTypeChanged: (String value) {
-                    setState(() {
-                      quantityType = value;
-                    });
-                  },
-                  onRemove: (int index) {
-                    ingredients.removeAt(index);
-                    setState(() {});
-                  },
-                  onEdit: (int index) async {
-                    var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
-                      'isNew': false,
-                      'locale': locale,
-                      'ingredient': ingredients[index]
-                    });
-                    if (result != null && result is Ingredient) {
-                      ingredients[index].name = result.name;
-                      ingredients[index].unit = result.unit;
-                      ingredients[index].quantity = result.quantity;
-                      ingredients[index].density = result.density;
-                      setState(() {});
-                    }
-                  },
-                  onAddIngredient: () async {
-                    var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
-                      'isNew': true,
-                      'locale': locale
-                    });
-                    if (result != null && result is Ingredient) {
-                      ingredients.add(result);
-                      setState(() {});
-                    }
-                  },
-                ),
-                const SizedBox(height: 80)
-              ],
-            ),
-          ),
-          floatingActionButton: FloatingActionButton.extended(
-              label: Text(S.of(context).recipe_edition_update),
-              onPressed: () {
-                DatabaseMgr().localMgr.updateRecipe(
-                  recipeId,
-                  RecipeUpdate(
-                    id: recipeId,
-                    quantity: quantity,
-                    quantityType: quantityType,
-                    recipeIngredients: ingredients
-                  )
-                );
-
-                Navigator.pop(context, 'update');
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(S.of(context).recipe_edition_ingredients_title),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () async {
+            bool returnValue = false;
+            await showAlertDialog(
+              context: context,
+              title: S.of(context).popup_loose_data_title,
+              description: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
+                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
+                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
+                ],
+              ),
+            ).then((value) {
+              print(value);
+              if (value != null && value) {
+                returnValue = true;
               }
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-      ),
-      onWillPop: () async {
-        bool returnValue = false;
-        await showAlertDialog(
-          context: context,
-          title: S.of(context).popup_loose_data_title,
-          description: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-              Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-              Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
-            ],
-          ),
-        ).then((value) {
-          print(value);
-          if (value != null && value) {
-            returnValue = true;
+            });
+
+            SchedulerBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pop(returnValue);
+            });
           }
-        });
-        return returnValue;
-      }
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            RecipeIngredientsEditionWidget(
+              ingredients: ingredients,
+              defaultQuantity: quantity,
+              quantityType: quantityType,
+              onNumberChanged: (int value) {
+                setState(() {
+                  quantity = value;
+                });
+              },
+              onQuantityTypeChanged: (String value) {
+                setState(() {
+                  quantityType = value;
+                });
+              },
+              onRemove: (int index) {
+                ingredients.removeAt(index);
+                setState(() {});
+              },
+              onEdit: (int index) async {
+                var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
+                  'isNew': false,
+                  'locale': locale,
+                  'ingredient': ingredients[index]
+                });
+                if (result != null && result is Ingredient) {
+                  ingredients[index].name = result.name;
+                  ingredients[index].unit = result.unit;
+                  ingredients[index].quantity = result.quantity;
+                  ingredients[index].density = result.density;
+                  setState(() {});
+                }
+              },
+              onAddIngredient: () async {
+                var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
+                  'isNew': true,
+                  'locale': locale
+                });
+                if (result != null && result is Ingredient) {
+                  ingredients.add(result);
+                  setState(() {});
+                }
+              },
+            ),
+            const SizedBox(height: 80)
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+          label: Text(S.of(context).recipe_edition_update),
+          onPressed: () {
+            DatabaseMgr().localMgr.updateRecipe(
+              recipeId,
+              RecipeUpdate(
+                id: recipeId,
+                quantity: quantity,
+                quantityType: quantityType,
+                recipeIngredients: ingredients
+              )
+            );
+
+            Navigator.pop(context, 'update');
+          }
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
     );
   }
 }

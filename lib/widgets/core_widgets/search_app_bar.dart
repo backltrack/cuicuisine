@@ -10,8 +10,9 @@ class SearchAppBar extends AppBar {
 
   final String? myTitle;
   final Function(String) onSearchChanged;
+  final Widget? leading;
 
-  SearchAppBar({Key? key, this.myTitle, required this.onSearchChanged}) : super(key: key);
+  SearchAppBar({Key? key, this.myTitle, required this.onSearchChanged, this.leading}) : super(key: key);
 
   @override
   _SearchAppBarState createState() => _SearchAppBarState();
@@ -37,7 +38,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
             },
           );
         }
-      ) : null,
+      ) : widget.leading,
       actions: [
         Container(
           padding: EdgeInsets.only(right: 5),
