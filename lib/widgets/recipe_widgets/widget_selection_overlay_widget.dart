@@ -10,7 +10,7 @@ class WidgetSelectionOverlay extends StatefulWidget {
   final double margin;
   final double opacity;
 
-  const WidgetSelectionOverlay({Key? key, required this.widget, required this.editModeController, this.onTap, this.borderRadius=12, this.margin=8, this.opacity=0.9}) : super(key: key);
+  const WidgetSelectionOverlay({super.key, required this.widget, required this.editModeController, this.onTap, this.borderRadius=12, this.margin=8, this.opacity=0.9});
 
   @override
   _WidgetSelectionOverlayState createState() => _WidgetSelectionOverlayState();
@@ -34,9 +34,9 @@ class _WidgetSelectionOverlayState extends State<WidgetSelectionOverlay> {
                 ),
                 child: Center(
                   child: CircleAvatar(
-                    child: FaIcon(FontAwesomeIcons.edit, color: Colors.grey),
                     radius: 24,
                     backgroundColor: Colors.grey.shade600,
+                    child: const FaIcon(FontAwesomeIcons.edit, color: Colors.grey),
                   ),
                 ),
               ),

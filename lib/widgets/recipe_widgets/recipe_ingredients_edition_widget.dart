@@ -60,22 +60,22 @@ class _RecipeIngredientsEditionWidgetState extends State<RecipeIngredientsEditio
   @override
   Widget build(BuildContext context) {
 
-    return locale == null ? Center(child: CircularProgressIndicator()) :
+    return locale == null ? const Center(child: CircularProgressIndicator()) :
     Container(
       decoration: BoxDecoration(
           color: ThemeMgr.getTheme(context)!.cardColor,
           borderRadius: BorderRadius.circular(12)
       ),
       width: double.infinity,
-      padding: EdgeInsets.all(12),
-      margin: EdgeInsets.only(left: 8, top: 8, right: 8),
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(left: 8, top: 8, right: 8),
       child: Column(
         children: [
           Text(
             S.of(context).ingredient_widget_title,
-            style: ThemeMgr.getTheme(context)!.textTheme.headline2,
+            style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           // persons selector
           QuantityEditorWidget(
             quantity: _quantity,
@@ -95,7 +95,7 @@ class _RecipeIngredientsEditionWidgetState extends State<RecipeIngredientsEditio
             },
           ),
 
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           //Ingredient Viewer
           ReorderableColumn(
             children: List<Widget>.generate(_ingredients.length, (ingredientIndex) {

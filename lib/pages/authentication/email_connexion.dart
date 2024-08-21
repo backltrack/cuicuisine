@@ -1,3 +1,4 @@
+import 'package:cuicuisine/models/data_model.dart';
 import 'package:cuicuisine/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,7 +9,6 @@ import '../../widgets/core_widgets/social_button.dart';
 
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
-import '../test.dart';
 import 'email_registration.dart';
 import 'forgotten_password.dart';
 
@@ -75,11 +75,12 @@ class _EmailConnexionState extends State<EmailConnexion> {
                   },
                   onInvalidPassword: () {
                     Fluttertoast.showToast(msg: "Invalid passward, try again!");
+                  },
+                  onSuccess: (AppUser user) async {
+                    await DatabaseMgr().synchronization.sync();
+                    if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
                   }
                 );
-
-                await DatabaseMgr().synchronization.sync();
-                if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
               } : null,
               // email sign in button
               child: Text(S.of(context).auth_connexion),

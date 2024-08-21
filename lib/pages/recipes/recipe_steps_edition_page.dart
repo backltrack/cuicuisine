@@ -90,7 +90,7 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
                     });
                   },
                 ),
-                SizedBox(height: 80)
+                const SizedBox(height: 80)
               ],
             )
         ),

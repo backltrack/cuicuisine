@@ -9,6 +9,7 @@ import '../../widgets/core_widgets/social_button.dart';
 
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
+import '../home_page.dart';
 
 
 class EmailRegistration extends StatefulWidget {
@@ -97,8 +98,8 @@ class _EmailRegistrationState extends State<EmailRegistration> {
               // email sign in button
               onPressed: areAllFieldsValid() ? () async {
                 await DatabaseMgr().remoteMgr.registerWithEmail(_email, _password, 
-                  onSuccess: (AppUser user) {
-                    Fluttertoast.showToast(msg: user.email);
+                  onSuccess: (AppUser user) async {
+                    if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
                   },
                   onFailure: (String reason) {
                     if (reason == "Email already exists") {

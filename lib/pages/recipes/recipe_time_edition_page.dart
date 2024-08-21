@@ -67,7 +67,7 @@ class _RecipeTimeEditionPageState extends State<RecipeTimeEditionPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-                  Text(S.of(context).recipe_edition_update, style: TextStyle(fontWeight: FontWeight.bold),),
+                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
                   Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
                   Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
                 ],

@@ -54,7 +54,7 @@ ThemeCollection setThemeCollection(context) {
             splashColor: DarkColors.writingColor,
             backgroundColor: DarkColors.menuColor,
             foregroundColor: DarkColors.writingColor,
-            shape: CircleBorder()
+            shape: StadiumBorder()
         ),
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: DarkColors.writingColor, fontSize: 14),
@@ -75,6 +75,9 @@ ThemeCollection setThemeCollection(context) {
         ),
         drawerTheme: const DrawerThemeData(
           backgroundColor: DarkColors.blackColor
+        ),
+        popupMenuTheme: const PopupMenuThemeData(
+          color: DarkColors.tileBackgroundColor
         )
       ),
       AppThemes.Light: ThemeData(

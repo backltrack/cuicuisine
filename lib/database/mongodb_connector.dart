@@ -14,21 +14,37 @@ import '../models/data_model.dart';
 
 class MongoConnector {
   String server = '';
-  late oauth2.Client client;
+  oauth2.Client? client;
   
   MongoConnector({required this.server});
 
+  Future<bool> setServer(String server) async {
+    try {
+      Response response = await http.get(Uri.parse("$server/test_connexion"),
+        headers: {
+          'accept': 'application/json'
+      });
+      DatabaseMgr().isOnline = true;
+      this.server = server;
+      return response.body == "true";
+    } catch (_) {
+      return false;
+    }
+  }
+
   // helper
   Future<dynamic> _secureGetRequest(String endpoint) async {
+    if (client == null) { return; }
+
     Uri serverUri = Uri.parse(server);
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client.credentials.accessToken
+      'Authorization': client!.credentials.accessToken
     };
 
     try {
-      Response response = await client.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
+      Response response = await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
         headers: headers);
       return response;
     } on TimeoutException catch(_) {
@@ -41,15 +57,17 @@ class MongoConnector {
   }
 
   Future<dynamic> _secureDeleteRequest(String endpoint, Object data) async {
+    if (client == null) { return; }
+    
     Uri serverUri = Uri.parse(server);
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client.credentials.accessToken
+      'Authorization': client!.credentials.accessToken
     };
 
     try {
-      Response response = await client.delete(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+      Response response = await client!.delete(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: data);
       return response;
@@ -63,16 +81,18 @@ class MongoConnector {
   }
 
   Future<dynamic> _securePostJsonRequest(String endpoint, Map<String, dynamic> data) async {
+    if (client == null) { return; }
+    
     Uri serverUri = Uri.parse(server);
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client.credentials.accessToken,
+      'Authorization': client!.credentials.accessToken,
       "Content-type": "application/json"
     };
 
     try {
-      Response response = await client.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+      Response response = await client!.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: jsonEncode(data));
       return response;
@@ -86,16 +106,18 @@ class MongoConnector {
   }
 
   Future<dynamic> _securePostFormRequest(String endpoint, Map<String, dynamic> data) async {
+    if (client == null) { return; }
+    
     Uri serverUri = Uri.parse(server);
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client.credentials.accessToken,
+      'Authorization': client!.credentials.accessToken,
       // "Content-type": "application/json"
     };
 
     try {
-      Response response = await client.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+      Response response = await client!.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: data);
         // body: jsonEncode(data));
@@ -110,15 +132,17 @@ class MongoConnector {
   }
 
   Future<dynamic> _securePutRequest(String endpoint, Object data) async {
+    if (client == null) { return; }
+    
     Uri serverUri = Uri.parse(server);
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client.credentials.accessToken
+      'Authorization': client!.credentials.accessToken
     };
 
     try {
-      Response response = await client.put(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
+      Response response = await client!.put(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: data);
       return response;
@@ -166,10 +190,10 @@ class MongoConnector {
           print('token expired');
           print(e);
           try {
-            oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client);
+            oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client!);
             if (newClient != null) {
               client = newClient;
-              DatabaseMgr().localMgr.saveCredentials(client.credentials.toJson());
+              DatabaseMgr().localMgr.saveCredentials(client!.credentials.toJson());
               
               AppUser user = await fetchUser();
               await DatabaseMgr().localMgr.setUser(user);
@@ -195,7 +219,7 @@ class MongoConnector {
     return null;
   }
 
-  Future<AppUser?> connectWithEmail(String email, String password, {Function? onInvalidEmail, Function? onInvalidPassword}) async {
+  Future<AppUser?> connectWithEmail(String email, String password, {Function? onInvalidEmail, Function? onInvalidPassword, Function(AppUser)? onSuccess}) async {
     try {
       oauth2.Client? _client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: email, password: password);
       if (_client != null) {
@@ -203,6 +227,8 @@ class MongoConnector {
 
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
+
+        onSuccess??(user);
 
         return user;
       }
@@ -228,7 +254,7 @@ class MongoConnector {
       oauth2.Client? _client = await OAuth2Connexion.createClientFromPassword(serverUri: server, email: email, password: password);
       if (_client != null) {
         client = _client;
-        print(client.credentials.accessToken);
+        print(client!.credentials.accessToken);
 
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
@@ -252,7 +278,9 @@ class MongoConnector {
   }
 
   void disconnect() {
-    client.close();
+    if (client == null) { return; }
+    
+    client!.close();
     DatabaseMgr().localMgr.deleteCredentials();
   }
 

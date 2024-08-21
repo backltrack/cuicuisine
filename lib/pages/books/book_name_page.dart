@@ -64,13 +64,13 @@ class _BookNamePageState extends State<BookNamePage> {
           if (_controller.text != "" && _controller.text != currentName) {
             if (isBookCreation) {
               String? newBookId = DatabaseMgr().localMgr.addNewBook(_controller.text);
-              // if (newBookId != null) {
-              //   Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
-              //   await createRecipe(tutorialRecipe, newBook.id).then((String recipeId) async {
-              //     await addRecipeToBook(recipeId, newBook.id);
-              //     Navigator.pop(context, newBook);
-              //   });
-              // }
+              if (newBookId != null) {
+                Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
+                // await createRecipe(tutorialRecipe, newBook.id).then((String recipeId) async {
+                //   await addRecipeToBook(recipeId, newBook.id);
+                // });
+                Navigator.pop(context, newBook);
+              }
             } else {
               DatabaseMgr().localMgr.updateBook(
                 bookId,

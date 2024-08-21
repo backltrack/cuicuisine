@@ -246,6 +246,13 @@ class HiveConnector {
     }
   }
 
+  void toggleFavorite(String recipeId) {
+    AppUser? user = getUser();
+    if (user != null) {
+      updateUser(favoriteRecipes: [...user.favoriteRecipes, recipeId]);
+    }
+  }
+
   // BOOK //
   Book? getBook(String bookId) {
     try {

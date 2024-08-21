@@ -1,8 +1,10 @@
 import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../generated/l10n.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
+// import 'package:url_launcher/url_launcher.dart';
+import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/time_functions.dart';
 import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
@@ -39,24 +41,24 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
         borderRadius: BorderRadius.circular(12)
       ),
       // width: double.infinity,
-      padding: EdgeInsets.all(12),
-      margin: EdgeInsets.only(left: 8, top: 8, right: 8),
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(left: 8, top: 8, right: 8),
       child: Column(
         children: [
           // title and zoom buttons
-          Container(
+          SizedBox(
             width: double.infinity,
             child: Center(
               child:Text(
                 S.of(context).steps_widget_title,
-                style: ThemeMgr.getTheme(context)!.textTheme.headline2,
+                style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
               ),
             ),
           ),
 
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           // generate steps
-          Container(
+          SizedBox(
             width: double.infinity,
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,29 +71,36 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                              S.of(context).steps_widget_step + " ${index+1}",
-                              style: ThemeMgr.getTheme(context)!.textTheme.headline3
+                              "${S.of(context).steps_widget_step} ${index+1}",
+                              style: ThemeMgr.getTheme(context)!.textTheme.displaySmall
                           ),
                           CircularIconButton(
                             icon: FaIcon(FontAwesomeIcons.trashAlt, size: 18, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
                             color: ThemeMgr.getTheme(context)!.colorScheme.background,
                             onPressed: () {
-                              if (widget.onRemoveStep != null)
+                              if (widget.onRemoveStep != null) {
                                 widget.onRemoveStep!(index);
+                              }
                             },
                           )
                         ],
                       ),
 
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
 
                       WidgetSelectionOverlay(
                         widget: Container(
-                          constraints: BoxConstraints(
+                          constraints: const BoxConstraints(
                               minHeight: 56
                           ),
                           child: Html(
-                            data: newSteps[index].step,
+                            data: newSteps[index].step.isNotEmpty ? newSteps[index].step : "step description",
+                            onLinkTap: (String? url, Map<String, String> attributes, dom.Element? element) async {
+                              if (url != null && url.isNotEmpty) {
+                                final Uri uri = Uri.parse(url);
+                                // await launchUrl(uri);
+                              }
+                            }
                           )
                         ),
                         borderRadius: 2,
@@ -99,7 +108,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                         editModeController: true,
                         opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
                         onTap: () {
-                          Navigator.pushNamed(context, ModalRoute.of(context)!.settings.name! + "/$index", arguments: {
+                          Navigator.pushNamed(context, "${ModalRoute.of(context)!.settings.name!}/$index", arguments: {
                             "stepNumber": index,
                             "stepDescription": newSteps[index].step
                           }).then((value) async {
@@ -117,7 +126,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                         },
                       ),
 
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
 
                       InkWell(
                         onTap: () async {
@@ -152,10 +161,11 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                   text: S.of(context).add_button,
                   icon: FontAwesomeIcons.plus,
                   onPressed: () {
-                    if (widget.onAddStep != null )
+                    if (widget.onAddStep != null ) {
                       setState(() {
                         widget.onAddStep!(RecipeStep(step: ''));
                       });
+                    }
                   },
                 )
               ]

@@ -103,7 +103,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
                     child: MyIconButton(
                       onPressed: () async {
                         //set favorite in database
-                        //await toggleFavorite(DatabaseMgr().localMgr.getUser()!, widget.recipe.id);
+                        DatabaseMgr().localMgr.toggleFavorite(widget.recipe.id);
                         AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
 
                         if (newAppUser != null) {

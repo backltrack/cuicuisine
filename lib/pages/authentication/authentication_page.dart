@@ -9,7 +9,6 @@ import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
 // import '../home_page.dart';
 import '../home_page.dart';
-import '../test.dart';
 import 'email_connexion.dart';
 
 class LogInPage extends StatefulWidget {

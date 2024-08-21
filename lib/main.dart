@@ -12,10 +12,13 @@ import 'pages/404.dart';
 import 'pages/authentication/authentication_page.dart';
 import 'pages/authentication/email_connexion.dart';
 import 'pages/authentication/email_registration.dart';
+import 'pages/authentication/remove_account.dart';
 import 'pages/books/book_join_page.dart';
+import 'pages/books/book_name_page.dart';
 import 'pages/books/book_settings_page.dart';
 import 'pages/general_settings_page.dart';
 import 'pages/home_page.dart';
+import 'pages/item_selector_page.dart';
 import 'pages/recipes/ingredient_edition_page.dart';
 import 'pages/recipes/new_tag_page.dart';
 // import 'pages/recipes/recipe_images_edition_page.dart';
@@ -88,7 +91,7 @@ class _CuicuisineState extends State<Cuicuisine> {
 
   @override
   void dispose() {
-    // Wakelock.disable();
+    WakelockPlus.disable();
     super.dispose();
   }
 
@@ -127,9 +130,9 @@ class _CuicuisineState extends State<Cuicuisine> {
               // ForgottenPasswordPage.route: (ctx) => ForgottenPasswordPage(),
               HomePage.route: (ctx) => HomePage(),
               GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
-              // RemoveAccountPage.route: (ctx) => RemoveAccountPage(),
-              // BookNamePage.route: (ctx) => BookNamePage(),
-              // ItemSelector.route: (ctx) => ItemSelector(),
+              RemoveAccountPage.route: (ctx) => RemoveAccountPage(),
+              BookNamePage.route: (ctx) => BookNamePage(),
+              ItemSelector.route: (ctx) => ItemSelector(),
               PageNotFound.route: (ctx) => PageNotFound(),
               TestPage.route: (ctx) => TestPage()
             },

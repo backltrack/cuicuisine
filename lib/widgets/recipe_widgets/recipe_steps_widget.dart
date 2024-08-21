@@ -27,19 +27,19 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
         borderRadius: BorderRadius.circular(12)
       ),
       // width: double.infinity,
-      padding: EdgeInsets.all(12),
-      margin: EdgeInsets.only(left: 8, top: 8, right: 8),
+      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(left: 8, top: 8, right: 8),
       child: Column(
         children: [
           // title and zoom buttons
           Stack(
             children: [
-              Container(
+              SizedBox(
                 width: double.infinity,
                 child: Center(
                   child:Text(
                     S.of(context).steps_widget_title,
-                    style: ThemeMgr.getTheme(context)!.textTheme.headline2,
+                    style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
                   ),
                 ),
               ),
@@ -49,7 +49,7 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                 child: Row(
                   children: [
                     MyIconButton(
-                      icon: Icon(Icons.zoom_out),
+                      icon: const Icon(Icons.zoom_out),
                       onPressed: () {
                         setState(() {
                           _textSize = _textSize > 12 ? _textSize - 2.0 : _textSize;
@@ -57,7 +57,7 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                       },
                     ),
                     MyIconButton(
-                      icon: Icon(Icons.zoom_in),
+                      icon: const Icon(Icons.zoom_in),
                       onPressed: () {
                         setState(() {
                           _textSize = _textSize < 24 ? _textSize + 2.0 : _textSize;
@@ -70,9 +70,9 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
             ],
           ),
 
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           // generate steps
-          Container(
+          SizedBox(
             width: double.infinity,
             child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,19 +83,19 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                     Row(
                       children: [
                         Text(
-                            S.of(context).steps_widget_step + " ${index+1}",
-                            style: ThemeMgr.getTheme(context)!.textTheme.headline3
+                            "${S.of(context).steps_widget_step} ${index+1}",
+                            style: ThemeMgr.getTheme(context)!.textTheme.displaySmall
                         ),
                         if (widget.steps[index].time > 0)
                           IconButton(
                             onPressed: () {
                               FlutterAlarmClock.createTimer(length: widget.steps[index].time * 60);
                             },
-                            icon: FaIcon(Icons.timer_outlined)
+                            icon: const FaIcon(Icons.timer_outlined)
                           )
                       ],
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Html(
                       data: widget.steps[index].step,
                       style: {
@@ -105,7 +105,7 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                       }
                     ),
 
-                    SizedBox(height: 24)
+                    const SizedBox(height: 24)
                   ],
                 );
               })

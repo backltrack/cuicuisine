@@ -8,7 +8,6 @@ import '../../utilities/string_functions.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
-import '../../pages/authentication/authentication_page.dart';
 import '../../pages/books/book_name_page.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
@@ -167,7 +166,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                         )
                     ).then((value) async {
                       if (value != null && value) {
-                        //await removeBook(_book!.id);
+                        DatabaseMgr().localMgr.deleteBook(_book!.id);
                         Navigator.pop(context);
                       }
                     });
@@ -182,7 +181,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                   showAlertDialog(
                       context: context,
                       title: S.of(context).popup_quit_title,
-                      description: Text(S.of(context).popup_quit_description + _book!.name + '?')
+                      description: Text('${S.of(context).popup_quit_description}${_book!.name}?')
                   ).then((value) async {
                     if (value != null && value) {
                       DatabaseMgr().localMgr.removeUserFromBook(_book!);
@@ -198,7 +197,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
             const SizedBox(
               height: 12,
             ),
-            Text(S.of(context).book_settings_users, style: ThemeMgr.getTheme(context)!.textTheme.headline2),
+            Text(S.of(context).book_settings_users, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
             const SizedBox(height: 12),
 
             ListView.builder(
@@ -213,16 +212,14 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Container( // user
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              child: Text(getInitials(_name)),
-                            ),
-                            const SizedBox(width: 16),
-                            Text(_name)
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            child: Text(getInitials(_name)),
+                          ),
+                          const SizedBox(width: 16),
+                          Text(_name)
+                        ],
                       ),
                       if (_book!.access[_book!.users[index]]! == 2) // this book user is owner
                         Container(
@@ -244,14 +241,14 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     shape: const CircleBorder(),
-                                    padding: const EdgeInsets.all(8),
-                                    primary: ThemeMgr.getTheme(context)!.cardColor
+                                    backgroundColor: ThemeMgr.getTheme(context)!.cardColor,
+                                    padding: const EdgeInsets.all(8)
                                 ),
                                 onPressed: () async {
                                   showAlertDialog(
                                       context: context,
                                       title: S.of(context).popup_remove_user_title,
-                                      description: Text(S.of(context).popup_remove_user_description + _name + '?')
+                                      description: Text('${S.of(context).popup_remove_user_description}$_name?')
                                   ).then((value) async {
                                     if (value != null && value) {
                                       // remove access to book
@@ -281,8 +278,8 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                   shape: const CircleBorder(),
-                                  padding: const EdgeInsets.all(8),
-                                  primary: ThemeMgr.getTheme(context)!.cardColor
+                                  backgroundColor: ThemeMgr.getTheme(context)!.cardColor,
+                                  padding: const EdgeInsets.all(8)
                               ),
                               onPressed: () async {
                                 // update access

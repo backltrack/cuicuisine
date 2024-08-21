@@ -12,8 +12,6 @@ import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/my_type_ahead_text_field.dart';
 
-import '../home_page.dart';
-
 class IngredientEditionPage extends StatefulWidget {
 
   const IngredientEditionPage({Key? key}) : super(key: key);
