@@ -168,7 +168,7 @@ class _FilterBottomMenuState extends State<FilterBottomMenu> {
                                 var resultingDuration = await showDurationPicker(
                                   context: context,
                                   initialTime: const Duration(hours: 1),
-                                  snapToMins: 10.0,
+                                  // snapToMins: 10.0,
                                 );
                                 setState(() {
                                   FilterBottomMenu.time = resultingDuration != null ? resultingDuration.inMinutes : FilterBottomMenu.time;

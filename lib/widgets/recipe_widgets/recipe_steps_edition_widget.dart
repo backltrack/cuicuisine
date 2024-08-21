@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:html/dom.dart' as dom;
-// import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/time_functions.dart';
@@ -98,7 +98,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                             onLinkTap: (String? url, Map<String, String> attributes, dom.Element? element) async {
                               if (url != null && url.isNotEmpty) {
                                 final Uri uri = Uri.parse(url);
-                                // await launchUrl(uri);
+                                await launchUrl(uri);
                               }
                             }
                           )
@@ -133,7 +133,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                           var resultingDuration = await showDurationPicker(
                             context: context,
                             initialTime: Duration(minutes: newSteps[index].time),
-                            snapToMins: 5.0,
+                            // snapToMins: 5.0,
                           );
                           if (resultingDuration != null)
                           {
