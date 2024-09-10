@@ -414,3 +414,14 @@ class Tag extends HiveObject {
   };
 }
 
+@HiveType(typeId: 7)
+class RecipeImage implements DatabaseObject {
+  @HiveField(0)
+  String path;
+  @HiveField(1)
+  String recipeId;
+  @HiveField(2)
+  String imageId;
+
+  RecipeImage({required this.path, required this.recipeId, required this.imageId});
+}

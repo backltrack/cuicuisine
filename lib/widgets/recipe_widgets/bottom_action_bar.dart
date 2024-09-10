@@ -39,11 +39,11 @@ class _BottomActionBarState extends State<BottomActionBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: AppBar().preferredSize.height,
       child: BottomAppBar(
         notchMargin: 6.0,
-        shape: CircularNotchedRectangle(),
+        shape: const CircularNotchedRectangle(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -51,7 +51,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
               children: [
                 BadgedIconButton(
                   key: UniqueKey(),
-                  icon: Icon(Icons.filter_list, size: 28, color: DarkColors.writingColor),
+                  icon: const Icon(Icons.filter_list, size: 28, color: DarkColors.writingColor),
                   badgeColor: ThemeMgr.getTheme(context)!.hintColor,
                   number: _badgeNumber,
                   onPressed: () {
@@ -61,7 +61,6 @@ class _BottomActionBarState extends State<BottomActionBar> {
                           backgroundColor: Colors.black.withOpacity(0.04),
                           builder: (BuildContext context) {
                             return FilterBottomMenu(
-                              currentBook: widget.currentBook,
                               onReset: () {
                                 setState(() {
                                   resetFilterItems();
@@ -88,12 +87,12 @@ class _BottomActionBarState extends State<BottomActionBar> {
                   itemBuilder: (context) => <PopupMenuItem>[
                     // first row
                     PopupMenuItem(
-                      padding: EdgeInsets.only(left: 12),
+                      padding: const EdgeInsets.only(left: 12),
                       child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: FaIcon(FontAwesomeIcons.sortAlphaDown),
+                              icon: const FaIcon(FontAwesomeIcons.sortAlphaDown),
                               onPressed: () {
                                 setState(() {
                                   BottomActionBar.sortingMethod = "alphaDown";
@@ -103,7 +102,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
                               },
                             ),
                             IconButton(
-                                icon: FaIcon(CustomIcons.sort_time_down),
+                                icon: const FaIcon(CustomIcons.sort_time_down),
                                 onPressed: () {
                                   setState(() {
                                     BottomActionBar.sortingMethod = "timeDown";
@@ -113,7 +112,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
                                 }
                             ),
                             IconButton(
-                              icon: FaIcon(CustomIcons.sort_last_down),
+                              icon: const FaIcon(CustomIcons.sort_last_down),
                               onPressed: () {
                                 setState(() {
                                   BottomActionBar.sortingMethod = "lastUpdatedDown";
@@ -127,12 +126,12 @@ class _BottomActionBarState extends State<BottomActionBar> {
                     ),
                     // second row
                     PopupMenuItem(
-                        padding: EdgeInsets.only(left: 12),
+                        padding: const EdgeInsets.only(left: 12),
                       child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: FaIcon(FontAwesomeIcons.sortAlphaUp),
+                                icon: const FaIcon(FontAwesomeIcons.sortAlphaUp),
                                 onPressed: () {
                                   setState(() {
                                     BottomActionBar.sortingMethod = "alphaUp";
@@ -142,7 +141,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
                                 },
                               ),
                               IconButton(
-                                  icon: FaIcon(CustomIcons.sort_time_up),
+                                  icon: const FaIcon(CustomIcons.sort_time_up),
                                   onPressed: () {
                                     setState(() {
                                       BottomActionBar.sortingMethod = "timeUp";
@@ -152,7 +151,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
                                   }
                               ),
                               IconButton(
-                                icon: FaIcon(CustomIcons.sort_last_up),
+                                icon: const FaIcon(CustomIcons.sort_last_up),
                                 onPressed: () {
                                   setState(() {
                                     BottomActionBar.sortingMethod = "lastUpdatedUp";

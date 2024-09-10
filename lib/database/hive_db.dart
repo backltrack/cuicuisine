@@ -1,6 +1,10 @@
+import 'package:flutter/material.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:objectid/objectid.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:uuid/uuid.dart';
 
@@ -8,6 +12,7 @@ import '../models/data_model.dart';
 import '../models/update_model.dart';
 import '../models/sync_model.dart';
 import './database_mgr.dart';
+import 'file_storage.dart';
 
 class HiveConnector {
   late Box<dynamic> _settingBox;
@@ -19,6 +24,7 @@ class HiveConnector {
   late Box<Operation> _queueOperationBox;
   late Box<String> _changeBox;
   late Box<dynamic> _contextBox;
+  FileStorage fileStorage = FileStorage();
 
   HiveConnector();
 
@@ -39,7 +45,8 @@ class HiveConnector {
         ..registerAdapter(RecipeUpdateAdapter())
         ..registerAdapter(OperationTypeAdapter())
         ..registerAdapter(OperationAdapter())
-        ..registerAdapter(OperationQueueAdapter());
+        ..registerAdapter(OperationQueueAdapter())
+        ..registerAdapter(RecipeImageAdapter());
     }
 
     _settingBox = await Hive.openBox('settings');
@@ -249,7 +256,14 @@ class HiveConnector {
   void toggleFavorite(String recipeId) {
     AppUser? user = getUser();
     if (user != null) {
-      updateUser(favoriteRecipes: [...user.favoriteRecipes, recipeId]);
+      if (user.favoriteRecipes.contains(recipeId)) {
+        List<String> list = [...user.favoriteRecipes];
+        list.remove(recipeId);
+        updateUser(favoriteRecipes: list);
+      }
+      else {
+        updateUser(favoriteRecipes: [...user.favoriteRecipes, recipeId]);
+      }
     }
   }
 
@@ -353,6 +367,7 @@ class HiveConnector {
         for (String recipeId in recipeIds) {
           Recipe? recipe = getRecipe(recipeId);
           if (recipe != null) {
+            print("check");
             for (String tag in recipe.tags) {
               if (!tags.contains(tag)) {
                 tags.add(tag);
@@ -365,16 +380,20 @@ class HiveConnector {
             }
           }
         }
+        print("1: $tags");
         _contextBox.clear();
         _contextBox.put('tags', tags);
         _contextBox.put('ingredients', ingredients);
+        print("2: ${_contextBox.get('tags')}");
       }
     }
   }
 
   List<String> getBookTags() {
     var tags = _contextBox.get('tags');
+    print(tags);
     if (tags is List<String>) {
+      print(tags);
       return tags;
     }
     return [];
@@ -688,6 +707,68 @@ class HiveConnector {
 
   void clearRecipes() {
     _recipeBox.clear();
+  }
+
+  Future<List<String>> saveRecipeImages(List<XFile> images, String recipeId) async {
+    List<String> newPictures = [];
+    for (XFile image in images) {
+      final String newImageId = ObjectId().hexString;
+      String? newPath = await fileStorage.writeImage(image: image, recipeId: recipeId, imageId: newImageId);
+      if (newPath != null) {
+        newPictures.add(newImageId);
+
+        addQueueOperation(type: OperationType.create, object: RecipeImage(path: newPath, recipeId: recipeId, imageId: newImageId));
+      }
+    }
+    return newPictures;
+  }
+
+  void putPicturesToStorage(List<XFile> images, String recipeId) async {
+    Recipe? recipe = getRecipe(recipeId);
+    if (recipe != null) {
+      List<String> newPictures = await saveRecipeImages(images, recipeId);
+      
+      if (newPictures.isNotEmpty) {
+        DatabaseMgr().localMgr.updateRecipe(
+          recipeId,
+          RecipeUpdate(
+            id: recipeId,
+            pictures: [...recipe.pictures] + newPictures
+          )
+        );
+      }
+    }
+  }
+
+  Future<List<Image>> getRecipeImages(String recipeId) async {
+    Recipe? recipe = getRecipe(recipeId);
+    if (recipe != null) {
+      List<Image> images = [];
+      for (String id in recipe.pictures) {
+        Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: id);
+        if (image != null) {
+          images.add(image);
+        } else {
+          images.add(Image.asset("assets/images/default_image.png"));
+        }
+      }
+
+      return images;
+    }
+    return [];
+  }
+
+  Future<Image> getFirstRecipeImage(String recipeId) async {
+    Recipe? recipe = getRecipe(recipeId);
+    if (recipe != null) {
+      if (recipe.pictures.isNotEmpty) {
+        Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: recipe.pictures[0]);
+        if (image != null) {
+          return image;
+        }
+      }
+    }
+    return Image.asset("assets/images/default_image.png");
   }
 
   // QUEUE //

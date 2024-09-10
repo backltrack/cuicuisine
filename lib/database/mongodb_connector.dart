@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/sync_model.dart';
 import 'package:cuicuisine/models/update_model.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
@@ -131,6 +133,34 @@ class MongoConnector {
     }
   }
 
+  Future<dynamic> _securePostMultipartRequest(String endpoint, File file, List<MapEntry<String, String>> form) async {
+    if (client == null) { return; }
+    
+    Uri serverUri = Uri.parse(server);
+
+    var headers = {
+      'accept': 'application/json',
+      'Authorization': client!.credentials.accessToken,
+      'Content-Type': 'multipart/form-data'
+    };
+
+    try {
+      var request = MultipartRequest('POST', Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint));
+      request.files.add(await http.MultipartFile.fromPath('file', file.path, filename: file.path.split('/').last));
+      request.headers.addAll(headers);
+      request.fields.addEntries(form);
+      StreamedResponse response = await client!.send(request);
+
+      return response;
+    } on TimeoutException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw TimeoutException;
+    } on SocketException catch(_) {
+      DatabaseMgr().isOnline = false;
+      // throw SocketException;
+    }
+  }
+
   Future<dynamic> _securePutRequest(String endpoint, Object data) async {
     if (client == null) { return; }
     
@@ -162,7 +192,8 @@ class MongoConnector {
         headers: {
           'accept': 'application/json'
       });
-      DatabaseMgr().isOnline = true;
+      print(response.body);
+      DatabaseMgr().isOnline = response.body == "true";
       return response.body == "true";
     } on SocketException catch (e) {
       print(e);
@@ -330,6 +361,8 @@ class MongoConnector {
               else {
                 DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
               }
+
+              downloadMissingImages(recipe);
             }
 
             // add change to local list
@@ -686,5 +719,38 @@ class MongoConnector {
     }
 
     return false;
+  }
+
+  Future<bool> uploadImage(RecipeImage recipeImage) async {
+    final response = await _securePostMultipartRequest('/image/upload',
+      File(recipeImage.path),
+      [MapEntry('recipeId', recipeImage.recipeId), MapEntry('imageId', recipeImage.imageId)]
+    );
+
+    if (response != null && response.statusCode == 200) {
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<MultipartFile?> downloadImage(String recipeId, String imageId) async {
+    final response = await _secureGetRequest('/image/download/$recipeId/$imageId');
+    if (response != null && response.statusCode == 200) {
+      print(response);
+      print(response.body);
+      
+    }
+
+    return null;
+  }
+
+  Future<bool> downloadMissingImages(Recipe recipe) async {
+    for (String imagePath in recipe.pictures) {
+      if (!await DatabaseMgr().localMgr.fileStorage.imageExists(recipeId: recipe.id, imageId: imagePath.split('/').last)) {
+        await downloadImage(recipe.id, imagePath.split('/').last);
+      }
+    }
+    return true;
   }
 }

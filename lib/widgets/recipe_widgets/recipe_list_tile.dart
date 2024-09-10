@@ -29,7 +29,6 @@ class _RecipeListTileState extends State<RecipeListTile> {
   Widget build(BuildContext context) {
     // get is favorite recipe
     bool isFav = DatabaseMgr().localMgr.getUser()!.favoriteRecipes.contains(widget.recipe.id);
-    //TODO: clean LogInPage_appUser
 
     const double cardHeight = 96;
     const double spacing = 8;
@@ -140,24 +139,24 @@ class _RecipeListTileState extends State<RecipeListTile> {
                       backgroundColor: ThemeMgr.getTheme(context)!.cardColor,
                     );
                   } else {
-                    // return FutureBuilder(
-                    //   future: getPicture(widget.recipe.pictures[0], widget.recipe.id),
-                    //   builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                    //     if (snapshot.hasData) {
-                    //       return CircleAvatar(
-                    //         maxRadius: (cardHeight) / 2,
-                    //         foregroundImage: NetworkImage(snapshot.data!),
-                    //         backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
-                    //       );
-                    //     } else {
-                    //       return CircleAvatar(
-                    //         maxRadius: (cardHeight) / 2,
-                    //         backgroundImage: const AssetImage("assets/images/default_circle_image.png"),
-                    //         backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
-                    //       );
-                    //     }
-                    //   }
-                    // );
+                    return FutureBuilder(
+                      future: DatabaseMgr().localMgr.getFirstRecipeImage(widget.recipe.id),
+                      builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
+                        if (snapshot.hasData) {
+                          return CircleAvatar(
+                            maxRadius: (cardHeight) / 2,
+                            foregroundImage: snapshot.data!.image,
+                            backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
+                          );
+                        } else {
+                          return CircleAvatar(
+                            maxRadius: (cardHeight) / 2,
+                            backgroundImage: const AssetImage("assets/images/default_circle_image.png"),
+                            backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
+                          );
+                        }
+                      }
+                    );
                   }
                 } ()
               )

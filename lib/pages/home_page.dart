@@ -88,11 +88,8 @@ class _HomePageState extends State<HomePage> {
         if (foundBook != null) {
           // set current book
           selectedBook = foundBook;
-          print("foundbook : ${foundBook.id}");
-          print(foundBook.toJson());
           //get recipes and set tags and ingredients names to book
           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-          print(recipes!.length);
           DatabaseMgr().localMgr.updateTagsAndIngredients();
           // get user access
           userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? 0;
@@ -278,6 +275,7 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         drawer: homepageDrawer(DatabaseMgr().localMgr.getUser()),
+        onDrawerChanged: (isOpened) => isOpened ? DatabaseMgr().remoteMgr.testConnexion(): (),
         body:
           selectedBook == null ?
           ListTile(
@@ -466,8 +464,25 @@ class _HomePageState extends State<HomePage> {
           UserAccountsDrawerHeader(
               accountName: Text(appUser!.name),
               accountEmail: Text(appUser.email),
-              currentAccountPicture: CircleAvatar(
-                child: Text(getInitials(appUser.name)),
+              currentAccountPicture: Stack(
+                fit: StackFit.expand,
+                children: [
+                  CircleAvatar(
+                    child: Text(getInitials(appUser.name)),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Container(
+                      width: 12.0,
+                      height: 12.0,
+                      decoration: BoxDecoration(
+                        color: DatabaseMgr().isOnline ? Colors.green : Colors.red,
+                        shape: BoxShape.circle,
+                      )
+                    )
+                  )
+                ],
               ),
           ),
 

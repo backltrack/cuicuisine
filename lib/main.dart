@@ -22,6 +22,7 @@ import 'pages/item_selector_page.dart';
 import 'pages/recipes/ingredient_edition_page.dart';
 import 'pages/recipes/new_tag_page.dart';
 // import 'pages/recipes/recipe_images_edition_page.dart';
+import 'pages/recipes/recipe_images_edition_page.dart';
 import 'pages/recipes/recipe_ingredients_edition_page.dart';
 import 'pages/recipes/recipe_name_page.dart';
 import 'pages/recipes/recipe_page.dart';
@@ -125,15 +126,15 @@ class _CuicuisineState extends State<Cuicuisine> {
             initialRoute: LogInPage.route,
             routes: {
               LogInPage.route: (ctx) => LogInPage(),
-              EmailConnexion.route: (ctx) => EmailConnexion(),
+              EmailConnexion.route: (ctx) => const EmailConnexion(),
               EmailRegistration.route: (ctx) => EmailRegistration(),
               // ForgottenPasswordPage.route: (ctx) => ForgottenPasswordPage(),
               HomePage.route: (ctx) => HomePage(),
               GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
-              RemoveAccountPage.route: (ctx) => RemoveAccountPage(),
-              BookNamePage.route: (ctx) => BookNamePage(),
-              ItemSelector.route: (ctx) => ItemSelector(),
-              PageNotFound.route: (ctx) => PageNotFound(),
+              RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),
+              BookNamePage.route: (ctx) => const BookNamePage(),
+              ItemSelector.route: (ctx) => const ItemSelector(),
+              PageNotFound.route: (ctx) => const PageNotFound(),
               TestPage.route: (ctx) => TestPage()
             },
             onGenerateRoute: (RouteSettings settings) {
@@ -144,60 +145,60 @@ class _CuicuisineState extends State<Cuicuisine> {
               }
               // navigate to recipe name edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
-                return MaterialPageRoute(builder: (context) => RecipeNamePage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const RecipeNamePage(), settings: settings);
               }
               // // navigate to recipe image edition page
-              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'images') {
-              //   return MaterialPageRoute(builder: (context) => RecipeImagesEditionPage(), settings: settings);
-              // }
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'images') {
+                return MaterialPageRoute(builder: (context) => const RecipeImagesEditionPage(), settings: settings);
+              }
               // navigate to recipe time edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'time') {
-                return MaterialPageRoute(builder: (context) => RecipeTimeEditionPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const RecipeTimeEditionPage(), settings: settings);
               }
               // navigate to recipe tags edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'tags') {
-                return MaterialPageRoute(builder: (context) => RecipeTagEditionPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const RecipeTagEditionPage(), settings: settings);
               }
               // navigate to recipe tags edition -> new tag page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
                   && settings.name!.split('/')[5] == 'tags'
                   && settings.name!.split('/').last == 'new') {
-                return MaterialPageRoute(builder: (context) => NewTagPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const NewTagPage(), settings: settings);
               }
               // navigate to recipe ingredients edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'ingredients') {
-                return MaterialPageRoute(builder: (context) => RecipeIngredientsEditionPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const RecipeIngredientsEditionPage(), settings: settings);
               }
               // navigate to specific ingredient edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
                   && settings.name!.split('/')[5] == 'ingredients'
                   && settings.name!.split('/').last == 'edition') {
-                return MaterialPageRoute(builder: (context) => IngredientEditionPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const IngredientEditionPage(), settings: settings);
               }
               // navigate to recipe steps edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'steps') {
-                return MaterialPageRoute(builder: (context) => RecipeStepsEditionPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const RecipeStepsEditionPage(), settings: settings);
               }
               // navigate to specific step edition page
               else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
                   && settings.name!.split('/')[5] == 'steps'
                   && int.tryParse(settings.name!.split('/').last) != null) {
-                return MaterialPageRoute(builder: (context) => StepEditionPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const StepEditionPage(), settings: settings);
               }
 
               // navigate to book settings page
               else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
-                return MaterialPageRoute(builder: (context) => BookSettingsPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const BookSettingsPage(), settings: settings);
               }
 
               // navigate to join book page
               else if (settings.name!.contains(BookJoinPage.route)) {
-                return MaterialPageRoute(builder: (context) => BookJoinPage(), settings: settings);
+                return MaterialPageRoute(builder: (context) => const BookJoinPage(), settings: settings);
               }
 
               else {
                 //404
-                return MaterialPageRoute(builder: (context) => PageNotFound());
+                return MaterialPageRoute(builder: (context) => const PageNotFound());
               }
             },
           );

@@ -97,11 +97,12 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
         floatingActionButton: FloatingActionButton.extended(
             label: Text(S.of(context).recipe_edition_update),
             onPressed: () async {
+              print(steps);
               DatabaseMgr().localMgr.updateRecipe(
                 recipeId,
                 RecipeUpdate(
                   id: recipeId,
-                  steps: steps
+                  steps: newSteps
                 )
               );
 

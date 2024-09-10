@@ -67,6 +67,8 @@ dependencies:
   google_fonts: ^5.1.0
   uuid: ^4.3.3
   url_launcher: ^6.3.0
+  path: ^1.8.3
+  objectid: ^3.0.0
   
 
 dev_dependencies:

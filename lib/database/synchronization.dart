@@ -92,6 +92,9 @@ class Synchronization {
     else if (object is Recipe) {
       return await _remoteMgr.createRecipe(object);
     }
+    else if (object is RecipeImage) {
+      return await _remoteMgr.uploadImage(object);
+    }
 
     return false;
   }

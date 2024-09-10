@@ -9,6 +9,7 @@ import '../../models/data_model.dart';
 import '../../pages/404.dart';
 import '../../themes/theme_mgr.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
+import '../../widgets/recipe_widgets/image_slideshow.dart';
 import '../../widgets/recipe_widgets/recipe_popup_menu.dart';
 import '../../widgets/recipe_widgets/book_picker_popup.dart';
 import '../../widgets/core_widgets/my_icon_button.dart';
@@ -199,60 +200,60 @@ class _RecipePageState extends State<RecipePage> {
         body: SingleChildScrollView(
             child: Column(
               children: [
-                // Stack(
-                //   children: [
-                //     WidgetSelectionOverlay(
-                //       widget: FireBaseImageSlideshow(
-                //           pictures: getPictures(recipe),
-                //       ),
-                //       editModeController: isEditMode,
-                //       opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
-                //       borderRadius: 0,
-                //       margin: 0,
-                //       onTap: () {
-                //         Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/images", arguments: {
-                //           "recipe": recipe
-                //         }).then((value) async {
-                //           // reload local recipe
-                //           Recipe? _tmp = await getRecipe(recipe.id);
-                //           if (_tmp != null) {
-                //             setState(() {
-                //               recipe = _tmp;
-                //             });
-                //           }
-                //         });
-                //       }
-                //     ),
-                //     Visibility(
-                //       child: Positioned(
-                //           top: 4,
-                //           right: 4,
-                //           child: MyIconButton(
-                //             onPressed: () async {
-                //               //set favorite in database
-                //               await toggleFavorite(DatabaseMgr().localMgr.getUser()!, recipe.id);
-                //               AppUser? newAppUser = await getCurrentAppUser();
+                Stack(
+                  children: [
+                    WidgetSelectionOverlay(
+                      widget: MyImageSlideshow(
+                          recipeId: recipe.id,
+                      ),
+                      editModeController: isEditMode,
+                      opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
+                      borderRadius: 0,
+                      margin: 0,
+                      onTap: () {
+                        Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/images", arguments: {
+                          "recipe": recipe
+                        }).then((value) async {
+                          // reload local recipe
+                          Recipe? _tmp = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                          if (_tmp != null) {
+                            setState(() {
+                              recipe = _tmp;
+                            });
+                          }
+                        });
+                      }
+                    ),
+                    Visibility(
+                      visible: !isEditMode,
+                      child: Positioned(
+                          top: 4,
+                          right: 4,
+                          child: MyIconButton(
+                            onPressed: () async {
+                              //set favorite in database
+                              DatabaseMgr().localMgr.toggleFavorite(recipe.id);
+                              AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
 
-                //               if (newAppUser != null && newAppUser.favoriteRecipes.contains(recipe.id)) {
-                //                 setState(() {
-                //                   isFav = true;
-                //                 });
-                //               } else {
-                //                 setState(() {
-                //                   isFav = false;
-                //                 });
-                //               }
+                              if (newAppUser != null && newAppUser.favoriteRecipes.contains(recipe.id)) {
+                                setState(() {
+                                  isFav = true;
+                                });
+                              } else {
+                                setState(() {
+                                  isFav = false;
+                                });
+                              }
 
-                //               // make refresh recipes
-                //               updateRecipes = "reloadRecipes";
-                //             },
-                //             icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : getTheme(context)!.iconTheme.color!.withOpacity(0.5)),
-                //           )
-                //       ),
-                //       visible: !isEditMode,
-                //     )
-                //   ],
-                // ),
+                              // make refresh recipes
+                              updateRecipes = "reloadRecipes";
+                            },
+                            icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color!.withOpacity(0.5)),
+                          )
+                      ),
+                    )
+                  ],
+                ),
                 WidgetSelectionOverlay(
                     widget: RecipeTimeWidget(
                         preparationTime: recipe.preparationTime,

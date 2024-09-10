@@ -45,14 +45,18 @@ class _StepEditionPageState extends State<StepEditionPage> {
           initiallyExpanded: true,
           toolbarType: ToolbarType.nativeScrollable,
           defaultToolbarButtons: [
-            const ColorButtons(),
             const FontButtons(
-              clearAll: false
+              clearAll: false,
+              subscript: false,
+              superscript: false
             ),
+            const ColorButtons(),
             const OtherButtons(
               codeview: false,
               fullscreen: false,
-              help: false
+              help: false,
+              copy: false,
+              paste: false
             ),
             const ListButtons(
               listStyles: false
@@ -63,10 +67,12 @@ class _StepEditionPageState extends State<StepEditionPage> {
               textDirection: false
             ),
             const InsertButtons(
-                audio: false,
-                hr: false,
-                otherFile: false,
-                table: false
+              picture: false,
+              video: false,
+              audio: false,
+              hr: false,
+              otherFile: false,
+              table: false
             ),
           ]
         )

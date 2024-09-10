@@ -1,33 +1,34 @@
+import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 
-class FireBaseImageSlideshow extends StatefulWidget {
-  FireBaseImageSlideshow({Key? key, required this.pictures}) : super(key: key);
+class MyImageSlideshow extends StatefulWidget {
+  MyImageSlideshow({Key? key, required this.recipeId}) : super(key: key);
 
-  final Future<List<String>> pictures;
+  final String recipeId;
 
   @override
-  State<FireBaseImageSlideshow> createState() => _FireBaseImageSlideshowState();
+  State<MyImageSlideshow> createState() => _MyImageSlideshowState();
 }
 
-class _FireBaseImageSlideshowState extends State<FireBaseImageSlideshow> {
+class _MyImageSlideshowState extends State<MyImageSlideshow> {
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: widget.pictures,
-      builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+      future: DatabaseMgr().localMgr.getRecipeImages(widget.recipeId),
+      builder: (BuildContext context, AsyncSnapshot<List<Image>> snapshot) {
         return ImageSlideshow(
           width: double.infinity,
           height: MediaQuery.of(context).size.width * 9 / 16,
           children: [
             if (!snapshot.hasData)
-              Center(child:CircularProgressIndicator())
+              const Center(child:CircularProgressIndicator())
             else if (snapshot.hasData && snapshot.data!.isEmpty)
               Image.asset("assets/images/default_image.png")
             else
               ...List<Image>.generate(snapshot.data!.length, (index) {
-                return Image.network(snapshot.data![index], fit: BoxFit.cover);
+                return snapshot.data![index];
               })
           ]
         );

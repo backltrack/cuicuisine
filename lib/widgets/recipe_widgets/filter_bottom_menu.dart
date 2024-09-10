@@ -1,14 +1,14 @@
+import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:duration_picker/duration_picker.dart';
+
 import '../../themes/colors.dart';
 
 import '../../utilities/time_functions.dart';
 import '../../generated/l10n.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:duration_picker/duration_picker.dart';
-import '../../models/data_model.dart';
-
-// import '../../pages/item_selector_page.dart';
+import '../../pages/item_selector_page.dart';
 import '../../widgets/core_widgets/tag_item.dart';
 
 class FilterBottomMenu extends StatefulWidget {
@@ -18,10 +18,9 @@ class FilterBottomMenu extends StatefulWidget {
   static List<String> mandatoryIngredients = [];
   static List<String> mandatoryTags = [];
 
-  final Book? currentBook;
   final VoidCallback? onReset;
 
-  FilterBottomMenu({this.currentBook, this.onReset});
+  FilterBottomMenu({this.onReset});
 
   @override
   _FilterBottomMenuState createState() => _FilterBottomMenuState();
@@ -207,12 +206,12 @@ class _FilterBottomMenuState extends State<FilterBottomMenu> {
                         child: Text(S.of(context).add_button),
                         onPressed: () {
                           // add ingredient
-                          // Navigator.of(context).pushNamed(ItemSelector.route, arguments: {
-                          //   'items': widget.currentBook != null ? widget.currentBook!.bookIngredients : [],
-                          //   'itemType': "ingredients"
-                          // }).whenComplete(() {
-                          //   refreshFilterItems();
-                          // });
+                          Navigator.of(context).pushNamed(ItemSelector.route, arguments: {
+                            'items': DatabaseMgr().localMgr.getBookIngredients(),
+                            'itemType': "ingredients"
+                          }).whenComplete(() {
+                            refreshFilterItems();
+                          });
                         },
                       ),
                     )
@@ -243,12 +242,12 @@ class _FilterBottomMenuState extends State<FilterBottomMenu> {
                         child: Text(S.of(context).add_button),
                         onPressed: () {
                           // add tag
-                          // Navigator.of(context).pushNamed(ItemSelector.route, arguments: {
-                          //   'items': widget.currentBook != null ? widget.currentBook!.tags : [],
-                          //   'itemType': "tags"
-                          // }).whenComplete(() {
-                          //   refreshFilterItems();
-                          // });
+                          Navigator.of(context).pushNamed(ItemSelector.route, arguments: {
+                            'items': DatabaseMgr().localMgr.getBookTags(),
+                            'itemType': "tags"
+                          }).whenComplete(() {
+                            refreshFilterItems();
+                          });
                         },
                       ),
                     )

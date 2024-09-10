@@ -5,7 +5,7 @@ import 'update_model.dart';
 
   part 'sync_model.g.dart';
 
-@HiveType(typeId: 10)
+@HiveType(typeId: 11)
 enum OperationType {
   @HiveField(0)
   create,
@@ -15,7 +15,7 @@ enum OperationType {
   update
 }
 
-@HiveType(typeId: 11)
+@HiveType(typeId: 12)
 class Operation extends HiveObject {
   @HiveField(0)
   String id;
@@ -28,7 +28,7 @@ class Operation extends HiveObject {
 }
 
 
-@HiveType(typeId: 12)
+@HiveType(typeId: 13)
 class OperationQueue extends HiveObject {
   @HiveField(0)
   List<String> queue = [];
