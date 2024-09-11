@@ -10,7 +10,7 @@ import '../../widgets/core_widgets/social_button.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
 import 'email_registration.dart';
-import 'forgotten_password.dart';
+// import 'forgotten_password.dart';
 
 class EmailConnexion extends StatefulWidget {
   static const String route = '/connexion';
@@ -77,8 +77,10 @@ class _EmailConnexionState extends State<EmailConnexion> {
                     Fluttertoast.showToast(msg: "Invalid passward, try again!");
                   },
                   onSuccess: (AppUser user) async {
+                    print('OK');
                     await DatabaseMgr().synchronization.sync();
                     if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+
                   }
                 );
               } : null,

@@ -47,7 +47,6 @@ dependencies:
   duration_picker: ^1.1.1
   flutter_image_slideshow: ^0.1.6
   image_picker: ^1.0.7
-  flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.3.10
   flutter_html: ^3.0.0-beta.2
   fluttertoast: ^8.2.4
@@ -82,6 +81,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
   build_runner: ^2.4.8
+  flutter_launcher_icons: ^0.13.1
 
 
 flutter_app_name:
@@ -103,6 +103,7 @@ flutter:
     - assets/icons/splash_icon.png
     - assets/images/default_image.png
     - assets/images/default_circle_image.png
+    - fonts/google_fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -144,7 +145,7 @@ flutter_intl:
   output_dir: lib/generated # Optional. Sets the directory of generated localization files. Provided value should be a valid path on your system. Default: lib/generated
   use_deferred_loading: false # Optional. Must be set to true to generate localization code that is loaded with deferred loading. Default: false
 
-flutter_icons:
+flutter_launcher_icons:
   android: "launcher_icon"
   ios: false
   image_path: "assets/icons/icon.png"

@@ -11,6 +11,8 @@ class AppThemes {
 }
 
 ThemeCollection setThemeCollection(context) {
+  GoogleFonts.config.allowRuntimeFetching = false;
+
   return ThemeCollection(
     themes: {
       AppThemes.Dark: ThemeData(

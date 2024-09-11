@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/sync_model.dart';
 import 'package:cuicuisine/models/update_model.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:oauth2/oauth2.dart' as oauth2;
 
@@ -46,7 +44,7 @@ class MongoConnector {
     };
 
     try {
-      Response response = await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
+      final response = await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
         headers: headers);
       return response;
     } on TimeoutException catch(_) {
@@ -259,7 +257,9 @@ class MongoConnector {
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
 
-        onSuccess??(user);
+        if (onSuccess != null) {
+          onSuccess(user);
+        }
 
         return user;
       }
@@ -391,6 +391,8 @@ class MongoConnector {
         for (String recipeId in recipeIds) {
           Recipe? recipe = await fetchRecipe(recipeId);
           DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+          
+          downloadMissingImages(recipe);
         }
 
         String? lastChange = data['lastChange'];
@@ -737,9 +739,10 @@ class MongoConnector {
   Future<MultipartFile?> downloadImage(String recipeId, String imageId) async {
     final response = await _secureGetRequest('/image/download/$recipeId/$imageId');
     if (response != null && response.statusCode == 200) {
-      print(response);
-      print(response.body);
-      
+      await DatabaseMgr().localMgr.fileStorage.writeImagefromBytes(bytes: response.bodyBytes, recipeId: recipeId, imageId: imageId);
+    }
+    else {
+      print("WRONG RESPONSE STATUS");
     }
 
     return null;

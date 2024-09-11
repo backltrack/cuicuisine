@@ -30,7 +30,6 @@ class FileStorage {
 
   Future<Image?> readImage({required String recipeId, required String imageId}) async {
     String path = p.join(storagePath, "storage", recipeId, imageId);
-    print(path);
     File file = File(path);
     if (await file.exists()) {
       return Image.file(file);
@@ -52,6 +51,29 @@ class FileStorage {
     
     try {
       await image.saveTo(imagePath);
+      return imagePath;
+    } catch (e) {
+      print(e);
+    }
+
+    return null;
+  }
+
+  Future<String?> writeImagefromBytes({required List<int> bytes, required String recipeId, required String imageId}) async {
+    String storePath = p.join(storagePath, "storage");
+    String recipePath = p.join(storePath, recipeId);
+    String imagePath = p.join(recipePath, imageId);
+
+    if (!await File(storePath).exists()) {
+      await Directory(storePath).create();
+    }
+    if (!await File(recipePath).exists()) {
+      await Directory(recipePath).create();
+    }
+    
+    try {
+      File file = File(imagePath);
+      await file.writeAsBytes(bytes);
       return imagePath;
     } catch (e) {
       print(e);
