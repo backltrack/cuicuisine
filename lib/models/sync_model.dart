@@ -1,7 +1,8 @@
+import 'dart:ffi';
+
 import 'package:hive/hive.dart';
 
 import 'data_model.dart';
-import 'update_model.dart';
 
   part 'sync_model.g.dart';
 
@@ -60,11 +61,12 @@ class OperationQueue extends HiveObject {
 class MongoChange {
   String changeId;
   String objectType;
+  OperationType operationType;
   String objectId;
 
-  MongoChange(this.changeId, this.objectType, this.objectId);
+  MongoChange(this.changeId, this.objectType, this.operationType, this.objectId);
 
   factory MongoChange.fromJson(Map<String, dynamic> data) {
-    return MongoChange(data['changeId'], data['objectType'], data['objectId']);
+    return MongoChange(data['changeId'], data['objectType'], OperationType.values[data['operationType'] as int], data['objectId']);
   }
 }

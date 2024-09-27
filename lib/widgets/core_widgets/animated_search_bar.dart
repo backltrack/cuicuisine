@@ -109,7 +109,7 @@ class _AnimSearchBarState extends State<AnimSearchBar>
       height: 100.0,
 
       ///if the rtl is true, search bar will be from right to left
-      alignment: widget.rtl ? Alignment.centerRight : Alignment(-1.0, 0.0),
+      alignment: widget.rtl ? Alignment.centerRight : const Alignment(-1.0, 0.0),
 
       ///Using Animated container to expand and shrink the widget
       child: AnimatedContainer(
@@ -121,7 +121,7 @@ class _AnimSearchBarState extends State<AnimSearchBar>
           /// can add custom color or the color will be white
           color: widget.color,
           borderRadius: BorderRadius.circular(30.0),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
               color: Colors.black26,
               spreadRadius: -10.0,
@@ -140,15 +140,23 @@ class _AnimSearchBarState extends State<AnimSearchBar>
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 opacity: (toggle == 0) ? 0.0 : 1.0,
-                duration: Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 200),
                 child: Container(
-                  padding: EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
                     /// can add custom color or the color will be white
                     color: widget.color,
                     borderRadius: BorderRadius.circular(30.0),
                   ),
                   child: AnimatedBuilder(
+                    builder: (context, widget) {
+                      ///Using Transform.rotate to rotate the suffix icon when it gets expanded
+                      return Transform.rotate(
+                        angle: _con.value * 2.0 * pi,
+                        child: widget,
+                      );
+                    },
+                    animation: _con,
                     child: GestureDetector(
                       onTap: () {
                         try {
@@ -169,21 +177,11 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                       },
 
                       ///suffixIcon is of type Icon
-                      child: widget.suffixIcon != null
-                          ? widget.suffixIcon
-                          : Icon(
+                      child: widget.suffixIcon ?? const Icon(
                         Icons.close,
                         size: 20.0,
                       ),
                     ),
-                    builder: (context, widget) {
-                      ///Using Transform.rotate to rotate the suffix icon when it gets expanded
-                      return Transform.rotate(
-                        angle: _con.value * 2.0 * pi,
-                        child: widget,
-                      );
-                    },
-                    animation: _con,
                   ),
                 ),
               ),
@@ -197,17 +195,17 @@ class _AnimSearchBarState extends State<AnimSearchBar>
               ///Using Animated opacity to change the opacity of th textField while expanding
               child: AnimatedOpacity(
                 opacity: (toggle == 0) ? 0.0 : 1.0,
-                duration: Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 200),
                 child: Container(
                   padding: const EdgeInsets.only(left: 10),
-                  margin: EdgeInsets.only(top: 3),
+                  margin: const EdgeInsets.only(top: 3),
                   width: widget.width / 1.7,
                   child: TextField(
                     ///Text Controller. you can manipulate the text inside this textField by calling this controller.
                     controller: widget.textController,
                     inputFormatters: widget.inputFormatters,
                     focusNode: focusNode,
-                    cursorRadius: Radius.circular(10.0),
+                    cursorRadius: const Radius.circular(10.0),
                     cursorWidth: 2.0,
                     cursorColor: widget.style == null ? Colors.black : widget.style!.color,
                     onChanged: widget.onSearchChanged,
@@ -219,9 +217,7 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                       });
                     },
                     ///style is of type TextStyle, the default is just a color black
-                    style: widget.style != null
-                        ? widget.style
-                        : TextStyle(color: Colors.black),
+                    style: widget.style ?? const TextStyle(color: Colors.black),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.only(bottom: 5),
                       isDense: true,
@@ -253,10 +249,10 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                   IconButton(
                     splashRadius: 19.0,
                     icon: toggle == 1 ?
-                    Icon(Icons.arrow_forward_ios_rounded,
+                    const Icon(Icons.arrow_forward_ios_rounded,
                       size: 20.0,
                     ) :
-                    Icon(Icons.search,
+                    const Icon(Icons.search,
                       size: 20.0,
                     ),
                     onPressed: () {
@@ -297,7 +293,7 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                       size: 12,
                       color: ThemeMgr.getTheme(context)!.hintColor,
                     ),
-                  ) : SizedBox()
+                  ) : const SizedBox()
                 ]
               )
             ),

@@ -96,7 +96,7 @@ class _RecipeCardTileState extends State<RecipeCardTile> {
       //           ),
       //           Container(
       //             alignment: AlignmentDirectional.topCenter,
-      //             child: MyIconButton(
+      //             child: IconButton(
       //                 onPressed: () {
       //                   //TODO
       //                   //set favorite in database

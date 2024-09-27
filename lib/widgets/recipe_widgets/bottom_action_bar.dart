@@ -7,7 +7,6 @@ import '../../widgets/core_widgets/badged_icon.dart';
 import '../../fonts/custom_icons.dart';
 import '../../themes/colors.dart';
 import 'filter_bottom_menu.dart';
-import '../core_widgets/my_icon_button.dart';
 
 class BottomActionBar extends StatefulWidget {
   static bool isSortingAZ = true;
@@ -30,7 +29,7 @@ class BottomActionBar extends StatefulWidget {
 class _BottomActionBarState extends State<BottomActionBar> {
 
   int _badgeNumber = 0;
-  IconData sortMenuIcon = FontAwesomeIcons.sortAlphaDown;
+  IconData sortMenuIcon = FontAwesomeIcons.arrowDownAZ;
 
   @override
   void initState() {
@@ -92,11 +91,11 @@ class _BottomActionBarState extends State<BottomActionBar> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const FaIcon(FontAwesomeIcons.sortAlphaDown),
+                              icon: const FaIcon(FontAwesomeIcons.arrowDownAZ),
                               onPressed: () {
                                 setState(() {
                                   BottomActionBar.sortingMethod = "alphaDown";
-                                  sortMenuIcon = FontAwesomeIcons.sortAlphaDown;
+                                  sortMenuIcon = FontAwesomeIcons.arrowDownAZ;
                                   if (widget.onSortingMethodChanged != null) widget.onSortingMethodChanged!();
                                 });
                               },
@@ -131,11 +130,11 @@ class _BottomActionBarState extends State<BottomActionBar> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const FaIcon(FontAwesomeIcons.sortAlphaUp),
+                                icon: const FaIcon(FontAwesomeIcons.arrowUpAZ),
                                 onPressed: () {
                                   setState(() {
                                     BottomActionBar.sortingMethod = "alphaUp";
-                                    sortMenuIcon = FontAwesomeIcons.sortAlphaUp;
+                                    sortMenuIcon = FontAwesomeIcons.arrowUpAZ;
                                     if (widget.onSortingMethodChanged != null) widget.onSortingMethodChanged!();
                                   });
                                 },
@@ -166,7 +165,7 @@ class _BottomActionBarState extends State<BottomActionBar> {
                   ],
 
                 ),
-                MyIconButton(
+                IconButton(
                     onPressed: () {
                       setState(() {
                         BottomActionBar.displayFavorites = !BottomActionBar.displayFavorites;
@@ -177,25 +176,6 @@ class _BottomActionBarState extends State<BottomActionBar> {
                 ),
               ],
             ),
-
-            /// V1
-            // Row(
-            //   children: [
-            //     MyIconButton(
-            //         onPressed: () {
-            //           setState(() {
-            //             BottomActionBar.isListed = !BottomActionBar.isListed;
-            //           });
-            //           // Callback
-            //           if (widget.onChangeDisplay != null) widget.onChangeDisplay!();
-            //         },
-            //         icon: BottomActionBar.isListed ? FaIcon(FontAwesomeIcons.listUl) : FaIcon(FontAwesomeIcons.thLarge)
-            //     ),
-            //     SizedBox(
-            //       width: 80,
-            //     )
-            //   ],
-            // )
           ],
         ),
       ),

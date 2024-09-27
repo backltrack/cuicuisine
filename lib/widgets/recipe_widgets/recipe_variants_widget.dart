@@ -4,7 +4,6 @@ import '../../database/database_mgr.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/recipe_widgets/variant_bubble_widget.dart';
 
@@ -94,7 +93,7 @@ class _RecipeVariantsWidgetState extends State<RecipeVariantsWidget> {
                         // });
                     },
                   ),
-                MyIconButton(
+                IconButton(
                   onPressed: () {
                     setState(() {
                       widgetApertureState = !widgetApertureState;

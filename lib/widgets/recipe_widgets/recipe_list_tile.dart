@@ -5,8 +5,6 @@ import '../../themes/theme_mgr.dart';
 import '../../utilities/time_functions.dart';
 import '../../models/data_model.dart';
 
-import '../core_widgets/my_icon_button.dart';
-
 class RecipeListTile extends StatefulWidget {
   final Recipe recipe;
   final Function()? onTap;
@@ -99,7 +97,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
                   ),
                   Container(
                     alignment: AlignmentDirectional.topCenter,
-                    child: MyIconButton(
+                    child: IconButton(
                       onPressed: () async {
                         //set favorite in database
                         DatabaseMgr().localMgr.toggleFavorite(widget.recipe.id);
@@ -126,40 +124,38 @@ class _RecipeListTileState extends State<RecipeListTile> {
               ),
             ),
             Container(
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: ThemeMgr.getTheme(context)!.colorScheme.background, spreadRadius: spacing)]
-                ),
-                child: () {
-                  if (widget.recipe.pictures.isEmpty) {
-                    return CircleAvatar(
-                      maxRadius: (cardHeight) / 2,
-                      backgroundImage: const AssetImage("assets/images/default_circle_image.png"),
-                      backgroundColor: ThemeMgr.getTheme(context)!.cardColor,
-                    );
-                  } else {
-                    return FutureBuilder(
-                      future: DatabaseMgr().localMgr.getFirstRecipeImage(widget.recipe.id),
-                      builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
-                        if (snapshot.hasData) {
-                          return CircleAvatar(
-                            maxRadius: (cardHeight) / 2,
-                            foregroundImage: snapshot.data!.image,
-                            backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
-                          );
-                        } else {
-                          return CircleAvatar(
-                            maxRadius: (cardHeight) / 2,
-                            backgroundImage: const AssetImage("assets/images/default_circle_image.png"),
-                            backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
-                          );
-                        }
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: ThemeMgr.getTheme(context)!.colorScheme.background, spreadRadius: spacing)]
+              ),
+              child: () {
+                if (widget.recipe.pictures.isEmpty) {
+                  return CircleAvatar(
+                    maxRadius: (cardHeight) / 2,
+                    backgroundImage: const AssetImage("assets/images/default_circle_image.png"),
+                    backgroundColor: ThemeMgr.getTheme(context)!.cardColor,
+                  );
+                } else {
+                  return FutureBuilder(
+                    future: DatabaseMgr().localMgr.getFirstRecipeImage(widget.recipe.id),
+                    builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
+                      if (snapshot.hasData) {
+                        return CircleAvatar(
+                          maxRadius: (cardHeight) / 2,
+                          foregroundImage: snapshot.data!.image,
+                          backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
+                        );
+                      } else {
+                        return CircleAvatar(
+                          maxRadius: (cardHeight) / 2,
+                          backgroundImage: const AssetImage("assets/images/default_circle_image.png"),
+                          backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
+                        );
                       }
-                    );
-                  }
-                } ()
-              )
+                    }
+                  );
+                }
+              } ()
             ),
           ],
         ),

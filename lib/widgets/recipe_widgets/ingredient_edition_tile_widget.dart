@@ -4,7 +4,6 @@ import '../../models/data_model.dart';
 import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/string_functions.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 
 class IngredientEditionTile extends StatefulWidget {
   final Ingredient ingredient;
@@ -80,12 +79,12 @@ class _IngredientEditionTileState extends State<IngredientEditionTile> {
                   child: Text(beautifyName(ingredient.name), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
                 )
             ),
-            MyIconButton(
+            IconButton(
               icon: FaIcon(FontAwesomeIcons.pen, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
               onPressed: widget.onEdit,
             ),
-            MyIconButton(
-              icon: FaIcon(FontAwesomeIcons.solidTrashAlt, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+            IconButton(
+              icon: FaIcon(FontAwesomeIcons.solidTrashCan, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
               onPressed: widget.onRemove
             ),
           ],

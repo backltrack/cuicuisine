@@ -150,6 +150,7 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
               );
               if(shouldSignOut != null && shouldSignOut) {
                 //await FirebaseAuth.instance.signOut();
+                DatabaseMgr().localMgr.deleteCredentials();
                 Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
               }
             }

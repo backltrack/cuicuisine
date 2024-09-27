@@ -1,13 +1,11 @@
 import 'dart:math';
 
-import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/l10n/localeMgr.dart';
 import 'package:flutter/material.dart';
 import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../widgets/recipe_widgets/ingredient_tile_widget.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/recipe_widgets/quantity_widget.dart';
 
 
@@ -112,7 +110,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
             })
           ),
           // Expand button
-          if (widget.ingredients.length > _maxIngredientDisplay) MyIconButton(
+          if (widget.ingredients.length > _maxIngredientDisplay) IconButton(
             onPressed: () {
               setState(() {
                 _isListViewOpened = !_isListViewOpened;

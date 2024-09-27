@@ -25,6 +25,7 @@ class MongoConnector {
           'accept': 'application/json'
       });
       DatabaseMgr().isOnline = true;
+      DatabaseMgr().localMgr.saveServerUri(server);
       this.server = server;
       return response.body == "true";
     } catch (_) {
@@ -33,6 +34,21 @@ class MongoConnector {
   }
 
   // helper
+  Future<dynamic>_secure(Function fun) async {
+    try {
+      return fun();
+    } on TimeoutException catch(_) {
+      DatabaseMgr().isOnline = false;
+      return Response("{'result': false}", HttpStatus.requestTimeout);
+    } on SocketException catch(_) {
+      DatabaseMgr().isOnline = false;
+      return Response("{'result': false}", HttpStatus.requestTimeout);
+    } on ClientException catch(_) {
+      DatabaseMgr().isOnline = false;
+      return Response("{'result': false}", HttpStatus.connectionClosedWithoutResponse);
+    }
+  }
+
   Future<dynamic> _secureGetRequest(String endpoint) async {
     if (client == null) { return; }
 
@@ -43,17 +59,10 @@ class MongoConnector {
       'Authorization': client!.credentials.accessToken
     };
 
-    try {
-      final response = await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
+    return await _secure(() async {
+      return await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
         headers: headers);
-      return response;
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw TimeoutException;
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw SocketException;
-    }
+    });
   }
 
   Future<dynamic> _secureDeleteRequest(String endpoint, Object data) async {
@@ -63,13 +72,14 @@ class MongoConnector {
 
     var headers = {
       'accept': 'application/json',
-      'Authorization': client!.credentials.accessToken
+      'Authorization': client!.credentials.accessToken,
+      'Content-type': 'application/json'
     };
 
     try {
       Response response = await client!.delete(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
-        body: data);
+        body: jsonEncode(data));
       return response;
     } on TimeoutException catch(_) {
       DatabaseMgr().isOnline = false;
@@ -88,39 +98,13 @@ class MongoConnector {
     var headers = {
       'accept': 'application/json',
       'Authorization': client!.credentials.accessToken,
-      "Content-type": "application/json"
+      'Content-type': 'application/json'
     };
 
     try {
       Response response = await client!.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: jsonEncode(data));
-      return response;
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw TimeoutException;
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw SocketException;
-    }
-  }
-
-  Future<dynamic> _securePostFormRequest(String endpoint, Map<String, dynamic> data) async {
-    if (client == null) { return; }
-    
-    Uri serverUri = Uri.parse(server);
-
-    var headers = {
-      'accept': 'application/json',
-      'Authorization': client!.credentials.accessToken,
-      // "Content-type": "application/json"
-    };
-
-    try {
-      Response response = await client!.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
-        headers: headers,
-        body: data);
-        // body: jsonEncode(data));
       return response;
     } on TimeoutException catch(_) {
       DatabaseMgr().isOnline = false;
@@ -176,10 +160,13 @@ class MongoConnector {
       return response;
     } on TimeoutException catch(_) {
       DatabaseMgr().isOnline = false;
-      // throw TimeoutException;
+      return Response("{'result': false}", HttpStatus.requestTimeout);
     } on SocketException catch(_) {
       DatabaseMgr().isOnline = false;
-      // throw SocketException;
+      return Response("{'result': false}", HttpStatus.requestTimeout);
+    } on ClientException catch(_) {
+      DatabaseMgr().isOnline = false;
+      return Response("{'result': false}", HttpStatus.connectionClosedWithoutResponse);
     }
   }
 
@@ -285,12 +272,13 @@ class MongoConnector {
       oauth2.Client? _client = await OAuth2Connexion.createClientFromPassword(serverUri: server, email: email, password: password);
       if (_client != null) {
         client = _client;
-        print(client!.credentials.accessToken);
 
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
 
-        onSuccess??(user);
+        if (onSuccess != null) {
+          onSuccess(user);
+        }
         return user;
       }
     }
@@ -339,30 +327,40 @@ class MongoConnector {
               }
             }
             else if (change.objectType == 'book') {
-              Book book = await fetchBook(change.objectId);
-              Book? localBook = DatabaseMgr().localMgr.getBook(book.id);
-
-              if (localBook != null) {
-                localBook.copyFromBook(book);
-                localBook.save();
+              if (change.operationType == OperationType.delete) {
+                DatabaseMgr().localMgr.deleteBook(change.objectId);
               }
               else {
-                DatabaseMgr().localMgr.addBook(book, addToQueue: false);
+                Book book = await fetchBook(change.objectId);
+                Book? localBook = DatabaseMgr().localMgr.getBook(book.id);
+
+                if (localBook != null) {
+                  localBook.copyFromBook(book);
+                  localBook.save();
+                }
+                else {
+                  DatabaseMgr().localMgr.addBook(book, addToQueue: false);
+                }
               }
             }
             else if (change.objectType == 'recipe') {
-              Recipe recipe = await fetchRecipe(change.objectId);
-              Recipe? localRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
-
-              if (localRecipe != null) {
-                localRecipe.copyFromRecipe(recipe);
-                localRecipe.save();
+              if (change.operationType == OperationType.delete) {
+                DatabaseMgr().localMgr.deleteRecipe(change.objectId);
               }
               else {
-                DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
-              }
+                Recipe recipe = await fetchRecipe(change.objectId);
+                Recipe? localRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
 
-              downloadMissingImages(recipe);
+                if (localRecipe != null) {
+                  localRecipe.copyFromRecipe(recipe);
+                  localRecipe.save();
+                }
+                else {
+                  DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+                }
+
+                downloadMissingImages(recipe);
+              }
             }
 
             // add change to local list
@@ -441,6 +439,7 @@ class MongoConnector {
           final changeResponse = await _securePostJsonRequest('/change/add', {
             'changeId': change,
             'objectType': 'user',
+            'operationType': OperationType.update.index,
             'objectId': userUpdate.id
           });
           
@@ -503,6 +502,7 @@ class MongoConnector {
           final changeResponse = await _securePostJsonRequest('/change/add', {
             'changeId': change,
             'objectType': 'book',
+            'operationType': OperationType.create.index,
             'objectId': data['id']
           });
           
@@ -542,6 +542,7 @@ class MongoConnector {
           final changeResponse = await _securePostJsonRequest('/change/add', {
             'changeId': change,
             'objectType': 'book',
+            'operationType': OperationType.update.index,
             'objectId': bookUpdate.id
           });
           
@@ -570,7 +571,22 @@ class MongoConnector {
     );
 
     if (response != null && response.statusCode == 200) {
-      return true;
+      final value = jsonDecode(response.body);
+      if (value is bool) {
+        String change = DatabaseMgr().localMgr.createChange();
+
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'book',
+          'operationType': OperationType.delete.index,
+          'objectId': book.id
+        });
+
+        if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+            return true;
+        }
+      }
     }
 
     return false;
@@ -640,6 +656,7 @@ class MongoConnector {
           final changeRecipeResponse = await _securePostJsonRequest('/change/add', {
             'changeId': changeRecipe,
             'objectType': 'recipe',
+            'operationType': OperationType.create.index,
             'objectId': data['id']
           });
 
@@ -649,6 +666,7 @@ class MongoConnector {
           final changeBookResponse = await _securePostJsonRequest('/change/add', {
             'changeId': changeBook,
             'objectType': 'book',
+            'operationType': OperationType.update.index,
             'objectId': data['id']
           });
           
@@ -689,6 +707,7 @@ class MongoConnector {
           final changeResponse = await _securePostJsonRequest('/change/add', {
             'changeId': change,
             'objectType': 'recipe',
+            'operationType': OperationType.update.index,
             'objectId': recipeUpdate.id
           });
           
@@ -717,7 +736,22 @@ class MongoConnector {
     );
 
     if (response != null && response.statusCode == 200) {
-      return true;
+      final value = jsonDecode(response.body);
+      if (value is bool && value) {
+        String change = DatabaseMgr().localMgr.createChange();
+
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'recipe',
+          'operationType': OperationType.delete.index,
+          'objectId': recipe.id
+        });
+
+        if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+            return true;
+        }
+      }
     }
 
     return false;

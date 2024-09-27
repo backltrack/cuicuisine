@@ -58,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   String _research = "";
 
   // popup menu position and selection
-  var _tapPosition;
+  Offset _tapPosition = const Offset(0, 0);
 
   // vibration access
   bool canVibrate = false;
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
           selectedBook = foundBook;
           //get recipes and set tags and ingredients names to book
           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-          DatabaseMgr().localMgr.updateTagsAndIngredients();
+          await DatabaseMgr().localMgr.updateTagsAndIngredients();
           // get user access
           userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? 0;
           // refresh UI
@@ -181,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                 print(value);
                 if (value != null && value) {
                   print("delete recipe");
-                  // await removeRecipe(recipe.id, selectedBook!.id);
+                  DatabaseMgr().localMgr.deleteRecipe(recipe.id);
                   // update book recipes
                   recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
                   setState(() {});
@@ -213,18 +213,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> setBookAsDefaultAndRefresh(Book book) async {
-    // set default book to 0
     selectedBook = book;
+    // store new default book
+    DatabaseMgr().localMgr.saveCurrentBook(book.id);
     //get recipes and set tags and ingredients names to book
     recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
-    DatabaseMgr().localMgr.updateTagsAndIngredients();
+    await DatabaseMgr().localMgr.updateTagsAndIngredients();
     // get user access
     userAccess = DatabaseMgr().localMgr.getUserAccess(book.id);
     // refresh UI
     setState(() {});
-    // store new default book
-    DatabaseMgr().localMgr.saveCurrentBook(book.id);
-    print("set default book");
   }
 
   Future<void> addNewBook() async {
@@ -315,7 +313,7 @@ class _HomePageState extends State<HomePage> {
                         if (result != null && result == "reloadRecipes") {
                           print('reload');
                           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                          DatabaseMgr().localMgr.updateTagsAndIngredients();
+                          await DatabaseMgr().localMgr.updateTagsAndIngredients();
                           // refresh UI
                           setState(() {});
                         } else if (result != null && result == "reloadBooks") {
@@ -407,7 +405,7 @@ class _HomePageState extends State<HomePage> {
             }
             // reload recipes
             recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-            DatabaseMgr().localMgr.updateTagsAndIngredients();
+            await DatabaseMgr().localMgr.updateTagsAndIngredients();
             // update UI
             setState(() {});
           },

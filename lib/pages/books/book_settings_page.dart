@@ -143,7 +143,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                   });
                 }
                 Share.share(
-                    "${S.of(context).book_settings_share_content1}${_book!.name}${S.of(context).book_settings_share_content2}${S.of(context).title}\nhttp://openapp.recettesdefamille.com/home/join_book/${_book!.id}"
+                    "${S.of(context).book_settings_share_content1}${_book!.name}${S.of(context).book_settings_share_content2}${S.of(context).title}\nhttp://openapp.cuicuisine.com/home/join_book/${_book!.id}"
                 );
               },
             ),

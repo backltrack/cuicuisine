@@ -37,6 +37,10 @@ class DatabaseMgr with ChangeNotifier {
     
     String? uri = localMgr.getServerUri();
 
+    if (uri == null) {
+      localMgr.saveServerUri(defaultServer);
+    }
+
     remoteMgr = MongoConnector(server: uri ?? defaultServer);
     
     synchronization = Synchronization();

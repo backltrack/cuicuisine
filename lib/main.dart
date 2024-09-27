@@ -53,7 +53,7 @@ class Cuicuisine extends StatefulWidget {
 }
 
 class _CuicuisineState extends State<Cuicuisine> {
-  // Handle local switch
+  // Handle locale switch
   Locale? _locale;
 
   void changeLocale(String localeCode) {

@@ -1,6 +1,6 @@
 {
   "@@locale": "fr",
-  "title": "Recette de famille",
+  "title": "Cuicuisine",
   "book_choice": "Choisis un livre !",
   "no_recipe": "Aucune recette disponible",
   "add_book": "Ajoute un livre !",
@@ -67,6 +67,7 @@
   "general_settings_signout": "Déconnexion",
   "general_settings_export": "Exporter mes livres",
   "general_settings_import": "Importer des livres",
+  "general_settings_server": "Adresse serveur",
 
   "remove_account": "Supprimer mon compte",
   "remove_button": "Supprimer",

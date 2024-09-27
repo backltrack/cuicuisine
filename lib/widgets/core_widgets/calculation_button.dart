@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../themes/theme_mgr.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/recipe_widgets/QuantityMultiplierDialog.dart';
 
 class CalculationButtonWidget extends StatefulWidget {
@@ -35,7 +34,7 @@ class _CalculationButtonWidgetState extends State<CalculationButtonWidget> {
         Text(_value != 1 ? _value.toStringAsFixed(3) : ''),
         IconTheme(
           data: _isEnabled ? ThemeMgr.getTheme(context)!.iconTheme.copyWith(color: ThemeMgr.getTheme(context)!.primaryColor) : ThemeMgr.getTheme(context)!.iconTheme.copyWith(color: Colors.grey),
-          child: MyIconButton(
+          child: IconButton(
             icon: FaIcon(FontAwesomeIcons.calculator),
             onPressed: () async {
               var newValue = await showQuantityMultiplierDialog(context: context, currentCoefficient: _value);

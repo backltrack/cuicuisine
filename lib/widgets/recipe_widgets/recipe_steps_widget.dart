@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
@@ -48,7 +47,7 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                 right: 0,
                 child: Row(
                   children: [
-                    MyIconButton(
+                    IconButton(
                       icon: const Icon(Icons.zoom_out),
                       onPressed: () {
                         setState(() {
@@ -56,7 +55,7 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                         });
                       },
                     ),
-                    MyIconButton(
+                    IconButton(
                       icon: const Icon(Icons.zoom_in),
                       onPressed: () {
                         setState(() {

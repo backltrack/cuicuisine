@@ -118,10 +118,10 @@ class Synchronization {
 
     }
     else if (object is Book) {
-      _remoteMgr.deleteBook(object);
+      return await _remoteMgr.deleteBook(object);
     }
     else if (object is Recipe) {
-      _remoteMgr.deleteRecipe(object);
+      return await _remoteMgr.deleteRecipe(object);
     }
 
     return true;

@@ -24,6 +24,7 @@ class HiveConnector {
   late Box<Operation> _queueOperationBox;
   late Box<String> _changeBox;
   late Box<dynamic> _contextBox;
+  late Box<dynamic> _bookIngredientsBox;
   FileStorage fileStorage = FileStorage();
 
   HiveConnector();
@@ -58,6 +59,7 @@ class HiveConnector {
     _queueOperationBox = await Hive.openBox('queueOperations');
     _changeBox = await Hive.openBox('changes');
     _contextBox = await Hive.openBox('context');
+    _bookIngredientsBox = await Hive.openBox('bookIngredients');
 
     if (_queueBox.isEmpty) {
       _queueBox.add(OperationQueue());
@@ -173,6 +175,7 @@ class HiveConnector {
 
   void deleteCredentials() {
     _serverBox.delete('credentials');
+    _userBox.clear();
   }
   
   // USER //
@@ -355,9 +358,11 @@ class HiveConnector {
     return 0;
   }
 
-  void updateTagsAndIngredients() {
+  Future<void> updateTagsAndIngredients() async {
     List<String> tags = [];
     List<String> ingredients = [];
+
+    _bookIngredientsBox.clear();
 
     String? currentBookId = loadCurrentBook();
     if (currentBookId != null) {
@@ -367,7 +372,6 @@ class HiveConnector {
         for (String recipeId in recipeIds) {
           Recipe? recipe = getRecipe(recipeId);
           if (recipe != null) {
-            print("check");
             for (String tag in recipe.tags) {
               if (!tags.contains(tag)) {
                 tags.add(tag);
@@ -377,32 +381,31 @@ class HiveConnector {
               if (!ingredients.contains(ingredient.name.trim().toLowerCase())) {
                 ingredients.add(ingredient.name.trim().toLowerCase());
               }
+              if (!_bookIngredientsBox.values.contains(ingredient.name.trim().toLowerCase())) {
+                _bookIngredientsBox.add(ingredient.name.trim().toLowerCase());
+              } 
             }
           }
         }
-        print("1: $tags");
-        _contextBox.clear();
-        _contextBox.put('tags', tags);
-        _contextBox.put('ingredients', ingredients);
-        print("2: ${_contextBox.get('tags')}");
+        await _contextBox.clear();
+        await _contextBox.put('tags', tags);
+        await _contextBox.put('ingredients', ingredients);
       }
     }
   }
 
   List<String> getBookTags() {
     var tags = _contextBox.get('tags');
-    print(tags);
-    if (tags is List<String>) {
-      print(tags);
-      return tags;
+    if (tags != null) {
+      return List<String>.from(tags);
     }
     return [];
   }
 
   List<String> getBookIngredients() {
     var ingredients = _contextBox.get('ingredients');
-    if (ingredients is List<String>) {
-      return ingredients;
+    if (ingredients != null) {
+      return List<String>.from(ingredients);
     }
     return [];
   }
@@ -578,7 +581,7 @@ class HiveConnector {
   }
 
   String addNewRecipe({String name="", required String bookId}) {
-    Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 0, recipeIngredients: [], steps: [], creationDate: DateTime.now());
+    Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [], steps: [], creationDate: DateTime.now());
     addRecipe(recipe);
 
     Book? book = getBook(bookId);

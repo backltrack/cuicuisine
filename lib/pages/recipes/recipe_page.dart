@@ -12,7 +12,6 @@ import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/recipe_widgets/image_slideshow.dart';
 import '../../widgets/recipe_widgets/recipe_popup_menu.dart';
 import '../../widgets/recipe_widgets/book_picker_popup.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/recipe_widgets/recipe_variants_widget.dart';
 import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
 import '../../widgets/recipe_widgets/recipe_ingredients_widget.dart';
@@ -126,7 +125,7 @@ class _RecipePageState extends State<RecipePage> {
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 child: IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.edit),
+                  icon: const FaIcon(FontAwesomeIcons.penToSquare),
                   onPressed: () {
                     Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
                       "currentName": recipe.name
@@ -229,7 +228,7 @@ class _RecipePageState extends State<RecipePage> {
                       child: Positioned(
                           top: 4,
                           right: 4,
-                          child: MyIconButton(
+                          child: IconButton(
                             onPressed: () async {
                               //set favorite in database
                               DatabaseMgr().localMgr.toggleFavorite(recipe.id);

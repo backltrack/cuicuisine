@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "title": "Family recipes",
+  "title": "Cookcorico",
   "book_choice": "Pick a book!",
   "no_recipe": "No recipe available",
   "add_book": "Add a book!",
@@ -67,6 +67,7 @@
   "general_settings_signout": "Sign out",
   "general_settings_export": "Owned books export",
   "general_settings_import": "Books Import",
+  "general_settings_server": "Server address",
 
   "remove_account": "Remove my account",
   "remove_button": "Remove",
@@ -110,7 +111,7 @@
   "popup_loose_data_2": "button to save your work.\n",
   "popup_loose_data_3": "Do you really want to go back without saving?",
 
-  "info_share_book_title": "Partager un livre",
+  "info_share_book_title": "Share a book",
   "info_share_book_description1": "You're about to share this book.",
   "info_share_book_description2": "By default, collaborators can only see recipes.",
   "info_share_book_description_owner": "You can give them more rights or remove their access to the book at any moment from the users parameters below.",

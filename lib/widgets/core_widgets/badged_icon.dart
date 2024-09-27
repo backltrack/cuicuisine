@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../themes/theme_mgr.dart';
-import 'my_icon_button.dart';
 
 class BadgedIconButton extends StatefulWidget {
   final icon;
@@ -36,7 +35,7 @@ class _BadgedIconButtonState extends State<BadgedIconButton> {
     final double iconHeight = widget.icon.size == null ? ThemeMgr.getTheme(context)!.iconTheme.size! : widget.icon.size!;
     return Stack(
       children: [
-        MyIconButton(
+        IconButton(
             onPressed: widget.onPressed == null ? () {} : widget.onPressed,
             icon: widget.icon
         ),

@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
 import '../../widgets/recipe_widgets/filter_bottom_menu.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/search_app_bar.dart';
 
 class ItemSelector extends StatefulWidget {
@@ -89,7 +88,7 @@ class _ItemSelectorState extends State<ItemSelector> {
           return _search != "" && items[index].contains(_search) || _search == "" ?
             ListTile(
               title: Text(itemType == "ingredients" ? beautifyName(items[index]) : items[index]),
-              trailing: MyIconButton(
+              trailing: IconButton(
                   onPressed: () {
                     setState(() {
                       if (_selectedIndices.contains(index)) {
@@ -99,10 +98,10 @@ class _ItemSelectorState extends State<ItemSelector> {
                       }
                     });
                   },
-                  icon: _selectedIndices.contains(index) ? FaIcon(FontAwesomeIcons.solidCheckCircle) : FaIcon(FontAwesomeIcons.plusCircle)
+                  icon: _selectedIndices.contains(index) ? const FaIcon(FontAwesomeIcons.solidCircleCheck) : const FaIcon(FontAwesomeIcons.circlePlus)
               ),
           ) :
-          SizedBox();
+          const SizedBox();
         },
       ),
     );

@@ -5,8 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../l10n/localeMgr.dart';
-import '../../pages/home_page.dart';
-import '../../widgets/core_widgets/my_icon_button.dart';
 import '../../widgets/core_widgets/my_outlined_button.dart';
 import '../../widgets/recipe_widgets/recipe_tags_widget.dart';
 import '../../widgets/core_widgets/search_app_bar.dart';
@@ -72,7 +70,7 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
     Widget listTile(tag) {
       return ListTile(
         title: Text(tag),
-        trailing: MyIconButton(
+        trailing: IconButton(
             onPressed: () {
               if (_selectedTags.contains(tag)) {
                 setState(() {

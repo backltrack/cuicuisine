@@ -103,7 +103,7 @@ flutter:
     - assets/icons/splash_icon.png
     - assets/images/default_image.png
     - assets/images/default_circle_image.png
-    - fonts/google_fonts/
+    - fonts/google_fonts/comfortaa/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
