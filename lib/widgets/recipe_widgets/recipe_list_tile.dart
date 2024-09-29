@@ -88,7 +88,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
                                       child: Text(minutesToTime(widget.recipe.preparationTime + widget.recipe.cookingTime + widget.recipe.waitingTime)),
                                     )
                                   ],
-                                )
+                                ),
                               ],
                             )
                           ],
@@ -97,28 +97,35 @@ class _RecipeListTileState extends State<RecipeListTile> {
                   ),
                   Container(
                     alignment: AlignmentDirectional.topCenter,
-                    child: IconButton(
-                      onPressed: () async {
-                        //set favorite in database
-                        DatabaseMgr().localMgr.toggleFavorite(widget.recipe.id);
-                        AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
+                    margin: const EdgeInsets.fromLTRB(0, 0, 0, spacing),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () async {
+                            //set favorite in database
+                            DatabaseMgr().localMgr.toggleFavorite(widget.recipe.id);
+                            AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
 
-                        if (newAppUser != null) {
-                          if (newAppUser.favoriteRecipes.contains(widget.recipe.id)) {
-                            setState(() {
-                              isFav = true;
-                            });
-                          } else {
-                            setState(() {
-                              isFav = false;
-                            });
-                          }
-                        } else {
-                          print("Connexion issue");
-                        }
-                      },
-                      icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color),
-                    ),
+                            if (newAppUser != null) {
+                              if (newAppUser.favoriteRecipes.contains(widget.recipe.id)) {
+                                setState(() {
+                                  isFav = true;
+                                });
+                              } else {
+                                setState(() {
+                                  isFav = false;
+                                });
+                              }
+                            } else {
+                              print("Connexion issue");
+                            }
+                          },
+                          icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color),
+                        ),
+                        FaIcon(widget.recipe.isDirty ? FontAwesomeIcons.arrowsRotate : FontAwesomeIcons.check)
+                      ],
+                    )
                   ),
                 ],
               ),

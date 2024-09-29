@@ -482,6 +482,7 @@ class MongoConnector {
   Future<bool> createBook(Book book) async {
     final response = await _securePutRequest('/books/create', 
       {
+        'id': book.id,
         'name': book.name
       }
     );
@@ -492,10 +493,10 @@ class MongoConnector {
       try {
         dynamic data = jsonDecode(response.body);
         print(data);
-        if (data != null) {
+        if (data != null && data['result']) {
+          print('test');
 
-          DatabaseMgr().localMgr.updateBookId(book.id, data['id']);
-          DatabaseMgr().localMgr.updateBookFromDict(data);
+          DatabaseMgr().localMgr.updateBookLastUpdate(book.id, DateTime.parse(data['lastUpdate']));
 
           String change = DatabaseMgr().localMgr.createChange();
           
@@ -503,7 +504,7 @@ class MongoConnector {
             'changeId': change,
             'objectType': 'book',
             'operationType': OperationType.create.index,
-            'objectId': data['id']
+            'objectId': book.id
           });
           
           if (bool.parse(changeResponse.body)){
@@ -628,6 +629,7 @@ class MongoConnector {
 
     final response = await _securePutRequest('/recipes/create', 
       {
+        'id': recipe.id,
         'name': recipe.name,
         'bookId': bookId
       }
@@ -640,8 +642,8 @@ class MongoConnector {
         dynamic data = jsonDecode(response.body);
         print(data);
 
-        if (data != null) {
-          DatabaseMgr().localMgr.updateRecipeId(recipe.id, data['id']);
+        if (data != null && data['result']) {
+          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipe.id, DateTime.parse(data['lastUpdate']));
 
           Book? book = DatabaseMgr().localMgr.getBook(bookId);
           if (book != null) {
@@ -657,7 +659,7 @@ class MongoConnector {
             'changeId': changeRecipe,
             'objectType': 'recipe',
             'operationType': OperationType.create.index,
-            'objectId': data['id']
+            'objectId': recipe.id
           });
 
           // change book
@@ -667,7 +669,7 @@ class MongoConnector {
             'changeId': changeBook,
             'objectType': 'book',
             'operationType': OperationType.update.index,
-            'objectId': data['id']
+            'objectId': bookId
           });
           
           if (bool.parse(changeRecipeResponse.body) && bool.parse(changeBookResponse.body)){

@@ -1,4 +1,6 @@
+import 'package:cuicuisine/widgets/core_widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
@@ -52,6 +54,16 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
 
   }
 
+  void tryOfflineConnexion() {
+    AppUser? user =  DatabaseMgr().localMgr.getUser();
+      if (user != null) {
+        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+      }
+      else {
+        Fluttertoast.showToast(msg: S.of(context).connexion_needed);
+      }
+  }
+
   void init() async {
     await DatabaseMgr().remoteMgr.testConnexion();
     if (DatabaseMgr().isOnline) {
@@ -72,16 +84,20 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
       }
     }
     else {
-      print('offline switch to local mode');
       AppUser? user =  DatabaseMgr().localMgr.getUser();
-      if (user != null) {        
-        print("Start offline");
-        print("Pending operations : ${DatabaseMgr().localMgr.getQueueLength()}");
-        print("Operations: ${DatabaseMgr().localMgr.getOperationLength()}");
-        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
-      }
-      else {
-        print("need internet connexion for registration");
+      if (user != null) {
+        bool? goOffline = await showAlertDialog(
+          context: context,
+          title: S.of(context).offline_alert_title,
+          description: Text(S.of(context).offline_alert_description)
+        );
+        if (goOffline != null && goOffline) {
+          print('offline switch to local mode');
+          tryOfflineConnexion();
+        } 
+        else {
+          Fluttertoast.showToast(msg: S.of(context).offline_refused_toast);
+        }
       }
     }
 
@@ -131,12 +147,12 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
 
                       // EMAIL method
                       SocialButton(
+                        onPressed: DatabaseMgr().isOnline ? () async {
+                          Navigator.pushNamed(context, EmailConnexion.route);
+                        } : null,
                         child: const FaIcon(
                           FontAwesomeIcons.envelope
                         ),
-                        onPressed: () async {
-                          Navigator.pushNamed(context, EmailConnexion.route);
-                        },
                       ),
                     ],
                   ),
@@ -168,7 +184,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                   ),
                   IconButton(
                     icon: const Icon(FontAwesomeIcons.gear),
-                    color: Colors.white70,
+                    color: !_showSettings ? Colors.white70 : ThemeMgr.getTheme(context)!.primaryColor,
                     onPressed: () {
                       setState(() {
                         _showSettings = !_showSettings;
@@ -213,7 +229,13 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                     AnimatedIconButton(
                       icon: const Icon(FontAwesomeIcons.arrowsRotate),
                       onPressed: () async {
-                        if (!await DatabaseMgr().remoteMgr.setServer(_serverTextEditingController.text)) {
+                        bool isUriWorking = await DatabaseMgr().remoteMgr.setServer(_serverTextEditingController.text);
+                        setState(() {});
+
+                        if (isUriWorking) {
+                          tryOfflineConnexion();
+                        }
+                        else {
                           _serverTextEditingController.text = DatabaseMgr().localMgr.getServerUri() ?? "";
                         }
                       },

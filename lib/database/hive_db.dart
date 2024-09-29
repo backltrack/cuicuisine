@@ -315,7 +315,7 @@ class HiveConnector {
     if (user == null) {
       return null;
     }
-    Book book = Book(id: const Uuid().v4(), name: name, recipeIds: [], users: [user.id], access: {user.id: 2});
+    Book book = Book(id: ObjectId().hexString, name: name, recipeIds: [], users: [user.id], access: {user.id: 2});
     addBook(book);
 
     return book.id;
@@ -324,7 +324,6 @@ class HiveConnector {
   void addBook(Book book, {bool addToQueue=true}) {
     try {
       _bookBox.add(book);
-      //to remove
       saveCurrentBook(book.id);
 
       if (addToQueue) {
@@ -429,6 +428,12 @@ class HiveConnector {
     }
   }
 
+  void updateBookLastUpdate(String id, DateTime lastUpdate) {
+    Book book = _bookBox.values.firstWhere((book) => book.id == id);
+    book.lastUpdate = lastUpdate;
+    book.save();
+  }
+
   void updateBookFromDict(Map<String, dynamic> data) {
     Book book = _bookBox.values.firstWhere((book) => book.id == data['id']);
 
@@ -448,12 +453,6 @@ class HiveConnector {
       book.lastUpdate = DateTime.parse(data['lastUpdate']);
     }
     
-    book.save();
-  }
-
-  void updateBookLastUpdate(String id, DateTime lastUpdate) {
-    Book book = _bookBox.values.firstWhere((book) => book.id == id);
-    book.lastUpdate = lastUpdate;
     book.save();
   }
 
@@ -575,13 +574,18 @@ class HiveConnector {
       if (addToQueue) {
         addQueueOperation(type: OperationType.create, object: recipe);
       }
+      else {
+        // if not, the recipe is fetched from more recent: not dirty
+        recipe.isDirty = false;
+        recipe.save();
+      }
     } on Exception catch(e) {
       throw Exception(e);
     }
   }
 
   String addNewRecipe({String name="", required String bookId}) {
-    Recipe recipe = Recipe(id: const Uuid().v4(), name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [], steps: [], creationDate: DateTime.now());
+    Recipe recipe = Recipe(id: ObjectId().hexString, name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [], steps: [], creationDate: DateTime.now());
     addRecipe(recipe);
 
     Book? book = getBook(bookId);
@@ -596,21 +600,13 @@ class HiveConnector {
     try {
       Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
       recipe.copyFromUpdate(recipeUpdate);
+      recipe.isDirty = true;
       print(recipe.toJson());
       await recipe.save();
     }
     catch (e) {
-      try {
-        Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.initId == id);
-        recipe.copyFromUpdate(recipeUpdate);
-        recipeUpdate.id = recipe.id;
-        print(recipe.toJson());
-        await recipe.save();
-      }
-      catch (e) {
-        print(e);
-        return;
-      }
+      print(e);
+      return;
     }
 
     if (addToQueue) {
@@ -669,6 +665,7 @@ class HiveConnector {
   void updateRecipeLastUpdate(String id, DateTime lastUpdate) {
     Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
     recipe.lastUpdate = lastUpdate;
+    recipe.isDirty = false;
     recipe.save();
   }
 
@@ -798,7 +795,7 @@ class HiveConnector {
   void addQueueOperation({required OperationType type, required DatabaseObject object, bool pushAfter=true}) {
     OperationQueue queue = _queueBox.getAt(0)!;
 
-    Operation ope = Operation(id: const Uuid().v4(), type: type, object: object);
+    Operation ope = Operation(id: ObjectId().hexString, type: type, object: object);
     _queueOperationBox.add(ope);
 
     queue.addOperation(ope.id);
@@ -840,7 +837,7 @@ class HiveConnector {
 
   // Changes
   String createChange() {
-    String change = const Uuid().v4();
+    String change = ObjectId().hexString;
     return change;
   }
 

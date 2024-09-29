@@ -181,8 +181,6 @@ class Recipe extends HiveObject implements DatabaseObject {
   DateTime? lastUpdate;
   @HiveField(14)
   bool isDirty;
-  @HiveField(15)
-  String? initId;
 
   Recipe(
   {
@@ -203,13 +201,7 @@ class Recipe extends HiveObject implements DatabaseObject {
     this.isDirty=true
   }) {
     lastUpdate ??= DateTime.now();
-    initId = id;
   }
-
-  // factory Recipe.fromDocument(DocumentSnapshot snapshot) {
-  //   Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-  //   return Recipe.fromJson(data, id: snapshot.id);
-  // }
 
   factory Recipe.fromJson(Map<String, dynamic> data) {
     // parse ingredients

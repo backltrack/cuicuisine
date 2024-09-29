@@ -1,6 +1,12 @@
 {
   "@@locale": "fr",
   "title": "Cuicuisine",
+
+  "offline_alert_title": "Hors-ligne",
+  "offline_alert_description": "Veux-tu passer en mode hors-ligne ? Les modifications seront synchronisée dès que le réseau est de retour.",
+  "offline_refused_toast": "Attends le retour du réseau ou tente de te connecter à un autre serveur.",
+  "connexion_needed": "Attends d'être en ligne pour pouvoir te connecter.",
+
   "book_choice": "Choisis un livre !",
   "no_recipe": "Aucune recette disponible",
   "add_book": "Ajoute un livre !",

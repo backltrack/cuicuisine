@@ -273,33 +273,47 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         drawer: homepageDrawer(DatabaseMgr().localMgr.getUser()),
-        onDrawerChanged: (isOpened) => isOpened ? DatabaseMgr().remoteMgr.testConnexion(): (),
+        onDrawerChanged: (isOpened) async {
+            if (isOpened) {
+              await DatabaseMgr().remoteMgr.testConnexion();
+              setState(() {});
+            }
+          },
         body:
           selectedBook == null ?
           ListTile(
             title: Text(S.of(context).book_choice),
           ):
-          Builder(
-            builder: (context) {
-              if (recipes != null && recipes!.isNotEmpty) {
+          RefreshIndicator(
+            
+            onRefresh: () async {
+              await DatabaseMgr().remoteMgr.testConnexion();
+              if (DatabaseMgr().isOnline) {
+                await DatabaseMgr().synchronization.sync();
+              }
+              setState(() {});
+            },
+            child: Builder(
+              builder: (context) {
+                if (recipes != null && recipes!.isNotEmpty) {
 
-                // sort Recipe list
-                List<Recipe> sortedData = List<Recipe>.from(recipes!);
-                if (_sortingMethod == "alphaDown") {
-                  sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-                } else if (_sortingMethod == "alphaUp") {
-                  sortedData.sort((Recipe a, Recipe b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
-                } else if (_sortingMethod == "timeDown") {
-                  sortedData.sort((Recipe a, Recipe b) => a.getTotalTime().compareTo(b.getTotalTime()));
-                } else if (_sortingMethod == "timeUp") {
-                  sortedData.sort((Recipe a, Recipe b) => b.getTotalTime().compareTo(a.getTotalTime()));
-                } else if (_sortingMethod == "lastUpdatedDown") {
-                  sortedData.sort((Recipe a, Recipe b) => b.lastUpdate!.compareTo(a.lastUpdate!));
-                } else if (_sortingMethod == "lastUpdatedUp") {
-                  sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
-                }
+                  // sort Recipe list
+                  List<Recipe> sortedData = List<Recipe>.from(recipes!);
+                  if (_sortingMethod == "alphaDown") {
+                    sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+                  } else if (_sortingMethod == "alphaUp") {
+                    sortedData.sort((Recipe a, Recipe b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+                  } else if (_sortingMethod == "timeDown") {
+                    sortedData.sort((Recipe a, Recipe b) => a.getTotalTime().compareTo(b.getTotalTime()));
+                  } else if (_sortingMethod == "timeUp") {
+                    sortedData.sort((Recipe a, Recipe b) => b.getTotalTime().compareTo(a.getTotalTime()));
+                  } else if (_sortingMethod == "lastUpdatedDown") {
+                    sortedData.sort((Recipe a, Recipe b) => b.lastUpdate!.compareTo(a.lastUpdate!));
+                  } else if (_sortingMethod == "lastUpdatedUp") {
+                    sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
+                  }
 
-                return ListView.builder(
+                  return ListView.builder(
                     key: UniqueKey(),
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.vertical,
@@ -376,16 +390,17 @@ class _HomePageState extends State<HomePage> {
                       }
                       return  returnedWidget;
                     }
-                );
-              }
-              else if (recipes != null) {
-                return ListTile(
-                  title: Text(S.of(context).no_recipe),
-                );
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
+                  ); 
+                }
+                else if (recipes != null) {
+                  return ListTile(
+                    title: Text(S.of(context).no_recipe),
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            )
           ),
 
         floatingActionButton: (selectedBook == null || userAccess == 0) ? null : FloatingActionButton(

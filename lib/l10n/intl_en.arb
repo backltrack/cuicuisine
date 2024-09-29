@@ -1,6 +1,12 @@
 {
   "@@locale": "en",
   "title": "Cookcorico",
+
+  "offline_alert_title": "Offline",
+  "offline_alert_description": "Do you want to go offline? Every modification will be synchronized when the connexion is back.",
+  "offline_refused_toast": "Wait for the Internet return or try to connect to another server.",
+  "connexion_needed": "You need to be online to log in.",
+
   "book_choice": "Pick a book!",
   "no_recipe": "No recipe available",
   "add_book": "Add a book!",

@@ -29,9 +29,10 @@ class DatabaseMgr with ChangeNotifier {
     localMgr = HiveConnector();
     await localMgr.initialize();
 
-    const String defaultServer = 'http://192.168.253.248:8000';
+    // const String defaultServer = 'http://192.168.253.248:8000';
+    const String defaultServer = 'http://192.168.55.248:8000';
     // const String defaultServer = 'http://192.168.82.248:8000';
-    // const String defaultServer = 'http://192.168.1.49:8000';
+    // const String defaultServer = 'http://192.168.1.48:8000';
     // const String defaultServer = 'http://192.168.1.28:8000';
     // const String defaultServer = 'http://192.168.2.72:8000';
     
