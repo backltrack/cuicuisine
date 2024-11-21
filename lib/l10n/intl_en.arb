@@ -6,6 +6,7 @@
   "offline_alert_description": "Do you want to go offline? Every modification will be synchronized when the connexion is back.",
   "offline_refused_toast": "Wait for the Internet return or try to connect to another server.",
   "connexion_needed": "You need to be online to log in.",
+  "connexion_needed2": "This action requires to be online",
 
   "book_choice": "Pick a book!",
   "no_recipe": "No recipe available",
@@ -85,8 +86,12 @@
 
   "auth_email_label": "e-mail",
   "auth_password_label": "Password",
-  "auth_password_requirements": "6 characters minimum",
+  "auth_password_req_len": "Length > ",
+  "auth_password_req_uplow": "Upper/Lower characters",
+  "auth_password_req_digit": "Digits",
+  "auth_password_req_sepcial": "Specials characters",
   "auth_connexion": "Connexion",
+  "auth_next": "Next",
   "auth_register": "Register",
   "auth_register_name": "First name",
   "auth_register_lastname": "Last name",

@@ -28,16 +28,16 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
       body: Column(
         children: [
           Container(
-            margin: EdgeInsets.all(12),
+            margin: const EdgeInsets.all(12),
             child: Text(S.of(context).auth_forgotten_password_method,
               textAlign: TextAlign.center,
-              style: ThemeMgr.getTheme(context)!.textTheme.headline2,
+              style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
             ),
           ),
           MyTextField(
             label: S.of(context).auth_email_label,
             keyboardType: TextInputType.emailAddress,
-            suffixIcon: isEmailValid(_email) ? FontAwesomeIcons.checkCircle : null,
+            suffixIcon: EmailPasswordValidator.isEmailValid(_email) ? FontAwesomeIcons.circleCheck : null,
             onChanged: (String val) {
               setState(() {
                 _email = val;
@@ -47,8 +47,7 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
             autofocus: true,
           ),
           SocialButton(
-            child: Text(S.of(context).auth_renewal_link),
-            onPressed: isEmailValid(_email) ? () async {
+            onPressed: EmailPasswordValidator.isEmailValid(_email) ? () async {
               // send email
               // await FirebaseAuth.instance.sendPasswordResetEmail(email: _email);
 
@@ -59,6 +58,7 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
               await Future.delayed(const Duration(seconds: 3));
               Navigator.pop(context);
             } : null,
+            child: Text(S.of(context).auth_renewal_link),
           )
         ],
       ),

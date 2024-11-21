@@ -20,9 +20,40 @@ String getRandomChar(int length){
       length, (_) => ch.codeUnitAt(r.nextInt(ch.length))));
 }
 
-bool isEmailValid(String email) {
-  RegExp exp = RegExp(r'^.+@.+\..+$');
-  return exp.firstMatch(email) != null;
+
+class EmailPasswordValidator {
+  static const int passwordLength = 6;
+
+  EmailPasswordValidator();
+
+  static bool isEmailValid(String email) {
+    RegExp exp = RegExp(r'^.+@.+\..+$');
+    return exp.firstMatch(email) != null;
+  }
+
+  static bool checkPasswordLength(String password) {
+    return password.length >= passwordLength;
+  }
+
+  static bool checkPasswordContainsLowerUpper(String password) {
+    return password.toLowerCase() != password && password.toUpperCase() !=  password;
+  }
+
+  static bool checkPasswordContainsDigit(String password) {
+    RegExp exp = RegExp(r".*\d.*");
+    return exp.hasMatch(password);
+  }
+
+  static bool checkPasswordContainsSpecials(String password) {
+    String test = r"[\W]";
+    RegExp exp = RegExp(test);
+    print(exp);
+    return exp.hasMatch(password);
+  }
+
+  static bool isPasswordValid(String password) {
+    return checkPasswordLength(password);// && checkPasswordContainsLowerUpper(password) && checkPasswordContainsDigit(password) && checkPasswordContainsSpecials(password);
+  }
 }
 
 String beautifyName(String name) {

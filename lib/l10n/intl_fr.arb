@@ -6,6 +6,7 @@
   "offline_alert_description": "Veux-tu passer en mode hors-ligne ? Les modifications seront synchronisée dès que le réseau est de retour.",
   "offline_refused_toast": "Attends le retour du réseau ou tente de te connecter à un autre serveur.",
   "connexion_needed": "Attends d'être en ligne pour pouvoir te connecter.",
+  "connexion_needed2": "Cette action nécessite une connexion.",
 
   "book_choice": "Choisis un livre !",
   "no_recipe": "Aucune recette disponible",
@@ -85,8 +86,12 @@
 
   "auth_email_label": "e-mail",
   "auth_password_label": "Mot de passe",
-  "auth_password_requirements": "6 caractères minimum",
+  "auth_password_req_len": "Longueur > ",
+  "auth_password_req_uplow": "Caractères min/maj ",
+  "auth_password_req_digit": "Chiffres",
+  "auth_password_req_sepcial": "Caractères spéciaux",
   "auth_connexion": "Connexion",
+  "auth_next": "Suivant",
   "auth_register": "Pas encore de compte ?",
   "auth_register_name": "Prénom",
   "auth_register_lastname": "Nom",

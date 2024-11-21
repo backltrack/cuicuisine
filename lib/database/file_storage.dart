@@ -24,8 +24,21 @@ class FileStorage {
   }
 
   Future<bool> imageExists({required String recipeId, required String imageId}) async {
-    String path = p.join(storagePath, "storage", recipeId, imageId);
+    String path = idToPath(recipeId: recipeId, imageId: imageId);
     return await File(path).exists();
+  }
+
+  String idToPath({required String recipeId, required String imageId}) {
+    return p.join(storagePath, "storage", recipeId, imageId);
+  }
+
+  Map<String, String>? pathToId(String path) {
+    if (path.contains(p.join(storagePath, "storage"))) {
+      String imageId = path.split('/').removeLast();
+      String recipeId = path.split('/').removeLast();
+      return {'imageId': imageId, 'recipeId': recipeId};
+    }
+    return null;
   }
 
   Future<Image?> readImage({required String recipeId, required String imageId}) async {
@@ -80,5 +93,41 @@ class FileStorage {
     }
 
     return null;
+  }
+
+  Future<bool> deleteImage({required String recipeId, required String imageId}) async {
+    String path = idToPath(recipeId: recipeId, imageId: imageId);
+    if (await File(path).exists()) {
+      try {
+        await File(path).delete();
+        return true;
+      }
+      catch (e) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  Future<List<String>> getAllRecipeImages(String recipeId) async {
+    String storePath = p.join(storagePath, "storage");
+    String recipePath = p.join(storePath, recipeId);
+
+    List<String> images = [];
+
+    if (!await File(storePath).exists()) {
+      await Directory(storePath).create();
+    }
+    if (!await File(recipePath).exists()) {
+      await Directory(recipePath).create();
+    }
+    
+    List<FileSystemEntity> imagesList = Directory(recipePath).listSync();
+    for (FileSystemEntity entity in imagesList) {
+      if (entity is File) {
+        images.add(entity.path);
+      }
+    }
+    return images;
   }
 }

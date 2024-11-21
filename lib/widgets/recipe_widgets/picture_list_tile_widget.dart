@@ -1,12 +1,14 @@
+import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../themes/theme_mgr.dart';
 
 class PictureListTile extends StatefulWidget {
-  const PictureListTile({Key? key, required this.picture, this.height=80, this.onRemove}) : super(key: key);
+  const PictureListTile({Key? key, required this.recipeId, required this.imageId, this.height=80, this.onRemove}) : super(key: key);
 
-  final String picture;
+  final String recipeId;
+  final String imageId;
   final double height;
   final Function()? onRemove;
 
@@ -20,7 +22,7 @@ class _PictureListTileState extends State<PictureListTile> {
     return Container(
       width: double.infinity,
       height: widget.height,
-      margin: EdgeInsets.only(left: 4, top: 4, right: 4, bottom: 4),
+      margin: const EdgeInsets.only(left: 4, top: 4, right: 4, bottom: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
         color: ThemeMgr.getTheme(context)!.cardColor
@@ -30,14 +32,23 @@ class _PictureListTileState extends State<PictureListTile> {
           Container(
             width: 12,
             decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(4), bottomLeft: Radius.circular(4)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(4), bottomLeft: Radius.circular(4)),
                 color: ThemeMgr.getTheme(context)!.primaryColorDark
             ),
           ),
-          Image.network(widget.picture),
-          Spacer(),
+          FutureBuilder(
+            future: DatabaseMgr().localMgr.getRecipeImage(widget.recipeId, widget.imageId),
+            builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
+              if (snapshot.hasData) {
+                Image image = snapshot.data!;
+                return image;
+              }
+              return Image.asset("assets/images/default_image.png");
+            }
+          ),
+          const Spacer(),
           IconButton(
-            icon: Icon(FontAwesomeIcons.trashAlt),
+            icon: const Icon(FontAwesomeIcons.trashCan),
             onPressed: widget.onRemove,
           )
         ],

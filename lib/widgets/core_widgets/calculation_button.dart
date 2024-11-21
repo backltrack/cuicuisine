@@ -6,7 +6,7 @@ import '../../widgets/recipe_widgets/QuantityMultiplierDialog.dart';
 class CalculationButtonWidget extends StatefulWidget {
   final double value;
   final Function(double) onValueChanged;
-  const CalculationButtonWidget({Key? key, required this.onValueChanged, this.value=0}) : super(key: key);
+  const CalculationButtonWidget({super.key, required this.onValueChanged, this.value=0});
 
   @override
   State<CalculationButtonWidget> createState() => _CalculationButtonWidgetState();

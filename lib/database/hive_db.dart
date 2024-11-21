@@ -520,8 +520,12 @@ class HiveConnector {
         addQueueOperation(type: OperationType.delete, object: bookCopy);
       }
 
+      for (String recipeId in bookCopy.recipeIds) {
+        deleteRecipe(recipeId);
+      }
+
     } on StateError {
-      print("recipe not found");
+      print("book not found");
       return;
     }
   }
@@ -546,9 +550,7 @@ class HiveConnector {
     if (book != null) {
       for (String recipeId in book.recipeIds) {
         Recipe? recipe = getRecipe(recipeId);
-        print("$recipeId is null ?");
         if (recipe != null) {
-          print("Nope, it exists");
           recipes.add(recipe);
         }
       }
@@ -669,8 +671,14 @@ class HiveConnector {
     recipe.save();
   }
 
-  void duplicateRecipe(Recipe recipe, String destinationBookId) {
+  void duplicateRecipe(Recipe recipe, String destinationBookId) async {
     String newRecipeId = addNewRecipe(name: recipe.name, bookId: destinationBookId);
+    
+    List<String> duplicatedImages = [];
+    for (String imageId in recipe.pictures) {
+      duplicatedImages.add(await duplicateImage(recipe.id, imageId, newRecipeId));
+    }
+    
     updateRecipe(newRecipeId, 
       RecipeUpdate(
         id: newRecipeId,
@@ -678,7 +686,7 @@ class HiveConnector {
         preparationTime: recipe.preparationTime,
         waitingTime: recipe.waitingTime,
         cookingTime: recipe.cookingTime,
-        pictures: recipe.pictures,
+        pictures: duplicatedImages,
         quantity: recipe.quantity,
         quantityType: recipe.quantityType,
         recipeIngredients: recipe.recipeIngredients,
@@ -723,13 +731,36 @@ class HiveConnector {
     return newPictures;
   }
 
-  void putPicturesToStorage(List<XFile> images, String recipeId) async {
+  Future<bool> removeRecipeImage(String recipeId, String imageId) async {
+    Recipe? recipe = getRecipe(recipeId);
+    if (recipe != null) {
+      if (recipe.pictures.contains(imageId)) {
+        bool result = await fileStorage.deleteImage(recipeId: recipeId, imageId: imageId);
+        if (result) {
+          addQueueOperation(type: OperationType.delete, object: RecipeImage(path: fileStorage.idToPath(recipeId: recipeId, imageId: imageId), recipeId: recipeId, imageId: imageId));
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<String> duplicateImage(String recipeId, String imageId, String newRecipeId) async {
+    String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
+    XFile file = XFile(path);
+
+    String newImageId = ObjectId().hexString;
+    await fileStorage.writeImage(image: file, recipeId: newRecipeId, imageId: newImageId);
+    return newImageId;
+  }
+
+  Future<void> putPicturesToStorage(List<XFile> images, String recipeId) async {
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
       List<String> newPictures = await saveRecipeImages(images, recipeId);
       
       if (newPictures.isNotEmpty) {
-        DatabaseMgr().localMgr.updateRecipe(
+        updateRecipe(
           recipeId,
           RecipeUpdate(
             id: recipeId,
@@ -740,17 +771,37 @@ class HiveConnector {
     }
   }
 
+  Future<void> removePictureFromStorage(String recipeId, String imageId) async {
+    bool result  = await removeRecipeImage(recipeId, imageId);
+    if (result) {
+      Recipe? recipe = getRecipe(recipeId);
+      if (recipe != null) {
+        recipe.pictures.remove(imageId);
+        updateRecipe(
+          recipeId,
+          RecipeUpdate(
+            id: recipeId,
+            pictures: recipe.pictures
+          )
+        );
+      }
+    }
+  }
+
+  Future<Image> getRecipeImage(String recipeId, imageId) async {
+    Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: imageId);
+    if (image != null) {
+      return image;
+    }
+    return Image.asset("assets/images/default_image.png");
+  }
+
   Future<List<Image>> getRecipeImages(String recipeId) async {
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
       List<Image> images = [];
       for (String id in recipe.pictures) {
-        Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: id);
-        if (image != null) {
-          images.add(image);
-        } else {
-          images.add(Image.asset("assets/images/default_image.png"));
-        }
+        images.add(await getRecipeImage(recipeId, id));
       }
 
       return images;
@@ -762,13 +813,22 @@ class HiveConnector {
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
       if (recipe.pictures.isNotEmpty) {
-        Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: recipe.pictures[0]);
-        if (image != null) {
-          return image;
-        }
+        return await getRecipeImage(recipeId, recipe.pictures[0]);
       }
     }
     return Image.asset("assets/images/default_image.png");
+  }
+
+  Future<void> cleanExtraImages(Recipe recipe) async {
+    List<String> allRecipeImages = await fileStorage.getAllRecipeImages(recipe.id);
+    for (String path in allRecipeImages) {
+      Map<String, String>? ids = fileStorage.pathToId(path);
+      if (ids != null && ids.containsKey('imageId')) {
+        if (!recipe.pictures.contains(ids['imageId'])) {
+          await fileStorage.deleteImage(recipeId: recipe.id, imageId: ids['imageId']!);
+        }
+      }
+    }
   }
 
   // QUEUE //

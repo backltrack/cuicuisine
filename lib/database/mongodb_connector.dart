@@ -235,6 +235,23 @@ class MongoConnector {
     return null;
   }
 
+  Future<bool> emailExists(String email) async {
+    print('check');
+    final response = await http.post(Uri.parse("$server/email_exists"),
+      headers: {
+        'accept': 'application/json',
+        'Content-type': 'application/json'
+      },
+      body: jsonEncode({'email': email})
+    );
+    print(response);
+
+    if (response.statusCode == 200) {
+      return bool.parse(response.body);
+    }
+    return false;
+  }
+
   Future<AppUser?> connectWithEmail(String email, String password, {Function? onInvalidEmail, Function? onInvalidPassword, Function(AppUser)? onSuccess}) async {
     try {
       oauth2.Client? _client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: email, password: password);
@@ -303,6 +320,16 @@ class MongoConnector {
     DatabaseMgr().localMgr.deleteCredentials();
   }
 
+  Future<bool> deleteUser() async {
+    final response = await _secureDeleteRequest("/users/me/delete", {});
+    if (response != null && response.statusCode == 200) {
+      if (response.body != null && jsonDecode(response.body)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   Future<void> getLatestChanges(String lastChange) async {
     final response = await _secureGetRequest('/change/get/$lastChange');
@@ -359,6 +386,7 @@ class MongoConnector {
                   DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
                 }
 
+                removeExtraImages(recipe);
                 downloadMissingImages(recipe);
               }
             }
@@ -390,6 +418,7 @@ class MongoConnector {
           Recipe? recipe = await fetchRecipe(recipeId);
           DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
           
+          removeExtraImages(recipe);
           downloadMissingImages(recipe);
         }
 
@@ -612,11 +641,11 @@ class MongoConnector {
   Future<Recipe> fetchRecipe(String recipeId) async {
     final response = await _secureGetRequest('/recipes/get/$recipeId');
 
-    if (response != null && response.statusCode == 200) {
+    if (response != null && response.statusCode == 200 && response.body != null) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       print(jsonDecode(response.body));
-      return Recipe.fromJson(jsonDecode(response.body));
+      return Recipe.fromJson(   jsonDecode(response.body));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -778,16 +807,40 @@ class MongoConnector {
       await DatabaseMgr().localMgr.fileStorage.writeImagefromBytes(bytes: response.bodyBytes, recipeId: recipeId, imageId: imageId);
     }
     else {
-      print("WRONG RESPONSE STATUS");
+      print("WRONG RESPONSE STATUS");
     }
 
     return null;
+  }
+
+  Future<bool> deleteImage(String recipeId, String imageId) async {
+    final response = await _secureDeleteRequest('/image/delete', {
+      'recipeId': recipeId,
+      'imageId': imageId
+    });
+
+    if (response != null && response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+
+    return false;
   }
 
   Future<bool> downloadMissingImages(Recipe recipe) async {
     for (String imagePath in recipe.pictures) {
       if (!await DatabaseMgr().localMgr.fileStorage.imageExists(recipeId: recipe.id, imageId: imagePath.split('/').last)) {
         await downloadImage(recipe.id, imagePath.split('/').last);
+      }
+    }
+    return true;
+  }
+
+  Future<bool> removeExtraImages(Recipe recipe) async {
+    List<String> images = await DatabaseMgr().localMgr.fileStorage.getAllRecipeImages(recipe.id);
+    
+    for (String imagePath in images) {
+      if (recipe.pictures.contains(DatabaseMgr().localMgr.fileStorage.pathToId(imagePath)!['imageId'])) {
+        await deleteImage(recipe.id, imagePath);
       }
     }
     return true;

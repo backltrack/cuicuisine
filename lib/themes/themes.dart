@@ -121,7 +121,9 @@ ThemeCollection setThemeCollection(context) {
         chipTheme: Theme.of(context).chipTheme.copyWith(backgroundColor: LightColors.backgroundColor, deleteIconColor: LightColors.writingColor),
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
             splashColor: LightColors.writingColor,
-            backgroundColor: LightColors.menuColor
+            backgroundColor: LightColors.menuColor,
+            foregroundColor: DarkColors.writingColor,
+            shape: StadiumBorder()
         ),
         textTheme: const TextTheme(
             bodyLarge: TextStyle(color: LightColors.writingColor, fontSize: 14),

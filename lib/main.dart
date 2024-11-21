@@ -10,6 +10,7 @@ import 'generated/l10n.dart';
 import 'package:dynamic_themes/dynamic_themes.dart';
 import 'pages/404.dart';
 import 'pages/authentication/authentication_page.dart';
+import 'pages/authentication/email_check_page.dart';
 import 'pages/authentication/email_connexion.dart';
 import 'pages/authentication/email_registration.dart';
 import 'pages/authentication/remove_account.dart';
@@ -75,7 +76,7 @@ class _CuicuisineState extends State<Cuicuisine> {
       changeLocale(localeCode);
     }
     else {
-      changeLocale("en");
+      changeLocale("fr");
     }
 
     // load wakelock state
@@ -126,8 +127,9 @@ class _CuicuisineState extends State<Cuicuisine> {
             initialRoute: LogInPage.route,
             routes: {
               LogInPage.route: (ctx) => LogInPage(),
-              EmailConnexion.route: (ctx) => const EmailConnexion(),
-              EmailRegistration.route: (ctx) => EmailRegistration(),
+              EmailCheck.route: (ctx) => const EmailCheck(),
+              // EmailConnexion.route: (ctx) => const EmailConnexion(),
+              // EmailRegistration.route: (ctx) => EmailRegistration(),
               // ForgottenPasswordPage.route: (ctx) => ForgottenPasswordPage(),
               HomePage.route: (ctx) => HomePage(),
               GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
@@ -138,9 +140,16 @@ class _CuicuisineState extends State<Cuicuisine> {
               TestPage.route: (ctx) => TestPage()
             },
             onGenerateRoute: (RouteSettings settings) {
-              print(settings.name);
+              // navigate to email connexion page
+              if (settings.name!.contains(EmailConnexion.route)) {
+                return MaterialPageRoute(builder: (context) => const EmailConnexion(), settings: settings);
+              }
+              // navigate to email connexion page
+              else if (settings.name!.contains(EmailRegistration.route)) {
+                return MaterialPageRoute(builder: (context) => EmailRegistration(), settings: settings);
+              }
               // navigate to recipe page
-              if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
+              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
                 return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
               }
               // navigate to recipe name edition page

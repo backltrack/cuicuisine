@@ -121,6 +121,9 @@ class Synchronization {
     else if (object is Recipe) {
       return await _remoteMgr.deleteRecipe(object);
     }
+    else if (object is RecipeImage) {
+      return await _remoteMgr.deleteImage(object.recipeId, object.imageId);
+    }
 
     return true;
   }

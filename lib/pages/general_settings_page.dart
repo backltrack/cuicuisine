@@ -2,6 +2,7 @@ import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/l10n/localeMgr.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import '../../generated/l10n.dart';
@@ -89,10 +90,10 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
                   Switch(
                     value: wakelockState,
                     onChanged: (bool val) {
-                      DatabaseMgr().localMgr.saveWakelock(wakelockState);
                       setState(() {
-                        wakelockState = !wakelockState;
+                        wakelockState = val;
                       });
+                      DatabaseMgr().localMgr.saveWakelock(wakelockState);
                       wakelockState ? WakelockPlus.enable() : WakelockPlus.disable();
                     },
                   )
@@ -133,15 +134,17 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
           ListTile(
               title: Text(S.of(context).remove_account),
               leading: const FaIcon(FontAwesomeIcons.userSlash),
-              onTap: () {
+              onTap: DatabaseMgr().isOnline ? () {
                 Navigator.pushNamed(context, RemoveAccountPage.route);
-              }
+              } : () {
+              Fluttertoast.showToast(msg: S.of(context).connexion_needed2);
+            }
           ),
           const Divider(),
           // Sign out
           ListTile(
             title: Text(S.of(context).general_settings_signout),
-            leading: const FaIcon(FontAwesomeIcons.signOutAlt),
+            leading: const FaIcon(FontAwesomeIcons.rightFromBracket),
             onTap: () async {
               bool? shouldSignOut = await showAlertDialog(
                 context: context,
@@ -149,7 +152,6 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
                 description: Text(S.of(context).sign_out_popup_description)
               );
               if(shouldSignOut != null && shouldSignOut) {
-                //await FirebaseAuth.instance.signOut();
                 DatabaseMgr().localMgr.deleteCredentials();
                 Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
               }

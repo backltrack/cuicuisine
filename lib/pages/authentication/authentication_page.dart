@@ -1,4 +1,3 @@
-import 'package:cuicuisine/widgets/core_widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,10 +6,11 @@ import '../../database/database_mgr.dart';
 import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
+import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/core_widgets/animated_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
 import '../home_page.dart';
-import 'email_connexion.dart';
+import './email_check_page.dart';
 
 class LogInPage extends StatefulWidget {
   static const String route = '/';
@@ -148,7 +148,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                       // EMAIL method
                       SocialButton(
                         onPressed: DatabaseMgr().isOnline ? () async {
-                          Navigator.pushNamed(context, EmailConnexion.route);
+                          Navigator.pushNamed(context, EmailCheck.route);
                         } : null,
                         child: const FaIcon(
                           FontAwesomeIcons.envelope

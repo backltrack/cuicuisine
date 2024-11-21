@@ -109,17 +109,17 @@ class _RecipePageState extends State<RecipePage> {
     // get is favorite recipe
     bool isFav = DatabaseMgr().localMgr.getUser()!.favoriteRecipes.contains(recipe.id);
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
+        if (didPop) {
+          return;
+        }
+        Navigator.of(context).pop(updateRecipes);
+      },
+      child: Scaffold(
         appBar: AppBar(
           title: Text(recipe.name),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              SchedulerBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).pop(updateRecipes);
-              });
-            }
-          ),
           actions: [
             isEditMode ?
               Container(
@@ -388,6 +388,7 @@ class _RecipePageState extends State<RecipePage> {
               ],
             )
         )
+      )
     );
   }
 }

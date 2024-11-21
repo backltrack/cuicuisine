@@ -40,7 +40,7 @@ class _RemoveAccountPageState extends State<RemoveAccountPage> {
           MyTextField(
             label: S.of(context).auth_email_label,
             icon: FontAwesomeIcons.at,
-            suffixIcon: isEmailValid(_email) ? FontAwesomeIcons.checkCircle : null,
+            suffixIcon: EmailPasswordValidator.isEmailValid(_email) ? FontAwesomeIcons.circleCheck : null,
             keyboardType: TextInputType.emailAddress,
             onChanged: (String val) {
               setState(() {
@@ -56,15 +56,16 @@ class _RemoveAccountPageState extends State<RemoveAccountPage> {
             ),
           ),
           SocialButton(
-            onPressed: isEmailValid(_email) ? () async {
+            onPressed: EmailPasswordValidator.isEmailValid(_email) ? () async {
 
               if(_email == DatabaseMgr().localMgr.getUser()!.email) {
                 // remove recipes, books and user from database
-                //await removeUser();
+                bool result = await DatabaseMgr().remoteMgr.deleteUser();
 
-                DatabaseMgr().remoteMgr.disconnect();
-
-                Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
+                if (result) {
+                  DatabaseMgr().remoteMgr.disconnect();
+                  Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
+                }
               }
             } : null,
             child: Text(S.of(context).remove_button),

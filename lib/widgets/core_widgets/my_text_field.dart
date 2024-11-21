@@ -12,6 +12,7 @@ class MyTextField extends StatefulWidget {
   final Function? onTap;
   final TextEditingController? textEditingController;
   final bool autofocus;
+  final FocusNode? focusNode;
   final TextInputType keyboardType;
   final String? suffixText;
   final IconData? suffixIcon;
@@ -28,6 +29,7 @@ class MyTextField extends StatefulWidget {
     this.onTap,
     this.textEditingController,
     this.autofocus=false,
+    this.focusNode,
     this.keyboardType=TextInputType.name,
     this.suffixText,
     this.suffixIcon,
@@ -41,13 +43,20 @@ class MyTextField extends StatefulWidget {
 }
 
 class _MyTextFieldState extends State<MyTextField> {
-  FocusNode _focusNode = FocusNode();
+  late FocusNode _focusNode;
   bool isFocused = false;
 
   bool isObscured = false;
 
   @override
   void initState() {
+    if (widget.focusNode != null) {
+      _focusNode = widget.focusNode!;
+    }
+    else {
+      _focusNode = FocusNode();
+    }
+
     _focusNode.addListener(() {
       setState(() {
         isFocused = _focusNode.hasFocus;
@@ -68,15 +77,15 @@ class _MyTextFieldState extends State<MyTextField> {
   @override
   Widget build(BuildContext context) {
     var outlineInputBorder = OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(12)),
         borderSide: BorderSide(
-            color: ThemeMgr.getTheme(context)!.textTheme.bodyText2!.color!,
+            color: ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color!,
             width: 2
         )
     );
 
     return Container(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       child: TextField(
         inputFormatters: [
           if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength)
@@ -91,7 +100,7 @@ class _MyTextFieldState extends State<MyTextField> {
           labelStyle: isFocused ? ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.primaryColor) : ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
           prefixIcon: widget.icon != null ? (Icon(widget.icon, color: isFocused ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyText2!.color, size: 20)) : null,
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
             borderSide: BorderSide(
               color: ThemeMgr.getTheme(context)!.primaryColor,
               width: 2

@@ -25,7 +25,7 @@ class _BookPickerDialogState extends State<BookPickerDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(S.of(context).recipe_page_book_picker_title),
-      content: Container(
+      content: SizedBox(
         height: MediaQuery.of(context).size.height / 4,
         width: MediaQuery.of(context).size.width * 2 / 3,
         child: ListView.builder(
@@ -35,7 +35,7 @@ class _BookPickerDialogState extends State<BookPickerDialog> {
             return RadioListTile(
               groupValue: value,
               value: index,
-              title: Text(widget.books[index].name, style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.background)),
+              title: Text(widget.books[index].name),
               onChanged: (val) {
                 setState(() {
                   value = index;
