@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../generated/l10n.dart';
+import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
 
-List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, int userAccess) {
+List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAccess) {
   return [
     // Add to shopping list
     /// v1
@@ -47,7 +48,7 @@ List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, int userAccess) {
         )
     ),
     // remove recipe
-    if (userAccess > 0)
+    if (userAccess.index > AccessLevel.read.index)
       PopupMenuItem(
         value: "remove",
         child: Container(

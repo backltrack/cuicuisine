@@ -22,7 +22,6 @@ import 'pages/home_page.dart';
 import 'pages/item_selector_page.dart';
 import 'pages/recipes/ingredient_edition_page.dart';
 import 'pages/recipes/new_tag_page.dart';
-// import 'pages/recipes/recipe_images_edition_page.dart';
 import 'pages/recipes/recipe_images_edition_page.dart';
 import 'pages/recipes/recipe_ingredients_edition_page.dart';
 import 'pages/recipes/recipe_name_page.dart';

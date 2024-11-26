@@ -12,7 +12,7 @@ import '../../models/data_model.dart';
 class RecipeVariantsWidget extends StatefulWidget {
   final String recipeId;
   final List<Variant> variants;
-  final int userAccess;
+  final AccessLevel userAccess;
   final Function()? onUpdate;
   RecipeVariantsWidget({Key? key, required this.recipeId, required this.variants, required this.userAccess, this.onUpdate}) : super(key: key);
 
@@ -72,7 +72,7 @@ class _RecipeVariantsWidgetState extends State<RecipeVariantsWidget> {
                       );
                     })
                 ),
-                if (widget.userAccess > 0 && widgetApertureState)
+                if (widget.userAccess.index > AccessLevel.read.index && widgetApertureState)
                   MyTextField(
                     textEditingController: _newVariantTextController,
                     label: S.of(context).variant_widget_new,

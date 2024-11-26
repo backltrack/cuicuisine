@@ -76,7 +76,7 @@ class Book extends HiveObject implements DatabaseObject {
   @HiveField(3)
   List<String> users;
   @HiveField(4)
-  Map<String, int> access;
+  Map<String, AccessLevel> access;
   @HiveField(5)
   List<String> bookIngredients;
   @HiveField(6)
@@ -97,19 +97,26 @@ class Book extends HiveObject implements DatabaseObject {
     lastUpdate ??= DateTime.now();
   }
 
-  Map<String,String> toJson() => {
-    'id': id,
-    'name': name,
-    'recipeIds': recipeIds.toString(),
-    'access': access.toString(),
-    'users': users.toString()
-  };
+  Map<String,String> toJson() {
+    Map<String, int> _access = {};
+    for (String userId in access.keys.toList()) {
+      _access[userId] = access[userId]!.index;
+    }
+
+    return {
+      'id': id,
+      'name': name,
+      'recipeIds': recipeIds.toString(),
+      'access': _access.toString(),
+      'users': users.toString()
+    };
+  }
 
   factory Book.fromJson(Map<String, dynamic> data) {
     // parse access
-    Map<String, int> access = {};
+    Map<String, AccessLevel> access = {};
     for (String userId in data['access'].keys.toList()) {
-      access[userId] = data['access'][userId];
+      access[userId] = AccessLevel.values[data['access'][userId]];
     }
 
     return Book(
@@ -416,4 +423,14 @@ class RecipeImage implements DatabaseObject {
   String imageId;
 
   RecipeImage({required this.path, required this.recipeId, required this.imageId});
+}
+
+@HiveType(typeId: 8)
+enum AccessLevel {
+  @HiveField(0)
+  read,
+  @HiveField(1)
+  write,
+  @HiveField(2)
+  own
 }

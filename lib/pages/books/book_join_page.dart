@@ -1,4 +1,3 @@
-import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

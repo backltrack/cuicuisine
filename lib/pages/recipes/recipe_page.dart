@@ -1,7 +1,6 @@
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../generated/l10n.dart';
@@ -42,7 +41,7 @@ class _RecipePageState extends State<RecipePage> {
 
   late Book currentBook;
 
-  int userAccess = 0;
+  AccessLevel userAccess = AccessLevel.read;
 
   String updateRecipes = "";
 
@@ -52,7 +51,7 @@ class _RecipePageState extends State<RecipePage> {
 
     _currentBookId = DatabaseMgr().localMgr.loadCurrentBook()!;
     currentBook = DatabaseMgr().localMgr.getBook(_currentBookId)!;
-    userAccess = currentBook.access[DatabaseMgr().localMgr.getUserId()] ?? 0;
+    userAccess = currentBook.access[DatabaseMgr().localMgr.getUserId()] ?? AccessLevel.read;
 
     setState(() {});
   }
@@ -152,7 +151,7 @@ class _RecipePageState extends State<RecipePage> {
                       return showAlertDialog(
                           context: context,
                           title: S.of(context).popup_delete_title,
-                          description: userAccess <= 1 ?
+                          description: userAccess.index <= AccessLevel.write.index ?
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -187,7 +186,7 @@ class _RecipePageState extends State<RecipePage> {
             )
           ],
         ),
-        floatingActionButton: userAccess > 0 ?
+        floatingActionButton: userAccess.index > AccessLevel.read.index ?
           FloatingActionButton(
             child: Icon(isEditMode ? Icons.check : Icons.edit),
             onPressed: ()  {

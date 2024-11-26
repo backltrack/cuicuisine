@@ -123,7 +123,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
                           },
                           icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color),
                         ),
-                        FaIcon(widget.recipe.isDirty ? FontAwesomeIcons.arrowsRotate : FontAwesomeIcons.check)
+                        FaIcon(widget.recipe.isDirty ? FontAwesomeIcons.arrowsRotate : FontAwesomeIcons.check, size: 14, color: widget.recipe.isDirty ? Colors.blue : Colors.green)
                       ],
                     )
                   ),

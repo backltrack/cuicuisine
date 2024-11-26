@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   List<Book>? books;
   List<Recipe>? recipes;
   Book? selectedBook;
-  int userAccess = 0;
+  AccessLevel userAccess = AccessLevel.read;
 
   // filtering variables
   bool _displayFavorites = false;
@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
           await DatabaseMgr().localMgr.updateTagsAndIngredients();
           // get user access
-          userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? 0;
+          userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? AccessLevel.read;
           // refresh UI
           setState(() {});
         }
@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
               return showAlertDialog(
                   context: context,
                   title: S.of(context).popup_delete_title,
-                  description: userAccess <= 1 ?
+                  description: userAccess.index <= AccessLevel.read.index ?
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -220,7 +220,7 @@ class _HomePageState extends State<HomePage> {
     recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
     await DatabaseMgr().localMgr.updateTagsAndIngredients();
     // get user access
-    userAccess = DatabaseMgr().localMgr.getUserAccess(book.id);
+    userAccess = DatabaseMgr().localMgr.getUserAccess(book.id) ?? AccessLevel.read;
     // refresh UI
     setState(() {});
   }
@@ -509,14 +509,14 @@ class _HomePageState extends State<HomePage> {
                   return index < books!.length  ?
                     ListTile(
                       key: UniqueKey(),
-                      leading: FaIcon(books![index].access[DatabaseMgr().localMgr.getUserId()] == 2 ? FontAwesomeIcons.book :
-                                        books![index].access[DatabaseMgr().localMgr.getUserId()] == 1 ? CustomIcons.book_write :
+                      leading: FaIcon(books![index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own ? FontAwesomeIcons.book :
+                                        books![index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.write ? CustomIcons.book_write :
                                           CustomIcons.book_read),
                       title: Text(books![index].name),
                       textColor: selectedBook != null && selectedBook!.id == books![index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
                       iconColor: selectedBook != null && selectedBook!.id == books![index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
                       trailing: selectedBook != null && selectedBook!.id == books![index].id ? CircularIconButton(
-                        icon: FaIcon(FontAwesomeIcons.cog, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+                        icon: FaIcon(FontAwesomeIcons.gear, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
                         color: ThemeMgr.getTheme(context)!.cardColor,
                         onPressed: () {
                           Navigator.of(context).pushNamed("${BookSettingsPage.route}/${books![index].id}", arguments: {
@@ -579,7 +579,7 @@ class _HomePageState extends State<HomePage> {
           const Divider(),
           ListTile(
             title: Text(S.of(context).settings),
-            leading: const FaIcon(FontAwesomeIcons.cog),
+            leading: const FaIcon(FontAwesomeIcons.gear),
             onTap: () {
               Navigator.of(context).pushNamed(GeneralSettingsPage.route);
             }

@@ -4,7 +4,7 @@ import 'data_model.dart';
 
   part 'update_model.g.dart';
 
-@HiveType(typeId: 8)
+@HiveType(typeId: 9)
 class UserUpdate implements DatabaseObject {
   @HiveField(0)
   String id;
@@ -41,7 +41,7 @@ class UserUpdate implements DatabaseObject {
   }
 }
 
-@HiveType(typeId: 9)
+@HiveType(typeId: 10)
 class BookUpdate implements DatabaseObject {
   @HiveField(0)
   String id;
@@ -52,7 +52,7 @@ class BookUpdate implements DatabaseObject {
   @HiveField(3)
   List<String>? users;
   @HiveField(4)
-  Map<String, int>? access;
+  Map<String, AccessLevel>? access;
   @HiveField(5)
   List<String>? bookIngredients;
   @HiveField(6)
@@ -80,7 +80,11 @@ class BookUpdate implements DatabaseObject {
       json['recipeIds'] = recipeIds!;
     }
     if (access != null) {
-      json['access'] = access!;
+      Map<String, int> _access = {};
+      for (String userId in access!.keys.toList()) {
+        _access[userId] = access![userId]!.index;
+      }
+      json['access'] = _access;
     }
     if (users != null) {
       json['users'] = users!;
@@ -90,7 +94,7 @@ class BookUpdate implements DatabaseObject {
   }
 }
 
-@HiveType(typeId: 10)
+@HiveType(typeId: 11)
 class RecipeUpdate implements DatabaseObject {
   @HiveField(0)
   String id;

@@ -47,7 +47,8 @@ class HiveConnector {
         ..registerAdapter(OperationTypeAdapter())
         ..registerAdapter(OperationAdapter())
         ..registerAdapter(OperationQueueAdapter())
-        ..registerAdapter(RecipeImageAdapter());
+        ..registerAdapter(RecipeImageAdapter())
+        ..registerAdapter(AccessLevelAdapter());
     }
 
     _settingBox = await Hive.openBox('settings');
@@ -289,7 +290,7 @@ class HiveConnector {
             print(book.users);
             if (book.users.contains(userId)) {
               if (getOwnedOnly) {
-                if (book.access[userId] != null && book.access[userId]! >= 1) {
+                if (book.access[userId] != null && book.access[userId]!.index >= AccessLevel.write.index) {
                   userBooks.add(book);
                 }
               }
@@ -315,7 +316,7 @@ class HiveConnector {
     if (user == null) {
       return null;
     }
-    Book book = Book(id: ObjectId().hexString, name: name, recipeIds: [], users: [user.id], access: {user.id: 2});
+    Book book = Book(id: ObjectId().hexString, name: name, recipeIds: [], users: [user.id], access: {user.id: AccessLevel.own});
     addBook(book);
 
     return book.id;
@@ -346,15 +347,15 @@ class HiveConnector {
     }
   }
 
-  int getUserAccess(String bookId) {
+  AccessLevel? getUserAccess(String bookId) {
     Book? book = getBook(bookId);
     if (book != null) {
-      int? access = book.access[getUserId()];
+      AccessLevel? access = book.access[getUserId()];
       if (access != null) {
         return access;
       }
     }
-    return 0;
+    return null;
   }
 
   Future<void> updateTagsAndIngredients() async {
@@ -447,7 +448,11 @@ class HiveConnector {
       book.users = List<String>.from(data['users']);
     }
     if (data.keys.contains('access')) {
-      book.access = Map<String, int>.from(data['access']);
+      Map<String, AccessLevel> _access = {};
+      for (String userId in data['access'].keys.toList()) {
+        _access[userId] = AccessLevel.values[data['access'][userId]];
+      }
+      book.access = _access;
     }
     if (data.keys.contains('lastUpdate')) {
       book.lastUpdate = DateTime.parse(data['lastUpdate']);
@@ -492,9 +497,9 @@ class HiveConnector {
     return false;
   }
 
-  bool updateUserAccess(Book book, String userId, int value) {
+  bool updateUserAccess(Book book, String userId, AccessLevel value) {
     if (book.access[DatabaseMgr().localMgr.getUserId()] == 2) {
-      Map<String, int> _newAccess = Map.from(book.access);
+      Map<String, AccessLevel> _newAccess = Map.from(book.access);
       _newAccess[userId] = value;
 
       DatabaseMgr().localMgr.updateBook(
