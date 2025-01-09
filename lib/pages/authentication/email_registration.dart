@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
+import '../../security/rsa.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/social_button.dart';
 
@@ -128,7 +129,8 @@ class _EmailRegistrationState extends State<EmailRegistration> {
             SocialButton(
               // email sign in button
               onPressed: areAllFieldsValid() ? () async {
-                await DatabaseMgr().remoteMgr.registerWithEmail(emailEditingController.text, passwordEditingController.text, 
+                String pwd = await RSAEncrypter.encryptData(passwordEditingController.text);
+                await DatabaseMgr().remoteMgr.registerWithEmail(emailEditingController.text, pwd, 
                   onSuccess: (AppUser user) async {
                     if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
                   },

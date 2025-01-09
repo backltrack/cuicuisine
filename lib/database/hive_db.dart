@@ -6,7 +6,6 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:objectid/objectid.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:uuid/uuid.dart';
 
 import '../models/data_model.dart';
 import '../models/update_model.dart';

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
-import '../../models/default_data.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
 import '../../models/data_model.dart';

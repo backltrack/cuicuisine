@@ -1,3 +1,4 @@
+import 'package:cuicuisine/security/rsa.dart';
 import 'package:cuicuisine/widgets/core_widgets/password_check_info.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -85,7 +86,10 @@ class _EmailConnexionState extends State<EmailConnexion> {
             SocialButton(
               // email sign in button
               onPressed: EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password) ? () async {
-                await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password, 
+
+                String pwd = await RSAEncrypter.encryptData(_password);
+                
+                await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, pwd, 
                   onInvalidEmail: () {
                     setState(() {
                       showForgottenButton = true;

@@ -1,8 +1,5 @@
-import 'package:cuicuisine/models/data_model.dart';
 import 'package:cuicuisine/pages/authentication/email_connexion.dart';
-import 'package:cuicuisine/pages/home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../database/database_mgr.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
