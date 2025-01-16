@@ -12,6 +12,7 @@ import '../../utilities/string_functions.dart';
 import '../../models/data_model.dart';
 import '../home_page.dart';
 import '../404.dart';
+import 'forgotten_password.dart';
 // import 'forgotten_password.dart';
 
 class EmailConnexion extends StatefulWidget {
@@ -111,13 +112,12 @@ class _EmailConnexionState extends State<EmailConnexion> {
             ),
 
             // forgotten password
-            // SocialButton(
-            //   // email sign in button
-            //   child: Text(S.of(context).auth_forgotten_password),
-            //   onPressed: () async {
-            //     Navigator.pushNamed(context, ForgottenPasswordPage.route);
-            //   },
-            // ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pushNamed(context, ForgottenPasswordPage.route);
+              },
+              child: Text(S.of(context).auth_forgotten_password)
+            ),
           ]),
         )
       )

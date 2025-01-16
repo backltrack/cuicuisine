@@ -29,8 +29,6 @@ import '../widgets/recipe_widgets/book_picker_popup.dart';
 
 class HomePage extends StatefulWidget {
   static const String route = '/home';
-  // static List<String> bookIngredients = [];
-  // static List<String> bookTags = [];
 
   @override
   _HomePageState createState() => _HomePageState();

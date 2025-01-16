@@ -434,3 +434,17 @@ enum AccessLevel {
   @HiveField(2)
   own
 }
+
+class Result {
+  bool result;
+  String reason;
+
+  Result({
+    required this.result,
+    this.reason = ''
+  });
+
+  factory Result.fromJson(Map<String, dynamic> json) {
+    return Result(result: json['result'], reason: json['reason'] ?? '');
+  }
+}

@@ -14,7 +14,6 @@ import './email_check_page.dart';
 
 class LogInPage extends StatefulWidget {
   static const String route = '/';
-  static AppUser? appUser;
 
   @override
   _LogInPageState createState() => _LogInPageState();

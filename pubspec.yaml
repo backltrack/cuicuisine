@@ -68,6 +68,7 @@ dependencies:
   url_launcher: ^6.3.0
   path: ^1.8.3
   objectid: ^3.0.0
+  encrypt: ^5.0.3
   
 
 dev_dependencies:
@@ -104,6 +105,7 @@ flutter:
     - assets/images/default_image.png
     - assets/images/default_circle_image.png
     - fonts/google_fonts/comfortaa/
+    - assets/keys/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

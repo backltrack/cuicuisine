@@ -7,10 +7,10 @@ import '../../widgets/core_widgets/social_button.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
-import 'authentication_page.dart';
+import '../authentication/authentication_page.dart';
 
 class RemoveAccountPage extends StatefulWidget {
-  static const String route = "/remove-account";
+  static const String route = "/account/remove-account";
 
   const RemoveAccountPage({Key? key}) : super(key: key);
 

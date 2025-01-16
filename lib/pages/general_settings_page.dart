@@ -1,16 +1,16 @@
-import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/l10n/localeMgr.dart';
-import 'package:cuicuisine/themes/theme_mgr.dart';
+import 'package:cuicuisine/pages/account/account_page.dart';
+
+import '../database/database_mgr.dart';
+import '../l10n/localeMgr.dart';
+import '../themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import '../../generated/l10n.dart';
-import '../../pages/authentication/authentication_page.dart';
-import '../../pages/authentication/remove_account.dart';
+import '../generated/l10n.dart';
+import 'authentication/authentication_page.dart';
 import '../themes/themes.dart';
-import '../../utilities/import_export.dart';
-import '../../widgets/core_widgets/alert_dialog.dart';
+import '../utilities/import_export.dart';
+import '../widgets/core_widgets/alert_dialog.dart';
 
 class GeneralSettingsPage extends StatefulWidget {
   static const String route = "/settings";
@@ -132,12 +132,10 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
           const Divider(),
           // remove account
           ListTile(
-              title: Text(S.of(context).remove_account),
-              leading: const FaIcon(FontAwesomeIcons.userSlash),
-              onTap: DatabaseMgr().isOnline ? () {
-                Navigator.pushNamed(context, RemoveAccountPage.route);
-              } : () {
-              Fluttertoast.showToast(msg: S.of(context).connexion_needed2);
+            title: Text(S.of(context).account),
+            leading: const FaIcon(FontAwesomeIcons.user),
+            onTap: () {
+              Navigator.pushNamed(context, AccountPage.route);
             }
           ),
           const Divider(),

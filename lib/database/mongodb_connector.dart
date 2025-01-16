@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/sync_model.dart';
 import 'package:cuicuisine/models/update_model.dart';
+import 'package:cuicuisine/security/rsa.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -311,6 +312,63 @@ class MongoConnector {
     }
     
     return null;
+  }
+
+  Future<bool> changeUserPassword(String oldPwd, String newPwd) async {
+    final response = await _securePostJsonRequest("/users/me/change_password/", 
+    {
+      "old_pwd": await RSAEncrypter.encryptData(oldPwd),
+      "new_pwd": await RSAEncrypter.encryptData(newPwd)
+    });
+
+    if (response != null && response.statusCode == 200) {
+      return response.body != null && jsonDecode(response.body);
+    }
+    return false;
+  }
+
+  Future<Result> requestPasswordRecovery(String email) async {
+    // WARNING Unsecure request
+    try {
+      Response response = await http.post(Uri.parse("$server/users/request_password_recovery/"),
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: jsonEncode(email)
+      );
+
+      if (response.statusCode == 200) {
+        return Result.fromJson(jsonDecode(response.body));
+      }
+      return Result(result: false, reason: "Server error");
+
+    } catch (e) {
+      return Result(result: false, reason: "Network issue");
+    }
+  }
+
+  Future<Result> passwordRecovery(String email, String newPassword, String code) async {
+    // WARNING Unsecure request
+    try {
+      Response response = await http.post(Uri.parse("$server/users/password_recovery/"),
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: jsonEncode({
+          "email": await RSAEncrypter.encryptData(email),
+          "encrypted_password": await RSAEncrypter.encryptData(newPassword),
+          "security_code": await RSAEncrypter.encryptData(code)
+        })
+      );
+
+      if (response.statusCode == 200) {
+        return Result.fromJson(jsonDecode(response.body));
+      }
+      return Result(result: false, reason: "Server error");
+
+    } catch (e) {
+      return Result(result: false, reason: "Network issue");
+    }
   }
 
   void disconnect() {

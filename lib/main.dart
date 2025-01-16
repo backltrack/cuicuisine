@@ -1,3 +1,5 @@
+import 'package:cuicuisine/pages/account/account_page.dart';
+import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:cuicuisine/pages/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,7 +15,8 @@ import 'pages/authentication/authentication_page.dart';
 import 'pages/authentication/email_check_page.dart';
 import 'pages/authentication/email_connexion.dart';
 import 'pages/authentication/email_registration.dart';
-import 'pages/authentication/remove_account.dart';
+import 'pages/account/remove_account.dart';
+import 'pages/authentication/forgotten_password.dart';
 import 'pages/books/book_join_page.dart';
 import 'pages/books/book_name_page.dart';
 import 'pages/books/book_settings_page.dart';
@@ -127,11 +130,13 @@ class _CuicuisineState extends State<Cuicuisine> {
             routes: {
               LogInPage.route: (ctx) => LogInPage(),
               EmailCheck.route: (ctx) => const EmailCheck(),
-              // EmailConnexion.route: (ctx) => const EmailConnexion(),
-              // EmailRegistration.route: (ctx) => EmailRegistration(),
-              // ForgottenPasswordPage.route: (ctx) => ForgottenPasswordPage(),
+              EmailConnexion.route: (ctx) => const EmailConnexion(),
+              EmailRegistration.route: (ctx) => EmailRegistration(),
+              ForgottenPasswordPage.route: (ctx) => const ForgottenPasswordPage(),
               HomePage.route: (ctx) => HomePage(),
               GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
+              AccountPage.route: (ctx) => const AccountPage(),
+              UpdatePassword.route: (ctx) => const UpdatePassword(),
               RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),
               BookNamePage.route: (ctx) => const BookNamePage(),
               ItemSelector.route: (ctx) => const ItemSelector(),
@@ -139,16 +144,8 @@ class _CuicuisineState extends State<Cuicuisine> {
               TestPage.route: (ctx) => TestPage()
             },
             onGenerateRoute: (RouteSettings settings) {
-              // navigate to email connexion page
-              if (settings.name!.contains(EmailConnexion.route)) {
-                return MaterialPageRoute(builder: (context) => const EmailConnexion(), settings: settings);
-              }
-              // navigate to email connexion page
-              else if (settings.name!.contains(EmailRegistration.route)) {
-                return MaterialPageRoute(builder: (context) => EmailRegistration(), settings: settings);
-              }
               // navigate to recipe page
-              else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
+              if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
                 return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
               }
               // navigate to recipe name edition page

@@ -31,6 +31,8 @@
   "shopping_list": "Shopping cart",
   "settings": "Settings",
 
+  "account": "Account",
+
   "time_widget_text": "Time",
   "time_widget_preparation": "Preparation",
   "time_widget_waiting": "Waiting",
@@ -86,6 +88,7 @@
 
   "auth_email_label": "e-mail",
   "auth_password_label": "Password",
+  "auth_code_label": "Code",
   "auth_password_req_len": "Length > ",
   "auth_password_req_uplow": "Upper/Lower characters",
   "auth_password_req_digit": "Digits",
@@ -96,9 +99,13 @@
   "auth_register_name": "First name",
   "auth_register_lastname": "Last name",
   "auth_forgotten_password": "Forgotten password",
-  "auth_forgotten_password_method": "Enter your email address to get the renewal link.",
-  "auth_renewal_link": "Get renewal link",
+  "auth_forgotten_password_method": "Enter your email address to get the renewal code.",
+  "auth_renewal_link": "Get renewal code by email",
   "auth_renewal_email_sent": "Email sent",
+  
+  "change_password": "Change password",
+  "change_password_label_new": "New password",
+  "change_password_issue": "Something went wrong, try again.",
 
   "cancel": "Cancel",
   "disable": "Disable",

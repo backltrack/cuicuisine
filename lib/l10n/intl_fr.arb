@@ -31,6 +31,8 @@
   "shopping_list": "Liste des courses",
   "settings": "Paramètres",
 
+  "account": "Compte",
+
   "time_widget_text": "Temps",
   "time_widget_preparation": "Préparation",
   "time_widget_waiting": "Attente",
@@ -86,6 +88,7 @@
 
   "auth_email_label": "e-mail",
   "auth_password_label": "Mot de passe",
+  "auth_code_label": "Code",
   "auth_password_req_len": "Longueur > ",
   "auth_password_req_uplow": "Caractères min/maj ",
   "auth_password_req_digit": "Chiffres",
@@ -96,9 +99,13 @@
   "auth_register_name": "Prénom",
   "auth_register_lastname": "Nom",
   "auth_forgotten_password": "Mot de passe oublié",
-  "auth_forgotten_password_method": "Entre ton email pour obtenir le lien de renouvellement du mot de passe",
-  "auth_renewal_link": "Obtenir le lien",
+  "auth_forgotten_password_method": "Entre ton email pour obtenir le code de renouvellement du mot de passe",
+  "auth_renewal_link": "Obtenir le code par email",
   "auth_renewal_email_sent": "Email envoyé",
+
+  "change_password": "Changement mdp",
+  "change_password_label_new": "Nouveau mot de passe",
+  "change_password_issue": "Un problème est survenu, essaie à nouveau.",
 
   "cancel": "Annuler",
   "disable": "Désactiver",
