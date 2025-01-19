@@ -1,4 +1,5 @@
 import 'package:cuicuisine/models/update_model.dart';
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -83,8 +84,8 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
               }
             },
             icon: _selectedTags.contains(tag) ? const FaIcon(
-                FontAwesomeIcons.solidCheckCircle) : const FaIcon(
-                FontAwesomeIcons.plusCircle)
+                FontAwesomeIcons.solidCircleCheck) : const FaIcon(
+                FontAwesomeIcons.circlePlus)
         ),
       );
     }
@@ -114,7 +115,6 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
                 ],
               ),
             ).then((value) {
-              print(value);
               if (value != null && value) {
                 returnValue = true;
               }
@@ -187,11 +187,11 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
                     return customTags.isNotEmpty ? const Divider() : const SizedBox();
                   }
                   else if (index < customTags.length) {
-                    return _search != "" && customTags[index].contains(_search) || _search == "" ?
+                    return _search != "" && removeDiacritics(customTags[index].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
                     listTile(customTags[index]) : const SizedBox();
                   }
                   else {
-                    return _search != "" && defaultTags[locale]![index-customTags.length-1].contains(_search) || _search == "" ?
+                    return _search != "" && removeDiacritics(defaultTags[locale]![index-customTags.length-1].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
                     listTile(defaultTags[locale]![index-customTags.length-1]) : const SizedBox();
                   }
                 },

@@ -2,6 +2,7 @@ import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
+import 'package:diacritic/diacritic.dart';
 
 import '../models/data_model.dart';
 import '../database/database_mgr.dart';
@@ -361,7 +362,7 @@ class _HomePageState extends State<HomePage> {
                             if (_time > 0 && _isTimeMax && sortedData[index].getTotalTime() < _time ||
                                 _time > 0 && !_isTimeMax && sortedData[index].getTotalTime() > _time ||
                                 _time == 0) {
-                              if (_research != "" && sortedData[index].name.toLowerCase().contains(_research.toLowerCase()) || _research == "") {
+                              if (_research != "" && removeDiacritics(sortedData[index].name.toLowerCase()).contains(removeDiacritics(_research.toLowerCase())) || _research == "") {
                                 if (_isListed) {
                                   returnedWidget = RecipeListTile(
                                     key: UniqueKey(),

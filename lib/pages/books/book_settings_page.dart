@@ -288,20 +288,20 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                               if (_book!.access[_book!.users[index]]!.index == AccessLevel.write.index) {
                                 DatabaseMgr().localMgr.updateUserAccess(_book!, _book!.users[index], AccessLevel.read);
                               }
-                              else{
+                              else {
                                 DatabaseMgr().localMgr.updateUserAccess(_book!, _book!.users[index], AccessLevel.write);
+
                               }
                               // get the book back from db
                               var _tmpBook = DatabaseMgr().localMgr.getBook(_book!.id);
                               if (_tmpBook != null) {
-                                print(_tmpBook.access[_book!.users[index]]);
                                 setState(() {
                                   _book = _tmpBook;
                                 });
                               }
                             },
                             child: FaIcon(FontAwesomeIcons.penToSquare,
-                                color: _book!.access[_book!.users[index]]!.index == AccessLevel.read.index ? ThemeMgr.getTheme(context)!.hintColor
+                                color: _book!.access[_book!.users[index]]!.index == AccessLevel.write.index ? ThemeMgr.getTheme(context)!.hintColor
                                     : ThemeMgr.getTheme(context)!.iconTheme.color
                             ),
                           ),

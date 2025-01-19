@@ -1,3 +1,4 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
@@ -85,7 +86,7 @@ class _ItemSelectorState extends State<ItemSelector> {
       body: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return _search != "" && items[index].contains(_search) || _search == "" ?
+          return _search != "" && removeDiacritics(items[index].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
             ListTile(
               title: Text(itemType == "ingredients" ? beautifyName(items[index]) : items[index]),
               trailing: IconButton(

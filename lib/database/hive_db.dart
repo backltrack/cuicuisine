@@ -338,7 +338,7 @@ class HiveConnector {
     Book book = _bookBox.values.firstWhere((book) => book.id == id);
 
     book.copyFromUpdate(bookUpdate);
-    print(book.toJson());
+    
     await book.save();
 
     if (addToQueue) {
@@ -481,7 +481,7 @@ class HiveConnector {
   }
 
   bool removeOtherUserFromBook(String userId, Book book) {
-    if (book.access[DatabaseMgr().localMgr.getUserId()] == 2) {
+    if (book.access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own) {
       DatabaseMgr().localMgr.updateBook(
         book.id,
         BookUpdate(
@@ -497,7 +497,7 @@ class HiveConnector {
   }
 
   bool updateUserAccess(Book book, String userId, AccessLevel value) {
-    if (book.access[DatabaseMgr().localMgr.getUserId()] == 2) {
+    if (book.access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own) {
       Map<String, AccessLevel> _newAccess = Map.from(book.access);
       _newAccess[userId] = value;
 
