@@ -322,7 +322,7 @@ class MongoConnector {
     });
 
     if (response != null && response.statusCode == 200) {
-      return response.body != null && jsonDecode(response.body);
+      return response.body != null && jsonDecode(utf8.decode(response.bodyBytes));
     }
     return false;
   }
@@ -338,7 +338,7 @@ class MongoConnector {
       );
 
       if (response.statusCode == 200) {
-        return Result.fromJson(jsonDecode(response.body));
+        return Result.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
       }
       return Result(result: false, reason: "Server error");
 
@@ -362,7 +362,7 @@ class MongoConnector {
       );
 
       if (response.statusCode == 200) {
-        return Result.fromJson(jsonDecode(response.body));
+        return Result.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
       }
       return Result(result: false, reason: "Server error");
 
@@ -381,7 +381,7 @@ class MongoConnector {
   Future<bool> deleteUser() async {
     final response = await _secureDeleteRequest("/users/me/delete", {});
     if (response != null && response.statusCode == 200) {
-      if (response.body != null && jsonDecode(response.body)) {
+      if (response.body != null && jsonDecode(utf8.decode(response.bodyBytes))) {
         return true;
       }
     }
@@ -394,7 +394,7 @@ class MongoConnector {
 
     if (response != null && response.statusCode == 200) {
       if (response.body != null) {
-        Map<String, dynamic> data = jsonDecode(response.body);
+        Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
 
       if (data['result']) {
           List<dynamic> tmp = data['changes'];
@@ -461,9 +461,8 @@ class MongoConnector {
     final response = await _secureGetRequest('/users/me/fetchall');
 
     if (response != null && response.statusCode == 200) {
-      print(response.body);
 
-      Map<String, dynamic> data = jsonDecode(response.body);
+      Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       if (data.keys.contains('books') && data.keys.contains('recipes') && data.keys.contains('lastChange')) {
         List<dynamic> bookIds = data['books'];
         for (String bookId in bookIds) {
@@ -500,8 +499,7 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(jsonDecode(response.body));
-      return AppUser.fromJson(jsonDecode(response.body));
+      return AppUser.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -518,7 +516,7 @@ class MongoConnector {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       try {
-        dynamic data = jsonDecode(response.body);
+        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data['result']) {
           String change = DatabaseMgr().localMgr.createChange();
@@ -557,8 +555,8 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(jsonDecode(response.body));
-      return Book.fromJson(jsonDecode(response.body));
+      print(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Book.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -578,10 +576,9 @@ class MongoConnector {
       // If the server did return a 201 CREATED response,
       // then parse the JSON.
       try {
-        dynamic data = jsonDecode(response.body);
+        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         print(data);
         if (data != null && data['result']) {
-          print('test');
 
           DatabaseMgr().localMgr.updateBookLastUpdate(book.id, DateTime.parse(data['lastUpdate']));
 
@@ -621,7 +618,7 @@ class MongoConnector {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       try {
-        dynamic data = jsonDecode(response.body);
+        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         print(data);
 
         if (data['result']) {
@@ -659,7 +656,7 @@ class MongoConnector {
     );
 
     if (response != null && response.statusCode == 200) {
-      final value = jsonDecode(response.body);
+      final value = jsonDecode(utf8.decode(response.bodyBytes));
       if (value is bool) {
         String change = DatabaseMgr().localMgr.createChange();
 
@@ -686,8 +683,8 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(jsonDecode(response.body));
-      return Map<String, String>.from(jsonDecode(response.body));
+      print(jsonDecode(utf8.decode(response.bodyBytes)));
+      return Map<String, String>.from(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     
     return {};
@@ -702,8 +699,7 @@ class MongoConnector {
     if (response != null && response.statusCode == 200 && response.body != null) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(jsonDecode(response.body));
-      return Recipe.fromJson(   jsonDecode(response.body));
+      return Recipe.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -726,7 +722,7 @@ class MongoConnector {
       // If the server did return a 201 CREATED response,
       // then parse the JSON.
       try {
-        dynamic data = jsonDecode(response.body);
+        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         print(data);
 
         if (data != null && data['result']) {
@@ -788,7 +784,7 @@ class MongoConnector {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       try {
-        dynamic data = jsonDecode(response.body);
+        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         print(data);
         if (data['result']) {
           String change = DatabaseMgr().localMgr.createChange();
@@ -825,7 +821,7 @@ class MongoConnector {
     );
 
     if (response != null && response.statusCode == 200) {
-      final value = jsonDecode(response.body);
+      final value = jsonDecode(utf8.decode(response.bodyBytes));
       if (value is bool && value) {
         String change = DatabaseMgr().localMgr.createChange();
 
@@ -878,7 +874,7 @@ class MongoConnector {
     });
 
     if (response != null && response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     }
 
     return false;
