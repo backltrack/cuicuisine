@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cuicuisine/database/database_mgr.dart';
+import 'package:cuicuisine/database/file_storage.dart';
 import 'package:cuicuisine/models/sync_model.dart';
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:cuicuisine/security/rsa.dart';
@@ -178,7 +179,7 @@ class MongoConnector {
         headers: {
           'accept': 'application/json'
       });
-      print(response.body);
+      
       DatabaseMgr().isOnline = response.body == "true";
       return response.body == "true";
     } on SocketException catch (e) {
@@ -218,7 +219,6 @@ class MongoConnector {
             }
           }
           catch (e) {
-            print('lv2');
             print(e);
           }
         }
@@ -237,7 +237,6 @@ class MongoConnector {
   }
 
   Future<bool> emailExists(String email) async {
-    print('check');
     final response = await http.post(Uri.parse("$server/email_exists"),
       headers: {
         'accept': 'application/json',
@@ -245,7 +244,6 @@ class MongoConnector {
       },
       body: jsonEncode({'email': email})
     );
-    print(response);
 
     if (response.statusCode == 200) {
       return bool.parse(response.body);
@@ -464,6 +462,9 @@ class MongoConnector {
 
       Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       if (data.keys.contains('books') && data.keys.contains('recipes') && data.keys.contains('lastChange')) {
+        DatabaseMgr().localMgr.clearBooks();
+        DatabaseMgr().localMgr.clearRecipes();
+
         List<dynamic> bookIds = data['books'];
         for (String bookId in bookIds) {
           Book? book = await fetchBook(bookId);
@@ -480,6 +481,7 @@ class MongoConnector {
         }
 
         String? lastChange = data['lastChange'];
+        print(lastChange);
         if (lastChange != null) {
           DatabaseMgr().localMgr.addChange(lastChange);
         }
@@ -555,7 +557,6 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(jsonDecode(utf8.decode(response.bodyBytes)));
       return Book.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
     } else {
       // If the server did not return a 200 OK response,
@@ -609,7 +610,6 @@ class MongoConnector {
   }
 
   Future<bool> updateBook(BookUpdate bookUpdate) async {
-    print(bookUpdate.toJson());
     final response = await _securePostJsonRequest('/books/update', 
       bookUpdate.toJson()
     );
@@ -619,7 +619,6 @@ class MongoConnector {
       // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        print(data);
 
         if (data['result']) {
           String change = DatabaseMgr().localMgr.createChange();
@@ -683,7 +682,6 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      print(jsonDecode(utf8.decode(response.bodyBytes)));
       return Map<String, String>.from(jsonDecode(utf8.decode(response.bodyBytes)));
     }
     
@@ -723,8 +721,6 @@ class MongoConnector {
       // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        print(data);
-
         if (data != null && data['result']) {
           DatabaseMgr().localMgr.updateRecipeLastUpdate(recipe.id, DateTime.parse(data['lastUpdate']));
 
@@ -775,7 +771,6 @@ class MongoConnector {
   }
 
   Future<bool> updateRecipe(RecipeUpdate recipeUpdate) async {
-    print(recipeUpdate.toJson());
     final response = await _securePostJsonRequest('/recipes/update', 
       recipeUpdate.toJson()
     );
@@ -785,7 +780,7 @@ class MongoConnector {
       // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        print(data);
+        
         if (data['result']) {
           String change = DatabaseMgr().localMgr.createChange();
           
@@ -893,8 +888,9 @@ class MongoConnector {
     List<String> images = await DatabaseMgr().localMgr.fileStorage.getAllRecipeImages(recipe.id);
     
     for (String imagePath in images) {
-      if (recipe.pictures.contains(DatabaseMgr().localMgr.fileStorage.pathToId(imagePath)!['imageId'])) {
-        await deleteImage(recipe.id, imagePath);
+      String imageId = DatabaseMgr().localMgr.fileStorage.pathToId(imagePath)!['imageId'] ?? "";
+      if (recipe.pictures.contains(imageId)) {
+        await FileStorage().deleteImage(recipeId: recipe.id, imageId: imageId);
       }
     }
     return true;

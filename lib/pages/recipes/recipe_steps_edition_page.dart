@@ -54,7 +54,6 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
                 ],
               ),
             ).then((value) {
-              print(value);
               if (value != null && value) {
                 returnValue = true;
               }
@@ -74,8 +73,6 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
                   steps: newSteps,
                   onStepChanged: (Map<String, dynamic> value) {
                     setState(() {
-                      print(value['step']);
-                      print(value['index']);
                       newSteps[value['index']].step = value['step'];
                     });
                   },
@@ -97,7 +94,6 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
         floatingActionButton: FloatingActionButton.extended(
             label: Text(S.of(context).recipe_edition_update),
             onPressed: () async {
-              print(steps);
               DatabaseMgr().localMgr.updateRecipe(
                 recipeId,
                 RecipeUpdate(

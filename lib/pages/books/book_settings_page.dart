@@ -35,11 +35,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
 
   void _init() async {
     bool? _bookSharingUnderstood = DatabaseMgr().localMgr.loadBookSharingAgreement();
-    print(_bookSharingUnderstood);
+
     if (_bookSharingUnderstood != null) {
       bookSharingUnderstood = _bookSharingUnderstood;
     }
-    print(bookSharingUnderstood);
   }
 
   getNames() async {
@@ -106,9 +105,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                     var _tmp = DatabaseMgr().localMgr.getBook(_book!.id);
                     if (_tmp != null) {
                       setState(() {
-                        print(_tmp.name);
                         _book = _tmp;
-                        print(_book!.name);
                       });
                       setState(() {
 
@@ -208,7 +205,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
             itemCount: _book!.users.length,
             itemBuilder: (context, int index) {
               final String _name = userNames[_book!.users[index]] ?? "";
-              print(_name);
+
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(

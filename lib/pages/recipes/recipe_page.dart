@@ -139,7 +139,7 @@ class _RecipePageState extends State<RecipePage> {
                     case "copy_into":
                       return showBookPickerDialog(
                           context: context,
-                          books: DatabaseMgr().localMgr.getUserBooks(getOwnedOnly: true)
+                          books: DatabaseMgr().localMgr.getUserBooks(getWritableOnly: true)
                       ).then((bookId) async {
                         if (bookId != null) {
                           print("add ${recipe.name} to $bookId");
@@ -171,9 +171,7 @@ class _RecipePageState extends State<RecipePage> {
                               ],
                             )
                       ).then((value) {
-                        print(value);
                         if (value != null && value) {
-                          print("delete recipe");
                           DatabaseMgr().localMgr.deleteRecipe(recipe.id);
                           if (mounted) Navigator.pop(context, "reloadRecipes");
                         }

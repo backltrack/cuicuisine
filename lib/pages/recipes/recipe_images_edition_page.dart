@@ -137,8 +137,6 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
                 );
               }),
               onReorder: (int oldIndex, int newIndex) async {
-                print(oldIndex);
-                print(newIndex);
                 // copy pictures
                 List<String> pictures = [];
                 pictures.addAll(_recipe.pictures);

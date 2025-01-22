@@ -33,7 +33,6 @@ class _IngredientTileState extends State<IngredientTile> {
     super.initState();
 
     setState(() {
-      print(widget.locale);
       ingredient = widget.ingredient;
       currentUnit = ingredient.unit;
       unitMgr = Unit(widget.locale);

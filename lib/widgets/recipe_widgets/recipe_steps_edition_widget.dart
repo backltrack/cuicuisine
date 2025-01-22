@@ -97,6 +97,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                             data: newSteps[index].step.isNotEmpty ? newSteps[index].step : "step description",
                             onLinkTap: (String? url, Map<String, String> attributes, dom.Element? element) async {
                               print("url:$url");
+                              // TODO: url links issue
                               if (url != null && url.isNotEmpty) {
                                 
                                 final Uri uri = Uri.parse(url);
@@ -115,7 +116,6 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                             "stepDescription": newSteps[index].step
                           }).then((value) async {
                             if (value != null) {
-                              print(value);
                               if (widget.onStepChanged != null) {
                                 setState(() {
                                   widget.onStepChanged!({

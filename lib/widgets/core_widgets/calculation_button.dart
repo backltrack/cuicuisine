@@ -42,7 +42,6 @@ class _CalculationButtonWidgetState extends State<CalculationButtonWidget> {
                 if (newValue != _value && newValue > 0) {
                   setState(() {
                     _isEnabled = newValue != 1;
-                    print(_isEnabled);
 
                     _value = newValue;
                   });

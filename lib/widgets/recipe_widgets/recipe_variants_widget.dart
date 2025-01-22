@@ -79,8 +79,8 @@ class _RecipeVariantsWidgetState extends State<RecipeVariantsWidget> {
                     suffixIcon: FontAwesomeIcons.paperPlane,
                     onSubmit: () async {
                       String? userId = DatabaseMgr().localMgr.getUserId();
-                      if (userId != null)
-                        print('test');
+                      if (userId != null) {}
+                      // TODO: variant
                         // await updateRecipe(
                         //   recipeId: widget.recipeId,
                         //   data: {

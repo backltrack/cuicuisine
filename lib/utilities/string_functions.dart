@@ -47,7 +47,6 @@ class EmailPasswordValidator {
   static bool checkPasswordContainsSpecials(String password) {
     String test = r"[\W]";
     RegExp exp = RegExp(test);
-    print(exp);
     return exp.hasMatch(password);
   }
 

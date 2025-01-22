@@ -280,15 +280,14 @@ class HiveConnector {
     }
   }
 
-  List<Book> getUserBooks({bool getOwnedOnly = false}) {
+  List<Book> getUserBooks({bool getWritableOnly = false}) {
     String? userId = getUserId();
     if (userId != null) {
       try {
         final List<Book> userBooks = [];
-        _bookBox.values.forEach((book) {
-            print(book.users);
+        for (var book in _bookBox.values) {
             if (book.users.contains(userId)) {
-              if (getOwnedOnly) {
+              if (getWritableOnly) {
                 if (book.access[userId] != null && book.access[userId]!.index >= AccessLevel.write.index) {
                   userBooks.add(book);
                 }
@@ -297,7 +296,7 @@ class HiveConnector {
                 userBooks.add(book);
               }
             }
-        });
+        }
 
         return userBooks;
       } on Exception catch(e) {
@@ -660,8 +659,6 @@ class HiveConnector {
   }
 
   void updateRecipeId(String id, String newId) {
-    print(id);
-    print(newId);
     Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
     recipe.id = newId;
     recipe.isDirty = false;

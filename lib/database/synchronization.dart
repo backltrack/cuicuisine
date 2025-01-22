@@ -59,13 +59,12 @@ class Synchronization {
 
   Future<bool> fetchNew() async {
     String? lastChange = DatabaseMgr().localMgr.getLastChange();
-    print(lastChange);
 
     if (lastChange != null) {
+      // already sync before
       await DatabaseMgr().remoteMgr.getLatestChanges(lastChange);
     }
     else {
-      print("fetch all");
       await DatabaseMgr().remoteMgr.fetchAllFromUser();
     }
     return true;

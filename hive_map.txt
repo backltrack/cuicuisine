@@ -1,0 +1,33 @@
+HIVE
+
+flutter packages pub run build_runner build
+
+BOX settings:
+    - String locale // 'en', 'fr'
+    - bool wakelock
+    - int theme
+    - String defaultBook // book id
+    - String server
+
+BOX server:
+    credentials: credentials String
+    uri:
+
+BOX user:
+    - AppUser appUser // current user - getAt(0) to access directly
+
+BOX books:
+    ListOf:
+        'bookId': Book
+
+BOX recipes:
+    ListOf:
+        'recipeId': Recipe
+
+BOX sync:
+    - Bool lock
+    - unsaved = { users: [], books: [], recipes: [] }
+
+ACTIONS
+- clear boxes on disconnect -> ensure that the connected user has always the right to read recipes stored locally
+- sync at app startup

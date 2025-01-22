@@ -30,7 +30,7 @@ Tag: ?
 LIFE CYCLE
 
 - Init db connectors (firebase auth, mongodb, hive)
-- connexion (firebase) -> firebase uid
+- connexion (firebase) -> firebase id
 - check if same as current user in hive
     > FALSE #INTERNET NECESSARY
         - clear hive

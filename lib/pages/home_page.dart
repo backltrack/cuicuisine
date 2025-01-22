@@ -74,7 +74,6 @@ class _HomePageState extends State<HomePage> {
     canVibrate = await Vibrate.canVibrate;
 
     // load books
-    //books = await getUserBooks();
     books = DatabaseMgr().localMgr.getUserBooks();
 
     // set default Book
@@ -99,8 +98,6 @@ class _HomePageState extends State<HomePage> {
           await setBookAsDefaultAndRefresh(books![0]);
         }
       } else {
-        print(books![0].id);
-        print(books![0].toJson());
         await setBookAsDefaultAndRefresh(books![0]);
       }
     } else {
@@ -142,7 +139,7 @@ class _HomePageState extends State<HomePage> {
             case "copy_into":
               return showBookPickerDialog(
                   context: context,
-                  books: DatabaseMgr().localMgr.getUserBooks(getOwnedOnly: true)
+                  books: DatabaseMgr().localMgr.getUserBooks(getWritableOnly: true)
               ).then((bookId) async {
                 if (bookId != null) {
                   print("add ${recipe.name} to $bookId");
@@ -177,9 +174,7 @@ class _HomePageState extends State<HomePage> {
                         ],
                       )
               ).then((value) async {
-                print(value);
                 if (value != null && value) {
-                  print("delete recipe");
                   DatabaseMgr().localMgr.deleteRecipe(recipe.id);
                   // update book recipes
                   recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
@@ -230,9 +225,7 @@ class _HomePageState extends State<HomePage> {
         Navigator.of(context).pushNamed(BookNamePage.route, arguments: {
           'isBookCreation': true
         }).then((value) async {
-          print('pop');
           if (value != null) {
-            print(value);
             if (value is Book?) {
               Book? newBook = value as Book?;
               if (newBook != null) {
@@ -402,7 +395,7 @@ class _HomePageState extends State<HomePage> {
             )
           ),
 
-        floatingActionButton: (selectedBook == null || userAccess == 0) ? null : FloatingActionButton(
+        floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read) ? null : FloatingActionButton(
           onPressed: () async {
             String newRecipeId = DatabaseMgr().localMgr.addNewRecipe(name: "test", bookId: selectedBook!.id);
             // Edit recipe
@@ -526,7 +519,6 @@ class _HomePageState extends State<HomePage> {
                             if (books != null) {
                               selectedBook = findBookFromId(selectedBook!.id);
                               if(selectedBook == null) {
-                                print('deleted');
                                 // current book has been deleted
                                 if (books!.isNotEmpty) {
                                   print('set first as default');

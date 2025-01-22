@@ -2,8 +2,6 @@ import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/main.dart';
 import 'package:flutter/material.dart';
 
-import '../generated/l10n.dart';
-
 class LocaleMgr {
   static final LocaleMgr _instance = LocaleMgr._();
 
@@ -15,7 +13,6 @@ class LocaleMgr {
 
   static void setLocale(BuildContext context, String code) {
     DatabaseMgr().localMgr.saveLocale(code);
-    print('Save locale $code');
 
     Cuicuisine.of(context)!.changeLocale(code);
   }
