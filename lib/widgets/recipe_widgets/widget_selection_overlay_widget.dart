@@ -36,7 +36,7 @@ class _WidgetSelectionOverlayState extends State<WidgetSelectionOverlay> {
                   child: CircleAvatar(
                     radius: 24,
                     backgroundColor: Colors.grey.shade600,
-                    child: const FaIcon(FontAwesomeIcons.edit, color: Colors.grey),
+                    child: const FaIcon(FontAwesomeIcons.penToSquare, color: Colors.grey),
                   ),
                 ),
               ),

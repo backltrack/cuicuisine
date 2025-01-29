@@ -27,7 +27,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
 
   bool _isListViewOpened = false;
 
-  int _maxIngredientDisplay = 6;
+  final int _maxIngredientDisplay = 6;
 
   String? locale;
 
@@ -74,7 +74,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
         children: [
           Text(
             S.of(context).ingredient_widget_title,
-            style: ThemeMgr.getTheme(context)!.textTheme.headline2,
+            style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
           ),
           const SizedBox(height: 12),
           // persons selector

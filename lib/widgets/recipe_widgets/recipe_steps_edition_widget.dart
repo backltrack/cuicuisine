@@ -75,7 +75,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                               style: ThemeMgr.getTheme(context)!.textTheme.displaySmall
                           ),
                           CircularIconButton(
-                            icon: FaIcon(FontAwesomeIcons.trashAlt, size: 18, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+                            icon: FaIcon(FontAwesomeIcons.trashCan, size: 18, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
                             color: ThemeMgr.getTheme(context)!.colorScheme.background,
                             onPressed: () {
                               if (widget.onRemoveStep != null) {

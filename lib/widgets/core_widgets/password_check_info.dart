@@ -49,7 +49,7 @@ class _PasswordCheckInfoState extends State<PasswordCheckInfo> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(S.of(context).auth_password_req_sepcial),
-              FaIcon(checkSpecials? FontAwesomeIcons.circleCheck : FontAwesomeIcons.circleXmark, size: 14, color: checkSpecials ? Colors.green : Colors.red)
+              FaIcon(checkSpecials? FontAwesomeIcons.circleCheck : FontAwesomeIcons.circleXmark, size: 14, color: checkSpecials ? Colors.green : Colors.orange)
             ],
           )
         ],

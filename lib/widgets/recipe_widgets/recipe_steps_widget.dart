@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -101,7 +102,13 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                         "*": Style(
                           fontSize: FontSize(_textSize)
                         )
-                      }
+                      },
+                      onLinkTap: (url, attributes, element) {
+                        if (url != null) {
+                          final Uri uri = Uri.parse(url);
+                          launchUrl(uri);
+                        }
+                      },
                     ),
 
                     const SizedBox(height: 24)

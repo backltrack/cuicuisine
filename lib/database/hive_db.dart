@@ -31,8 +31,10 @@ class HiveConnector {
   Future<void> initialize() async {
     if (!kIsWeb) {
       final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
+      if (!kIsWeb) {
+        Hive.init(appDocumentDir.path);
+      }
       Hive
-        ..init(appDocumentDir.path)
         ..registerAdapter(AppUserAdapter())
         ..registerAdapter(BookAdapter())
         ..registerAdapter(VariantAdapter())
@@ -777,7 +779,9 @@ class HiveConnector {
     if (result) {
       Recipe? recipe = getRecipe(recipeId);
       if (recipe != null) {
+        print(recipe.pictures);
         recipe.pictures.remove(imageId);
+        print(recipe.pictures);
         updateRecipe(
           recipeId,
           RecipeUpdate(

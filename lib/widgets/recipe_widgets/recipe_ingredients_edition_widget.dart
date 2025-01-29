@@ -22,7 +22,7 @@ class RecipeIngredientsEditionWidget extends StatefulWidget {
   final Function(String) onQuantityTypeChanged;
 
   RecipeIngredientsEditionWidget({
-    Key? key,
+    super.key,
     required this.ingredients,
     required this.defaultQuantity,
     required this.quantityType,
@@ -31,7 +31,7 @@ class RecipeIngredientsEditionWidget extends StatefulWidget {
     required this.onAddIngredient,
     required this.onNumberChanged,
     required this.onQuantityTypeChanged
-  }) : super(key: key);
+  });
 
   @override
   _RecipeIngredientsEditionWidgetState createState() => _RecipeIngredientsEditionWidgetState();

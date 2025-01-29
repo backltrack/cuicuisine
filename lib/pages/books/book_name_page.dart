@@ -52,6 +52,8 @@ class _BookNamePageState extends State<BookNamePage> {
         child: MyTextField(
           textEditingController: _controller,
           autofocus: true,
+          keyboardType: TextInputType.name,
+          textCapitalization: TextCapitalization.words,
           icon: FontAwesomeIcons.book,
           label: S.of(context).book_creation_name,
         )

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_tags_x/flutter_tags_x.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 import '../../themes/theme_mgr.dart';
@@ -16,9 +15,10 @@ class MyTypeAheadTextField extends StatefulWidget {
   final Widget Function(BuildContext, dynamic) itemBuilder;
   final FutureOr<List<String>> Function(String) suggestionsCallback;
   final Function(String) onSuggestionSelected;
+  final TextCapitalization textCapitalization;
 
   const MyTypeAheadTextField({
-    Key? key,
+    super.key,
     required this.label,
     required this.itemBuilder,
     required this.suggestionsCallback,
@@ -27,15 +27,16 @@ class MyTypeAheadTextField extends StatefulWidget {
     this.onSubmit,
     this.textEditingController,
     this.autofocus=false,
-    this.keyboardType=TextInputType.name
-  }) : super(key: key);
+    this.keyboardType=TextInputType.name,
+    this.textCapitalization=TextCapitalization.words
+  });
 
   @override
   _MyTypeAheadTextFieldState createState() => _MyTypeAheadTextFieldState();
 }
 
 class _MyTypeAheadTextFieldState extends State<MyTypeAheadTextField> {
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
   bool isFocused = false;
 
   @override
@@ -75,7 +76,9 @@ class _MyTypeAheadTextFieldState extends State<MyTypeAheadTextField> {
             autofocus: widget.autofocus,
             decoration: InputDecoration(
               border: outlineInputBorder
-            )
+            ),
+            textCapitalization: widget.textCapitalization,
+            keyboardType: widget.keyboardType
           );
         },
         itemBuilder: widget.itemBuilder,

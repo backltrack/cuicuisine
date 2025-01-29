@@ -19,9 +19,10 @@ class MyTextField extends StatefulWidget {
   final bool isPassword;
   final int? maxLength;
   final Color? overrideTextColor;
+  final TextCapitalization? textCapitalization;
 
   const MyTextField({
-    Key? key,
+    super.key,
     required this.label,
     this.icon,
     this.onChanged,
@@ -31,12 +32,13 @@ class MyTextField extends StatefulWidget {
     this.autofocus=false,
     this.focusNode,
     this.keyboardType=TextInputType.name,
+    this.textCapitalization,
     this.suffixText,
     this.suffixIcon,
     this.isPassword=false,
     this.maxLength,
     this.overrideTextColor
-  }) : super(key: key);
+  });
 
   @override
   _MyTextFieldState createState() => _MyTextFieldState();
@@ -91,6 +93,7 @@ class _MyTextFieldState extends State<MyTextField> {
           if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength)
         ],
         keyboardType: widget.keyboardType,
+        textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
         controller: widget.textEditingController,
         focusNode: _focusNode,
         autofocus: widget.autofocus,

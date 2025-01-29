@@ -37,12 +37,14 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
         title: Text(S.of(context).recipe_edition_new_name),
       ),
       body: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: MyTextField(
           textEditingController: _controller,
           maxLength: 60,
           autofocus: true,
-          icon: FontAwesomeIcons.fileAlt,
+          keyboardType: TextInputType.name,
+          textCapitalization: TextCapitalization.words,
+          icon: FontAwesomeIcons.fileLines,
           label: S.of(context).book_creation_name,
         )
       ),
