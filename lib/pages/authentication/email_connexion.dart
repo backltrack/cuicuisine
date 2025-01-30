@@ -87,10 +87,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
             SocialButton(
               // email sign in button
               onPressed: EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password) ? () async {
-
-                String pwd = await RSAEncrypter.encryptData(_password);
-                
-                await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, pwd, 
+                await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password, 
                   onInvalidEmail: () {
                     setState(() {
                       showForgottenButton = true;

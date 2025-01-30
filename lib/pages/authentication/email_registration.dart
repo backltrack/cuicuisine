@@ -64,8 +64,16 @@ class _EmailRegistrationState extends State<EmailRegistration> {
           emailEditingController.text = routeArgs['email']!;
           String name = routeArgs['email']!.split('@')[0];
           if (name.contains('.')) {
-            nameEditingController.text = name.split('.')[0];
-            lastnameEditingController.text = name.split('.')[1];
+            String firstName = name.split('.')[0];
+            if (firstName.isNotEmpty) {
+              firstName = firstName[0].toUpperCase() + firstName.substring(1);
+            }
+            String lastName = name.split('.')[1];
+            if (lastName.isNotEmpty) {
+              lastName = lastName[0].toUpperCase() + lastName.substring(1);
+            }
+            nameEditingController.text = firstName;
+            lastnameEditingController.text = lastName;
           }
           else {
             nameEditingController.text = name;
@@ -94,7 +102,8 @@ class _EmailRegistrationState extends State<EmailRegistration> {
               label: S.of(context).auth_register_name,
               icon: FontAwesomeIcons.idCard,
               suffixIcon: nameEditingController.text != "" ? FontAwesomeIcons.circleCheck : null,
-              keyboardType: TextInputType.name
+              keyboardType: TextInputType.name,
+              textCapitalization: TextCapitalization.words
             ),
             // Last name
             MyTextField(
@@ -103,7 +112,8 @@ class _EmailRegistrationState extends State<EmailRegistration> {
               label: S.of(context).auth_register_lastname,
               icon: FontAwesomeIcons.idCard,
               suffixIcon: lastnameEditingController.text != "" ? FontAwesomeIcons.circleCheck : null,
-              keyboardType: TextInputType.name
+              keyboardType: TextInputType.name,
+              textCapitalization: TextCapitalization.words
             ),
             // email
             MyTextField(
@@ -129,8 +139,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
             SocialButton(
               // email sign in button
               onPressed: areAllFieldsValid() ? () async {
-                String pwd = await RSAEncrypter.encryptData(passwordEditingController.text);
-                await DatabaseMgr().remoteMgr.registerWithEmail(emailEditingController.text, pwd, 
+                await DatabaseMgr().remoteMgr.registerWithEmail(emailEditingController.text, passwordEditingController.text, "${nameEditingController.text} ${lastnameEditingController.text}",
                   onSuccess: (AppUser user) async {
                     if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
                   },

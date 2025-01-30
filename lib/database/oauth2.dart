@@ -71,10 +71,11 @@ class OAuth2Connexion {
   }
 
   static Future<oauth2.Client?> createClientFromPassword({required String serverUri, required String email, required String password}) async {
-
+    print(serverUri);
+    print(email);
+    print(password);
     try {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/register"), email, password);
-      print(client.credentials.toJson());
 
       DatabaseMgr().localMgr.saveCredentials(client.credentials.toJson());
       

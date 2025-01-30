@@ -252,8 +252,11 @@ class MongoConnector {
   }
 
   Future<AppUser?> connectWithEmail(String email, String password, {Function? onInvalidEmail, Function? onInvalidPassword, Function(AppUser)? onSuccess}) async {
+    String enc_pwd = await RSAEncrypter.encryptData(password);
+    String enc_email = await RSAEncrypter.encryptData(email);
+    
     try {
-      oauth2.Client? _client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: email, password: password);
+      oauth2.Client? _client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: enc_email, password: enc_pwd);
       if (_client != null) {
         client = _client;
 
@@ -283,14 +286,19 @@ class MongoConnector {
     return null;
   }
 
-  Future<AppUser?> registerWithEmail(String email, String password, {Function(AppUser)? onSuccess, Function(String)? onFailure}) async {
+  Future<AppUser?> registerWithEmail(String email, String password, String name, {Function(AppUser)? onSuccess, Function(String)? onFailure}) async {
+    String enc_pwd = await RSAEncrypter.encryptData(password);
+    String enc_email = await RSAEncrypter.encryptData(email);
+    
     try {
-      oauth2.Client? _client = await OAuth2Connexion.createClientFromPassword(serverUri: server, email: email, password: password);
+      oauth2.Client? _client = await OAuth2Connexion.createClientFromPassword(serverUri: server, email: enc_email, password: enc_pwd);
       if (_client != null) {
         client = _client;
 
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
+
+        DatabaseMgr().localMgr.updateUser(name: name);
 
         if (onSuccess != null) {
           onSuccess(user);
