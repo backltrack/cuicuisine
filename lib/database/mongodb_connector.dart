@@ -25,7 +25,8 @@ class MongoConnector {
       Response response = await http.get(Uri.parse("$server/test_connexion"),
         headers: {
           'accept': 'application/json'
-      });
+        }
+      );
       DatabaseMgr().isOnline = true;
       DatabaseMgr().localMgr.saveServerUri(server);
       this.server = server;
@@ -36,23 +37,16 @@ class MongoConnector {
   }
 
   // helper
-  Future<dynamic>_secure(Function fun) async {
-    try {
-      return fun();
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      return Response("{'result': false}", HttpStatus.requestTimeout);
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      return Response("{'result': false}", HttpStatus.requestTimeout);
-    } on ClientException catch(_) {
-      DatabaseMgr().isOnline = false;
-      return Response("{'result': false}", HttpStatus.connectionClosedWithoutResponse);
-    }
+  retryFuture(future, delay) {
+    print("retrying in $delay ms");
+    Future.delayed(Duration(milliseconds: delay), () {
+      future();
+    });
   }
 
-  Future<dynamic> _secureGetRequest(String endpoint) async {
+  Future<dynamic> _secureGetRequest(String endpoint, {int trials=3}) async {
     if (client == null) { return; }
+    print("GET $endpoint");
 
     Uri serverUri = Uri.parse(server);
 
@@ -61,14 +55,29 @@ class MongoConnector {
       'Authorization': client!.credentials.accessToken
     };
 
-    return await _secure(() async {
-      return await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
-        headers: headers);
-    });
+    try {
+      Response response = await client!.get(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint), 
+        headers: headers).timeout(const Duration(seconds: 10));
+        
+      if (response.statusCode == 401) {
+        if (await refreshToken() != null) {
+          return await _secureGetRequest(endpoint, trials: trials - 1);
+        }
+      }
+      return response;
+    } catch (e) {
+      if (trials == 0) {
+        DatabaseMgr().isOnline = false;
+        return null;
+      }
+      print("try again : $trials");
+      return await retryFuture(() => _secureGetRequest(endpoint, trials: trials - 1), 1000);
+    }
   }
 
-  Future<dynamic> _secureDeleteRequest(String endpoint, Object data) async {
+  Future<dynamic> _secureDeleteRequest(String endpoint, Object data, {int trials=3}) async {
     if (client == null) { return; }
+    print("DELETE $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -82,18 +91,26 @@ class MongoConnector {
       Response response = await client!.delete(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: jsonEncode(data));
+
+      if (response.statusCode == 401) {
+        if (await refreshToken() != null) {
+          return await _secureDeleteRequest(endpoint, data, trials: trials - 1);
+        }
+      }
       return response;
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw TimeoutException;
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw SocketException;
+    } catch (e) {
+      if (trials == 0) {
+        DatabaseMgr().isOnline = false;
+        return null;
+      }
+      print("try again : $trials");
+      return await retryFuture(() => _secureDeleteRequest(endpoint, data, trials: trials - 1), 1000);
     }
   }
 
-  Future<dynamic> _securePostJsonRequest(String endpoint, Map<String, dynamic> data) async {
+  Future<dynamic> _securePostJsonRequest(String endpoint, Map<String, dynamic> data, {int trials=3}) async {
     if (client == null) { return; }
+    print("POST Json $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -107,18 +124,26 @@ class MongoConnector {
       Response response = await client!.post(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: jsonEncode(data));
+      
+      if (response.statusCode == 401) {
+        if (await refreshToken() != null) {
+          return await _securePostJsonRequest(endpoint, data, trials: trials - 1);
+        }
+      }
       return response;
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw TimeoutException;
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw SocketException;
+    } catch (e) {
+      if (trials == 0) {
+        DatabaseMgr().isOnline = false;
+        return null;
+      }
+      print("try again : $trials");
+      return await retryFuture(() => _securePostJsonRequest(endpoint, data, trials: trials - 1), 1000);
     }
   }
 
-  Future<dynamic> _securePostMultipartRequest(String endpoint, File file, List<MapEntry<String, String>> form) async {
+  Future<dynamic> _securePostMultipartRequest(String endpoint, File file, List<MapEntry<String, String>> form, {int trials=3}) async {
     if (client == null) { return; }
+    print("POST Multipart $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -130,23 +155,30 @@ class MongoConnector {
 
     try {
       var request = MultipartRequest('POST', Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint));
-      request.files.add(await http.MultipartFile.fromPath('file', file.path, filename: file.path.split('/').last));
+      request.files.add(await MultipartFile.fromPath('file', file.path, filename: file.path.split('/').last));
       request.headers.addAll(headers);
       request.fields.addEntries(form);
       StreamedResponse response = await client!.send(request);
 
+      if (response.statusCode == 401) {
+        if (await refreshToken() != null) {
+          return await _securePostMultipartRequest(endpoint, file, form, trials: trials - 1);
+        }
+      }
       return response;
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw TimeoutException;
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      // throw SocketException;
+    } catch (e) {
+      if (trials == 0) {
+        DatabaseMgr().isOnline = false;
+        return null;
+      }
+      print("try again : $trials");
+      return await retryFuture(() => _securePostMultipartRequest(endpoint, file, form, trials: trials - 1), 1000);
     }
   }
 
-  Future<dynamic> _securePutRequest(String endpoint, Object data) async {
+  Future<dynamic> _securePutRequest(String endpoint, Object data, {int trials=3}) async {
     if (client == null) { return; }
+    print("PUT $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -159,16 +191,20 @@ class MongoConnector {
       Response response = await client!.put(Uri(scheme: serverUri.scheme, host: serverUri.host, port: serverUri.port, path: endpoint),
         headers: headers,
         body: data);
+
+      if (response.statusCode == 401) {
+        if (await refreshToken() != null) {
+          return await _securePutRequest(endpoint, data, trials: trials - 1);
+        }
+      }
       return response;
-    } on TimeoutException catch(_) {
-      DatabaseMgr().isOnline = false;
-      return Response("{'result': false}", HttpStatus.requestTimeout);
-    } on SocketException catch(_) {
-      DatabaseMgr().isOnline = false;
-      return Response("{'result': false}", HttpStatus.requestTimeout);
-    } on ClientException catch(_) {
-      DatabaseMgr().isOnline = false;
-      return Response("{'result': false}", HttpStatus.connectionClosedWithoutResponse);
+    } catch (e) {
+      if (trials == 0) {
+        DatabaseMgr().isOnline = false;
+        return null;
+      }
+      print("try again : $trials");
+      return await retryFuture(() => _securePutRequest(endpoint, data, trials: trials - 1), 1000);
     }
   }
 
@@ -193,6 +229,25 @@ class MongoConnector {
     }
   }
 
+  Future<AppUser?> refreshToken() async {
+    print('refreshing token...');
+    try {
+      oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client!);
+      if (newClient != null) {
+        client = newClient;
+        DatabaseMgr().localMgr.saveCredentials(client!.credentials.toJson());
+        
+        AppUser user = await fetchUser();
+        await DatabaseMgr().localMgr.setUser(user);
+        return user;
+      }
+    }
+    catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
   Future<AppUser?> tryReconnect() async {
     try {
       String? savedCredentials = DatabaseMgr().localMgr.getCredentials();
@@ -207,20 +262,6 @@ class MongoConnector {
         catch (e) {
           print('token expired');
           print(e);
-          try {
-            oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client!);
-            if (newClient != null) {
-              client = newClient;
-              DatabaseMgr().localMgr.saveCredentials(client!.credentials.toJson());
-              
-              AppUser user = await fetchUser();
-              await DatabaseMgr().localMgr.setUser(user);
-              return user;
-            }
-          }
-          catch (e) {
-            print(e);
-          }
         }
         
       }

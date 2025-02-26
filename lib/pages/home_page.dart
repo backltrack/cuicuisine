@@ -280,6 +280,7 @@ class _HomePageState extends State<HomePage> {
             
             onRefresh: () async {
               await DatabaseMgr().remoteMgr.testConnexion();
+              print("isOnline: ${DatabaseMgr().isOnline}");
               if (DatabaseMgr().isOnline) {
                 await DatabaseMgr().synchronization.sync();
               }

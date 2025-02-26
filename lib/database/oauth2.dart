@@ -46,7 +46,7 @@ class OAuth2Connexion {
   }
 
   static Future<oauth2.Client?> connectFromPassword({required String serverUri, required String email, required String password}) async {
-
+    print(email);
     try {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/token"), email, password);
 
@@ -109,7 +109,11 @@ class OAuth2Connexion {
     var response = await client.post(Uri(scheme: server.scheme, host: server.host, port: server.port, path: '/refresh_token'), 
       body: body);
     
+    if (jsonDecode(response.body) == null) {
+      return null;
+    }
     Map<String, dynamic> data = jsonDecode(response.body);
+
     oauth2.Credentials newCred = oauth2.Credentials(
       data['access_token'],
       refreshToken: client.credentials.refreshToken,

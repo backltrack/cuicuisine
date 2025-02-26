@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuicuisine/pages/account/account_page.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:cuicuisine/pages/test.dart';
@@ -40,6 +42,11 @@ void main() async {
   // Disable landscape mode
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+  HttpOverrides.global = MyHttpOverrides();
+
+  // ByteData data = await PlatformAssetBundle().load('assets/ca/cuicuisine.crt');
+  // SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
 
   await DatabaseMgr().initialize();
 
@@ -209,5 +216,12 @@ class _CuicuisineState extends State<Cuicuisine> {
           );
         }
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides{
+  @override
+  HttpClient createHttpClient(SecurityContext? context){
+    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }

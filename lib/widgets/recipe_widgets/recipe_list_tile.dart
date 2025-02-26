@@ -28,7 +28,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
     // get is favorite recipe
     bool isFav = DatabaseMgr().localMgr.getUser()!.favoriteRecipes.contains(widget.recipe.id);
 
-    const double cardHeight = 96;
+    const double cardHeight = 110;
     const double spacing = 8;
 
     return GestureDetector(
@@ -36,14 +36,14 @@ class _RecipeListTileState extends State<RecipeListTile> {
       onLongPress: widget.onLongPress,
       onTapDown: widget.onTapDown,
       child: Container(
-        padding: const EdgeInsets.only(top: spacing, right: spacing, left: spacing),
+        padding: const EdgeInsets.only(top: 18, right: spacing, left: spacing),
         child: Stack(
           children: [
             Container(
               height: cardHeight,
               decoration: BoxDecoration(
                   color: ThemeMgr.getTheme(context)!.cardColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(4))
+                  borderRadius: const BorderRadius.all(Radius.circular(24))
               ),
               margin: const EdgeInsets.only(left: cardHeight / 2),
               child: Row(
@@ -97,7 +97,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
                   ),
                   Container(
                     alignment: AlignmentDirectional.topCenter,
-                    margin: const EdgeInsets.fromLTRB(0, 0, 0, spacing),
+                    margin: const EdgeInsets.fromLTRB(0, 0, 0, spacing * 1.5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -133,7 +133,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: ThemeMgr.getTheme(context)!.colorScheme.background, spreadRadius: spacing)]
+                boxShadow: [BoxShadow(color: ThemeMgr.getTheme(context)!.colorScheme.background, spreadRadius: 8)]
               ),
               child: () {
                 if (widget.recipe.pictures.isEmpty) {

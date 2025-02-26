@@ -107,6 +107,7 @@ flutter:
     - assets/images/default_circle_image.png
     - fonts/google_fonts/comfortaa/
     - assets/keys/
+    - assets/ca/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -167,5 +168,5 @@ flutter_native_splash:
   # png file and should be sized for 4x pixel density.
   image: assets/icons/splash_icon.png
   android: true
-  ios: false
   web: true
+  ios: false
