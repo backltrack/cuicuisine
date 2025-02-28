@@ -268,10 +268,8 @@ class MongoConnector {
     }
     on SocketException catch (e) {
       DatabaseMgr().isOnline = false;
-      print('toast timeout');
     } on TimeoutException catch (e) {
       DatabaseMgr().isOnline = false;
-      print('other exception');
     }
 
     return null;
