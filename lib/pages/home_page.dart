@@ -1,4 +1,5 @@
 import 'package:cuicuisine/themes/theme_mgr.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -71,7 +72,9 @@ class _HomePageState extends State<HomePage> {
   void init() async {
 
     // check if vibration available
-    canVibrate = await Vibrate.canVibrate;
+    if (!kIsWeb) {
+      canVibrate = await Vibrate.canVibrate;
+    }
 
     // load books
     books = DatabaseMgr().localMgr.getUserBooks();
@@ -398,7 +401,7 @@ class _HomePageState extends State<HomePage> {
 
         floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read) ? null : FloatingActionButton(
           onPressed: () async {
-            String newRecipeId = DatabaseMgr().localMgr.addNewRecipe(name: "test", bookId: selectedBook!.id);
+            String newRecipeId = DatabaseMgr().localMgr.addNewRecipe(name: "", bookId: selectedBook!.id);
             // Edit recipe
             await Navigator.of(context).pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
               'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),

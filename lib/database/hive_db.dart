@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter/foundation.dart';
@@ -24,6 +26,7 @@ class HiveConnector {
   late Box<String> _changeBox;
   late Box<dynamic> _contextBox;
   late Box<dynamic> _bookIngredientsBox;
+  late Box<dynamic> _webImagesBox;
   FileStorage fileStorage = FileStorage();
 
   HiveConnector();
@@ -31,26 +34,24 @@ class HiveConnector {
   Future<void> initialize() async {
     if (!kIsWeb) {
       final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
-      if (!kIsWeb) {
-        Hive.init(appDocumentDir.path);
-      }
-      Hive
-        ..registerAdapter(AppUserAdapter())
-        ..registerAdapter(BookAdapter())
-        ..registerAdapter(VariantAdapter())
-        ..registerAdapter(IngredientAdapter())
-        ..registerAdapter(TagAdapter())
-        ..registerAdapter(RecipeStepAdapter())
-        ..registerAdapter(RecipeAdapter())
-        ..registerAdapter(UserUpdateAdapter())
-        ..registerAdapter(BookUpdateAdapter())
-        ..registerAdapter(RecipeUpdateAdapter())
-        ..registerAdapter(OperationTypeAdapter())
-        ..registerAdapter(OperationAdapter())
-        ..registerAdapter(OperationQueueAdapter())
-        ..registerAdapter(RecipeImageAdapter())
-        ..registerAdapter(AccessLevelAdapter());
+      Hive.init(appDocumentDir.path);
     }
+    Hive
+      ..registerAdapter(AppUserAdapter())
+      ..registerAdapter(BookAdapter())
+      ..registerAdapter(VariantAdapter())
+      ..registerAdapter(IngredientAdapter())
+      ..registerAdapter(TagAdapter())
+      ..registerAdapter(RecipeStepAdapter())
+      ..registerAdapter(RecipeAdapter())
+      ..registerAdapter(UserUpdateAdapter())
+      ..registerAdapter(BookUpdateAdapter())
+      ..registerAdapter(RecipeUpdateAdapter())
+      ..registerAdapter(OperationTypeAdapter())
+      ..registerAdapter(OperationAdapter())
+      ..registerAdapter(OperationQueueAdapter())
+      ..registerAdapter(RecipeImageAdapter())
+      ..registerAdapter(AccessLevelAdapter());
 
     _settingBox = await Hive.openBox('settings');
     _serverBox = await Hive.openBox('server');
@@ -62,6 +63,7 @@ class HiveConnector {
     _changeBox = await Hive.openBox('changes');
     _contextBox = await Hive.openBox('context');
     _bookIngredientsBox = await Hive.openBox('bookIngredients');
+    _webImagesBox = await Hive.openBox('webImages');
 
     if (_queueBox.isEmpty) {
       _queueBox.add(OperationQueue());
@@ -834,6 +836,45 @@ class HiveConnector {
         }
       }
     }
+  }
+
+  // WEB IMAGES //
+  Future<String?> writeWebImage({required XFile image, required String recipeId, required String imageId}) async {
+    String imageString = await image.readAsString();
+    String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
+    await _webImagesBox.put(path, imageString);
+    return path;
+  }
+
+  Future<Image?> readWebImage({required String recipeId, required String imageId}) async {
+    String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
+    if (_webImagesBox.containsKey(path)) {
+      Uint8List bytes = base64.decode(_webImagesBox.get(path));
+      return Image.memory(bytes);
+    }
+    return null;
+  }
+
+  Future<String?> writeWebImagefromBytes({required List<int> bytes, required String recipeId, required String imageId}) async {
+    String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
+    String imageString = base64.encode(bytes);
+    
+    await _webImagesBox.put(path, imageString);
+    return path;
+  }
+
+  bool webImageExists({required String recipeId, required String imageId}) {
+    String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
+    return _webImagesBox.containsKey(path);
+  }
+
+  Future<bool> deleteWebImage({required String recipeId, required String imageId}) async {
+    String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
+    if (_webImagesBox.containsKey(path)) {
+      await _webImagesBox.delete(path);
+      return true;
+    }
+    return false;
   }
 
   // QUEUE //

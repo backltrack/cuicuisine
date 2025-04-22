@@ -5,7 +5,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
-import '../../security/rsa.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/social_button.dart';
 

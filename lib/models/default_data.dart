@@ -1,5 +1,3 @@
-import '../../generated/l10n.dart';
-import 'data_model.dart';
 
 Map<String,List<String>> defaultTags = {
   'en': [

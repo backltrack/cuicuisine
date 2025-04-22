@@ -266,9 +266,9 @@ class MongoConnector {
         
       }
     }
-    on SocketException catch (e) {
+    on SocketException {
       DatabaseMgr().isOnline = false;
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       DatabaseMgr().isOnline = false;
     }
 
@@ -350,6 +350,7 @@ class MongoConnector {
       onFailure??("Incorrect password");
     }
     on EmailAlreadyExistsException catch(e) {
+      print(e);
       onFailure??("Email already exists");
     }
     catch (e) {

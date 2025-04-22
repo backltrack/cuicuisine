@@ -63,7 +63,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
       }
   }
 
-  void init() async {
+  Future<void> tryConnect() async {
     await DatabaseMgr().remoteMgr.testConnexion();
     if (DatabaseMgr().isOnline) {
       AppUser? user = await DatabaseMgr().remoteMgr.tryReconnect();
@@ -99,6 +99,10 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         }
       }
     }
+  }
+
+  void init() async {
+    await tryConnect();
 
     setState(() {
       _connexionTested = true;
@@ -232,7 +236,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                         setState(() {});
 
                         if (isUriWorking) {
-                          tryOfflineConnexion();
+                          tryConnect();
                         }
                         else {
                           _serverTextEditingController.text = DatabaseMgr().localMgr.getServerUri() ?? "";

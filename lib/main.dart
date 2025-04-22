@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cuicuisine/pages/account/account_page.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:cuicuisine/pages/test.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -89,20 +90,23 @@ class _CuicuisineState extends State<Cuicuisine> {
     }
 
     // load wakelock state
-    bool? wakelockState = DatabaseMgr().localMgr.loadWakelock();
-    if (wakelockState != null) {
-      wakelockState ? WakelockPlus.enable() : WakelockPlus.disable();
-    } else {
-      DatabaseMgr().localMgr.saveWakelock(false);
+    if (!kIsWeb) {
+      bool? wakelockState = DatabaseMgr().localMgr.loadWakelock();
+      if (wakelockState != null) {
+        wakelockState ? WakelockPlus.enable() : WakelockPlus.disable();
+      } else {
+        DatabaseMgr().localMgr.saveWakelock(false);
+      }
+      print("Wakelock state: $wakelockState");
     }
-    print("Wakelock state: $wakelockState");
-
   }
 
 
   @override
   void dispose() {
-    WakelockPlus.disable();
+    if (kIsWeb) {
+      WakelockPlus.disable();
+    }
     super.dispose();
   }
 

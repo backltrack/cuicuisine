@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'database_mgr.dart';
 
 class FileStorage {
   static final FileStorage _instance = FileStorage._();
@@ -19,11 +21,16 @@ class FileStorage {
   }
 
   void init() async {
-    Directory documentDirectoryPath = await getApplicationDocumentsDirectory();
-    storagePath = documentDirectoryPath.path;
+    if (!kIsWeb) {
+      Directory documentDirectoryPath = await getApplicationDocumentsDirectory();
+      storagePath = documentDirectoryPath.path;  
+    }
   }
 
   Future<bool> imageExists({required String recipeId, required String imageId}) async {
+    if (kIsWeb) {
+      return DatabaseMgr().localMgr.webImageExists(recipeId: recipeId, imageId: imageId);
+    }
     String path = idToPath(recipeId: recipeId, imageId: imageId);
     return await File(path).exists();
   }
@@ -42,8 +49,10 @@ class FileStorage {
   }
 
   Future<Image?> readImage({required String recipeId, required String imageId}) async {
-    String path = p.join(storagePath, "storage", recipeId, imageId);
-    File file = File(path);
+    if (kIsWeb) {
+      return await DatabaseMgr().localMgr.readWebImage(recipeId: recipeId, imageId: imageId);
+    }
+    File file = File(idToPath(recipeId: recipeId, imageId: imageId));
     if (await file.exists()) {
       return Image.file(file);
     }
@@ -51,6 +60,9 @@ class FileStorage {
   }
 
   Future<String?> writeImage({required XFile image, required String recipeId, required String imageId}) async {
+    if (kIsWeb) {
+      return await DatabaseMgr().localMgr.writeWebImage(image: image, recipeId: recipeId, imageId: imageId);
+    }
     String storePath = p.join(storagePath, "storage");
     String recipePath = p.join(storePath, recipeId);
     String imagePath = p.join(recipePath, imageId);
@@ -73,6 +85,9 @@ class FileStorage {
   }
 
   Future<String?> writeImagefromBytes({required List<int> bytes, required String recipeId, required String imageId}) async {
+    if (kIsWeb) {
+      return await DatabaseMgr().localMgr.writeWebImagefromBytes(bytes: bytes, recipeId: recipeId, imageId: imageId);
+    }
     String storePath = p.join(storagePath, "storage");
     String recipePath = p.join(storePath, recipeId);
     String imagePath = p.join(recipePath, imageId);
@@ -96,6 +111,9 @@ class FileStorage {
   }
 
   Future<bool> deleteImage({required String recipeId, required String imageId}) async {
+    if (kIsWeb) {
+      return await DatabaseMgr().localMgr.deleteWebImage(recipeId: recipeId, imageId: imageId);
+    }
     String path = idToPath(recipeId: recipeId, imageId: imageId);
     if (await File(path).exists()) {
       try {
@@ -110,6 +128,9 @@ class FileStorage {
   }
 
   Future<List<String>> getAllRecipeImages(String recipeId) async {
+    if (kIsWeb) {
+      return [];
+    }
     String storePath = p.join(storagePath, "storage");
     String recipePath = p.join(storePath, recipeId);
 
