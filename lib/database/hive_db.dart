@@ -677,11 +677,19 @@ class HiveConnector {
   }
 
   void duplicateRecipe(Recipe recipe, String destinationBookId) async {
+    AccessLevel? accessLevel = getUserAccess(destinationBookId);
+    if (accessLevel == null || accessLevel.index == AccessLevel.read.index) {
+      print("You don't have access to this book");
+      return;
+    }
     String newRecipeId = addNewRecipe(name: recipe.name, bookId: destinationBookId);
     
     List<String> duplicatedImages = [];
     for (String imageId in recipe.pictures) {
-      duplicatedImages.add(await duplicateImage(recipe.id, imageId, newRecipeId));
+      String? newImageId = await duplicateImage(recipe.id, imageId, newRecipeId);
+      if (newImageId != null) {
+        duplicatedImages.add(newImageId);
+      }
     }
     
     updateRecipe(newRecipeId, 
@@ -750,13 +758,13 @@ class HiveConnector {
     return false;
   }
 
-  Future<String> duplicateImage(String recipeId, String imageId, String newRecipeId) async {
+  Future<String?> duplicateImage(String recipeId, String imageId, String newRecipeId) async {
     String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
     XFile file = XFile(path);
 
-    String newImageId = ObjectId().hexString;
-    await fileStorage.writeImage(image: file, recipeId: newRecipeId, imageId: newImageId);
-    return newImageId;
+    List<String> newIds = await saveRecipeImages([file], newRecipeId);
+    // await fileStorage.writeImage(image: file, recipeId: newRecipeId, imageId: newImageId);
+    return newIds.isNotEmpty ? newIds[0] : null;
   }
 
   Future<void> putPicturesToStorage(List<XFile> images, String recipeId) async {
