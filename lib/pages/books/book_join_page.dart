@@ -28,7 +28,7 @@ class _BookJoinPageState extends State<BookJoinPage> {
 
   void getIdFromClipboard() async {
     FlutterClipboard.paste().then((value) {
-      RegExp pattern = RegExp('[a-zA-Z0-9]{20}');
+      RegExp pattern = RegExp('[a-zA-Z0-9]{24}');
       final RegExpMatch? match = pattern.firstMatch(value);
       if (match != null && match.group(0) != null) {
         _controller.text = match.group(0)!;
@@ -85,23 +85,21 @@ class _BookJoinPageState extends State<BookJoinPage> {
       floatingActionButton: FloatingActionButton.extended(
         label: Text(S.of(context).join_button),
         onPressed: () async {
+          print("text: " + _controller.text);
           if (_controller.text != "") {
             // is book already accessed by user
             bool canAlreadyAccess = false;
             List<Book> books = DatabaseMgr().localMgr.getUserBooks();
             books.forEach((Book book) {
+              print(book.id);
               canAlreadyAccess = canAlreadyAccess || book.id == _controller.text;
+              print(canAlreadyAccess);
             });
             // add user to book
             if (!canAlreadyAccess) {
               //await addUserToBook(_controller.text);
               try {
-                // Get book locally 
-                Book? remoteBook = await DatabaseMgr().remoteMgr.fetchBook(_controller.text);
-                DatabaseMgr().localMgr.addBook(remoteBook, addToQueue: false);
-
-                // update book to add user
-                DatabaseMgr().localMgr.addUserToBook(remoteBook);
+                await DatabaseMgr().remoteMgr.joinBook(_controller.text);
               }
               catch (e) {
                 return;

@@ -697,6 +697,30 @@ class MongoConnector {
     return false;
   }
 
+  Future<String?> joinBook(String bookId) async {
+    final response = await _secureGetRequest('/books/join/$bookId');
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        bool data = jsonDecode(utf8.decode(response.bodyBytes));
+
+        if (data) {
+          await DatabaseMgr().synchronization.fetchNew();
+        }
+
+        return null;
+      }
+      catch (e) {
+        print(e);
+        return null;
+      }
+    }
+
+    return null;
+  }
+
   Future<bool> deleteBook(Book book) async {
     final response = await _secureDeleteRequest('/books/delete',
       book.id

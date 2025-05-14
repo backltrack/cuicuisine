@@ -463,14 +463,14 @@ class HiveConnector {
     book.save();
   }
 
-  void addUserToBook(Book book) {
-    DatabaseMgr().localMgr.updateBook(book.id, 
-      BookUpdate(
-        id: book.id,
-        users: List.from(book.users)..add(DatabaseMgr().localMgr.getUserId()!)
-      )
-    );
-  }
+  // void addUserToBook(Book book) {
+  //   DatabaseMgr().localMgr.updateBook(book.id, 
+  //     BookUpdate(
+  //       id: book.id,
+  //       users: List.from(book.users)..add(DatabaseMgr().localMgr.getUserId()!)
+  //     )
+  //   );
+  // }
 
   void removeUserFromBook(Book book) {
     DatabaseMgr().localMgr.updateBook(
