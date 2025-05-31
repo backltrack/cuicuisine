@@ -1,4 +1,5 @@
 import 'package:cuicuisine/themes/theme_mgr.dart';
+import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -266,6 +267,12 @@ class _HomePageState extends State<HomePage> {
               _research = val;
             });
           },
+          extraWebButton: IconButton(
+            icon: const FaIcon(FontAwesomeIcons.download),
+            onPressed: () {
+              downloadFile("${DatabaseMgr().localMgr.getServerUri()!}/downloads/cuicuisine.apk");
+            },
+          )
         ),
         drawer: homepageDrawer(DatabaseMgr().localMgr.getUser()),
         onDrawerChanged: (isOpened) async {

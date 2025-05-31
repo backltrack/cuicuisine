@@ -18,7 +18,7 @@ class _CircularIconButtonState extends State<CircularIconButton> {
       child: widget.icon,
       style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),
-          primary: widget.color
+          backgroundColor: widget.color
       ),
       onPressed: widget.onPressed
     );

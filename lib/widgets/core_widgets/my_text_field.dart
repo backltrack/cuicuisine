@@ -101,7 +101,7 @@ class _MyTextFieldState extends State<MyTextField> {
         decoration: InputDecoration(
           labelText: widget.label,
           labelStyle: isFocused ? ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.primaryColor) : ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
-          prefixIcon: widget.icon != null ? (Icon(widget.icon, color: isFocused ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyText2!.color, size: 20)) : null,
+          prefixIcon: widget.icon != null ? (Icon(widget.icon, color: isFocused ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)) : null,
           focusedBorder: OutlineInputBorder(
             borderRadius: const BorderRadius.all(Radius.circular(12)),
             borderSide: BorderSide(
@@ -110,7 +110,7 @@ class _MyTextFieldState extends State<MyTextField> {
             )
           ),
           suffixText: widget.suffixText,
-          suffixStyle: ThemeMgr.getTheme(context)!.textTheme.headline2,
+          suffixStyle: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
           suffixIcon: widget.isPassword ? IconButton(
             padding: EdgeInsets.zero,
             icon: FaIcon(isObscured ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, color: Colors.grey, size: 20),
@@ -124,13 +124,13 @@ class _MyTextFieldState extends State<MyTextField> {
               onPressed: () {
                 if (widget.onSubmit != null) widget.onSubmit!();
               },
-              icon: Icon(widget.suffixIcon!, color: ThemeMgr.getTheme(context)!.textTheme.bodyText2!.color, size: 20)
+              icon: Icon(widget.suffixIcon!, color: ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)
             )
             : null,
           border: outlineInputBorder,
           enabledBorder: outlineInputBorder,
         ),
-        style: widget.overrideTextColor != null ? ThemeMgr.getTheme(context)!.textTheme.headline2!.copyWith(color: widget.overrideTextColor) : ThemeMgr.getTheme(context)!.textTheme.headline2,
+        style: widget.overrideTextColor != null ? ThemeMgr.getTheme(context)!.textTheme.displayMedium!.copyWith(color: widget.overrideTextColor) : ThemeMgr.getTheme(context)!.textTheme.displayMedium,
         onChanged: (String val) {
           if (widget.onChanged != null) widget.onChanged!(val);
         },

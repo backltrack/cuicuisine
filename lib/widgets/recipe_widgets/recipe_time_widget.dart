@@ -29,12 +29,12 @@ class RecipeTimeWidget extends StatelessWidget {
               children: [
                 Text(
                     S.of(context).time_widget_text,
-                    style: ThemeMgr.getTheme(context)!.textTheme.headline2
+                    style: ThemeMgr.getTheme(context)!.textTheme.displayMedium
                 ),
                 SizedBox(height: 4),
                 Text(
                     minutesToTime(_totalTime),
-                    style: ThemeMgr.getTheme(context)!.textTheme.headline1
+                    style: ThemeMgr.getTheme(context)!.textTheme.displayLarge
                 )
               ],
             ),

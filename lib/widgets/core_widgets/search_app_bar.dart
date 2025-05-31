@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../generated/l10n.dart';
@@ -10,9 +11,10 @@ class SearchAppBar extends AppBar {
 
   final String? myTitle;
   final Function(String) onSearchChanged;
+  final IconButton? extraWebButton;
   final Widget? leading;
 
-  SearchAppBar({Key? key, this.myTitle, required this.onSearchChanged, this.leading}) : super(key: key);
+  SearchAppBar({Key? key, this.myTitle, required this.onSearchChanged, this.leading, this.extraWebButton}) : super(key: key);
 
   @override
   _SearchAppBarState createState() => _SearchAppBarState();
@@ -32,7 +34,7 @@ class _SearchAppBarState extends State<SearchAppBar> {
       leading: hasDrawer ? Builder(
         builder: (BuildContext context) {
           return IconButton(
-            icon: Icon(Icons.menu, size: 26),
+            icon: const Icon(Icons.menu, size: 26),
             onPressed: () {
               Scaffold.of(context).openDrawer();
             },
@@ -40,8 +42,9 @@ class _SearchAppBarState extends State<SearchAppBar> {
         }
       ) : widget.leading,
       actions: [
+        kIsWeb ? widget.extraWebButton ?? const SizedBox() : const SizedBox(),
         Container(
-          padding: EdgeInsets.only(right: 5),
+          padding: const EdgeInsets.only(right: 5),
           child: AnimSearchBar(
             width: MediaQuery.of(context).size.width * 3 / 5,
             textController: _searchTextController,
