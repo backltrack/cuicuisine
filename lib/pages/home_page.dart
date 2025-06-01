@@ -3,7 +3,7 @@ import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_vibrate/flutter_vibrate.dart';
+// import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:diacritic/diacritic.dart';
 
 import '../models/data_model.dart';
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
   Offset _tapPosition = const Offset(0, 0);
 
   // vibration access
-  bool canVibrate = false;
+  // bool canVibrate = false;
 
   @override
   void initState() {
@@ -73,9 +73,9 @@ class _HomePageState extends State<HomePage> {
   void init() async {
 
     // check if vibration available
-    if (!kIsWeb) {
-      canVibrate = await Vibrate.canVibrate;
-    }
+    // if (!kIsWeb) {
+    //   canVibrate = await Vibrate.canVibrate;
+    // }
 
     // load books
     books = DatabaseMgr().localMgr.getUserBooks();
@@ -373,9 +373,9 @@ class _HomePageState extends State<HomePage> {
                                     recipe: sortedData[index],
                                     onTap: onTap,
                                     onLongPress: () async {
-                                      if (canVibrate) {
-                                        Vibrate.feedback(FeedbackType.medium);
-                                      }
+                                      // if (canVibrate) {
+                                      //   Vibrate.feedback(FeedbackType.medium);
+                                      // }
                                       _showCustomMenu(sortedData[index]);
                                     },
                                     onTapDown: _storePosition,
