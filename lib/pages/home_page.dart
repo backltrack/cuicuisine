@@ -269,8 +269,11 @@ class _HomePageState extends State<HomePage> {
           },
           extraWebButton: IconButton(
             icon: const FaIcon(FontAwesomeIcons.download),
-            onPressed: () {
-              downloadFile("${DatabaseMgr().localMgr.getServerUri()!}/downloads/cuicuisine.apk");
+            onPressed: () async {
+              String? apkPath = await DatabaseMgr().remoteMgr.getLatestApk();
+              if (apkPath != null) {
+                downloadFile("${DatabaseMgr().localMgr.getServerUri()!}$apkPath");
+              }
             },
           )
         ),

@@ -967,4 +967,15 @@ class MongoConnector {
     }
     return true;
   }
+
+  Future<String?> getLatestApk() async {
+    final response = await _secureGetRequest('/apk/get_latest');
+    if (response != null && response.statusCode == 200) {
+      String? value = jsonDecode(utf8.decode(response.bodyBytes));
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
 }
