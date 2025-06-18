@@ -6,7 +6,7 @@ Future<bool?> showInfoDialog({required context, required String title, Widget? d
     context: context,
     builder: (BuildContext context) => AlertDialog(
       title: Text(title),
-      content: description != null ? description : null,
+      content: description,
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.pop(context, false),

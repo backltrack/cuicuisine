@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../themes/theme_mgr.dart';
-import '../../widgets/core_widgets/info_dialog.dart';
-import 'package:share_plus/share_plus.dart';
 
+import '../../themes/theme_mgr.dart';
 import '../../utilities/string_functions.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
 import '../../pages/books/book_name_page.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
+import 'book_share_page.dart';
 
 class BookSettingsPage extends StatefulWidget {
   static const route = "/home/book_settings";
@@ -25,21 +24,6 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
   Book? _book;
   bool isReady = false;
   bool bookSharingUnderstood = false;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _init();
-  }
-
-  void _init() async {
-    bool? _bookSharingUnderstood = DatabaseMgr().localMgr.loadBookSharingAgreement();
-
-    if (_bookSharingUnderstood != null) {
-      bookSharingUnderstood = _bookSharingUnderstood;
-    }
-  }
 
   getNames() async {
     if (_book != null) {
@@ -77,7 +61,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
           Center(
               child: CircleAvatar(
                   radius: 96 / 2 + 36,
-                  backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.background,
+                  backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
                   child: Image.asset('assets/icons/splash_icon.png', width: 96)
               )
           ),
@@ -119,30 +103,9 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
           ListTile(
             title: Text(S.of(context).book_settings_share),
             onTap: () async {
-              if (!bookSharingUnderstood) {
-                await showInfoDialog(
-                  context: context,
-                  title: S.of(context).info_share_book_title,
-                  description: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(S.of(context).info_share_book_description1, textAlign: TextAlign.center),
-                      Text(S.of(context).info_share_book_description2, textAlign: TextAlign.center),
-                      Text(_book!.access[DatabaseMgr().localMgr.getUser()!.id]!.index < AccessLevel.own.index ?
-                          S.of(context).info_share_book_description_collaborator :
-                          S.of(context).info_share_book_description_owner
-                        , textAlign: TextAlign.center)
-                    ],
-                  )
-                ).then((value) async {
-                  if (value != null && value) {
-                    DatabaseMgr().localMgr.saveBookSharingAgreement(value);
-                  }
-                });
-              }
-              Share.share(
-                  "${S.of(context).book_settings_share_content1}${_book!.name}${S.of(context).book_settings_share_content2}${S.of(context).title}\nhttp://openapp.cuicuisine.com/home/join_book/${_book!.id}"
-              );
+              Navigator.pushNamed(context, "${BookSharePage.route}/${_book!.id}", arguments: {
+                "book": _book
+              });
             },
           ),
           // Leave / remove book

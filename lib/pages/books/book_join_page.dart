@@ -1,7 +1,11 @@
+import 'dart:io';
+
+import 'package:cuicuisine/widgets/core_widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
@@ -18,8 +22,27 @@ class BookJoinPage extends StatefulWidget {
 }
 
 class _BookJoinPageState extends State<BookJoinPage> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   bool argsLoaded = false;
+
+  final FocusNode focusNode = FocusNode();
+
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  Barcode? result;
+  QRViewController? qrViewController;
+  bool showQrView = false;
+
+  // In order to get hot reload to work we need to pause the camera if the platform
+  // is android, or resume the camera if the platform is iOS.
+  @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      qrViewController!.pauseCamera();
+    } else if (Platform.isIOS) {
+      qrViewController!.resumeCamera();
+    }
+  }
 
   @override
   void initState() {
@@ -32,6 +55,19 @@ class _BookJoinPageState extends State<BookJoinPage> {
       final RegExpMatch? match = pattern.firstMatch(value);
       if (match != null && match.group(0) != null) {
         _controller.text = match.group(0)!;
+      }
+    });
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    qrViewController = controller;
+    focusNode.unfocus();
+    controller.scannedDataStream.listen((scanData) {
+      if (scanData.code != null) {
+        setState(() {
+          _controller.text = scanData.code!;
+          showQrView = false;
+        });
       }
     });
   }
@@ -57,6 +93,7 @@ class _BookJoinPageState extends State<BookJoinPage> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(S.of(context).book_join_title),
       ),
@@ -66,6 +103,7 @@ class _BookJoinPageState extends State<BookJoinPage> {
           children: [
             MyTextField(
               textEditingController: _controller,
+              focusNode: focusNode,
               autofocus: true,
               icon: FontAwesomeIcons.solidKeyboard,
               label: S.of(context).book_join_uid,
@@ -77,7 +115,30 @@ class _BookJoinPageState extends State<BookJoinPage> {
                 onPressed: getIdFromClipboard,
                 child: const FaIcon(FontAwesomeIcons.paste, size: 20)
               ),
-            )
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              child: ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    showQrView = !showQrView;
+                  });
+                },
+                child: const FaIcon(FontAwesomeIcons.qrcode, size: 20)
+              ),
+            ),
+            const SizedBox(height: 48),
+            showQrView ? 
+              SizedBox(
+                width: 300,
+                height: 300,
+                child: QRView(
+                  key: qrKey,
+                  onQRViewCreated: _onQRViewCreated
+                )
+              ) :
+              const SizedBox()
           ],
         )
       ),
@@ -85,7 +146,6 @@ class _BookJoinPageState extends State<BookJoinPage> {
       floatingActionButton: FloatingActionButton.extended(
         label: Text(S.of(context).join_button),
         onPressed: () async {
-          print("text: " + _controller.text);
           if (_controller.text != "") {
             // is book already accessed by user
             bool canAlreadyAccess = false;

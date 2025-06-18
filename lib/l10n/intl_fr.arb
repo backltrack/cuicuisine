@@ -140,6 +140,7 @@
 
   "book_join_title": "Rejoindre un livre",
   "book_join_uid": "ID du livre",
+  "book_join_scan": "Scan ID",
   "book_already_accessible": "Livre est déjà accessible",
 
   "book_rename_title": "Renommer le livre",
@@ -147,6 +148,8 @@
   "book_settings_page_title": "Paramètres du livre",
   "book_settings_rename": "Renommer",
   "book_settings_share": "Partager",
+  "book_settings_share_link": "Partager avec lien",
+  "book_settings_share_qr": "Partager avec code QR",
   "book_settings_remove": "Supprimer",
   "book_settings_quit": "Quitter",
   "book_settings_users": "Utilisateurs",

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cuicuisine/pages/account/account_page.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
-import 'package:cuicuisine/pages/test.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +22,7 @@ import 'pages/authentication/forgotten_password.dart';
 import 'pages/books/book_join_page.dart';
 import 'pages/books/book_name_page.dart';
 import 'pages/books/book_settings_page.dart';
+import 'pages/books/book_share_page.dart';
 import 'pages/general_settings_page.dart';
 import 'pages/home_page.dart';
 import 'pages/item_selector_page.dart';
@@ -151,8 +151,7 @@ class _CuicuisineState extends State<Cuicuisine> {
               RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),
               BookNamePage.route: (ctx) => const BookNamePage(),
               ItemSelector.route: (ctx) => const ItemSelector(),
-              PageNotFound.route: (ctx) => const PageNotFound(),
-              TestPage.route: (ctx) => TestPage()
+              PageNotFound.route: (ctx) => const PageNotFound()
             },
             onGenerateRoute: (RouteSettings settings) {
               // navigate to recipe page
@@ -205,6 +204,11 @@ class _CuicuisineState extends State<Cuicuisine> {
               // navigate to book settings page
               else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
                 return MaterialPageRoute(builder: (context) => const BookSettingsPage(), settings: settings);
+              }
+
+              // navigate to book share page
+              else if (settings.name!.contains(BookSharePage.route) && settings.name!.split('/').length == 4) {
+                return MaterialPageRoute(builder: (context) => const BookSharePage(), settings: settings);
               }
 
               // navigate to join book page

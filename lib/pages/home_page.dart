@@ -1,6 +1,5 @@
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:cuicuisine/utilities/web_helper.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:flutter_vibrate/flutter_vibrate.dart';
