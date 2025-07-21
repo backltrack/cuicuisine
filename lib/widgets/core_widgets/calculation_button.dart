@@ -35,18 +35,19 @@ class _CalculationButtonWidgetState extends State<CalculationButtonWidget> {
         IconTheme(
           data: _isEnabled ? ThemeMgr.getTheme(context)!.iconTheme.copyWith(color: ThemeMgr.getTheme(context)!.primaryColor) : ThemeMgr.getTheme(context)!.iconTheme.copyWith(color: Colors.grey),
           child: IconButton(
-            icon: FaIcon(FontAwesomeIcons.calculator),
+            icon: const FaIcon(FontAwesomeIcons.calculator),
             onPressed: () async {
-              var newValue = await showQuantityMultiplierDialog(context: context, currentCoefficient: _value);
-              if (newValue != null) {
-                if (newValue != _value && newValue > 0) {
-                  setState(() {
-                    _isEnabled = newValue != 1;
-
-                    _value = newValue;
-                  });
-                  await widget.onValueChanged(newValue);
-                }
+              if (!mounted) return;
+              double? newValue = await showQuantityMultiplierDialog(context: Navigator.of(context).context, currentCoefficient: _value);
+              if (newValue == null) return;
+              if (newValue != _value && newValue > 0) {
+                print("JE SUIS EN TRAIN DE CHANGER LA VALEUR");
+                print(mounted);
+                setState(() {
+                  _isEnabled = newValue != 1;
+                  _value = newValue;
+                });
+                await widget.onValueChanged(newValue);
               }
             },
           )

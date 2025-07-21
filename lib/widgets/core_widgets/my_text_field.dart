@@ -143,6 +143,9 @@ class _MyTextFieldState extends State<MyTextField> {
                 widget.textEditingController!.selection = TextSelection(baseOffset: 0, extentOffset: widget.textEditingController!.text.length);
               }
             }
+        },
+        onSubmitted: (String val) {
+          if (widget.onSubmit != null) widget.onSubmit!(val);
         }
       ),
     );

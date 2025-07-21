@@ -3,10 +3,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
-Future<double?> showQuantityMultiplierDialog({required context, double currentCoefficient=1}) async {
+Future<double?> showQuantityMultiplierDialog({required BuildContext context, double currentCoefficient=1}) async {
   TextEditingController textEditingController = TextEditingController();
   textEditingController.text = currentCoefficient.toString();
-
+  
   return showDialog<double>(
     context: context,
     builder: (BuildContext context) => AlertDialog(

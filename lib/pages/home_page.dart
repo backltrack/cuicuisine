@@ -473,6 +473,7 @@ class _HomePageState extends State<HomePage> {
     Widget addButton = MyOutlinedButton(
         text: S.of(context).add_button,
         icon: FontAwesomeIcons.plus,
+        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
         onPressed: addNewBook
     );
 

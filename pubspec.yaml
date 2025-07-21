@@ -72,6 +72,7 @@ dependencies:
   file_saver: ^0.2.12
   qr_flutter: ^4.1.0
   qr_code_scanner_plus: ^2.0.10+1
+  window_size: ^0.1.0
   
 
 dev_dependencies:

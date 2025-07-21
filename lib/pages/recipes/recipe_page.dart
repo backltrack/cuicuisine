@@ -110,7 +110,7 @@ class _RecipePageState extends State<RecipePage> {
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) {
+      onPopInvokedWithResult: (bool didPop, dynamic a) {
         if (didPop) {
           return;
         }
@@ -306,7 +306,7 @@ class _RecipePageState extends State<RecipePage> {
                 ),
                 WidgetSelectionOverlay(
                     widget: RecipeIngredientsWidget(
-                      key: UniqueKey(),
+                      key: ValueKey('recipe_ingredients_${recipe.id}'),
                       ingredients: recipe.recipeIngredients,
                       defaultQuantity: recipe.quantity,
                       quantityType: recipe.quantityType,

@@ -6,14 +6,15 @@ import '../../themes/theme_mgr.dart';
 class MyOutlinedButton extends StatelessWidget {
   final IconData? icon;
   final String text;
+  final EdgeInsetsGeometry? padding;
   final VoidCallback? onPressed;
 
-  const MyOutlinedButton({super.key, this.icon, required this.text, this.onPressed});
+  const MyOutlinedButton({super.key, this.icon, required this.text, this.padding, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 10, left: MediaQuery.of(context).size.width/8, right: MediaQuery.of(context).size.width/8),
+      padding: padding ?? const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: OutlinedButton(
           onPressed: onPressed,
           child: Row(

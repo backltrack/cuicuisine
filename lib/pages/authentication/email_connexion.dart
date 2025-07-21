@@ -51,6 +51,25 @@ class _EmailConnexionState extends State<EmailConnexion> {
       shouldInit = false;
     }
 
+    void _submitPassword() async {
+      await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password, 
+        onInvalidEmail: () {
+          setState(() {
+            showForgottenButton = true;
+          });
+          Fluttertoast.showToast(msg: "Invalid email, do you want to register?");
+        },
+        onInvalidPassword: () {
+          Fluttertoast.showToast(msg: "Invalid passward, try again!");
+        },
+        onSuccess: (AppUser user) async {
+          await DatabaseMgr().synchronization.sync();
+          if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+
+        }
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(S.of(context).auth_connexion)),
       body: SingleChildScrollView(
@@ -77,6 +96,11 @@ class _EmailConnexionState extends State<EmailConnexion> {
                   _password = val;
                 });
               },
+              onSubmit: (String val) {
+                if (EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password)) {
+                  _submitPassword();
+                }
+              },
             ),
 
             PasswordCheckInfo(password: _password),
@@ -85,24 +109,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
 
             SocialButton(
               // email sign in button
-              onPressed: EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password) ? () async {
-                await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password, 
-                  onInvalidEmail: () {
-                    setState(() {
-                      showForgottenButton = true;
-                    });
-                    Fluttertoast.showToast(msg: "Invalid email, do you want to register?");
-                  },
-                  onInvalidPassword: () {
-                    Fluttertoast.showToast(msg: "Invalid passward, try again!");
-                  },
-                  onSuccess: (AppUser user) async {
-                    await DatabaseMgr().synchronization.sync();
-                    if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
-
-                  }
-                );
-              } : null,
+              onPressed: EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password) ? _submitPassword : null,
               // email sign in button
               child: Text(S.of(context).auth_connexion),
             ),

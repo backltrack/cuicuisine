@@ -441,9 +441,11 @@ class MongoConnector {
     if (response != null && response.statusCode == 200) {
       if (response.body != null) {
         Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+        print(data);
 
       if (data['result']) {
           List<dynamic> tmp = data['changes'];
+          print(tmp);
           List<MongoChange> changes = [];
           tmp.forEach((element) {changes.add(MongoChange.fromJson(element));});
           
@@ -682,6 +684,44 @@ class MongoConnector {
             DatabaseMgr().localMgr.addChange(change);
 
             DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
+            return true;
+          }
+        }
+
+        return false;
+      }
+      catch (e) {
+        print(e);
+        return false;
+      }
+    }
+
+    return false;
+  }
+
+  Future<bool> revokeUserFromBook(String bookId) async {
+    final response = await _secureGetRequest('/books/revokeme/$bookId');
+
+    if (response != null && response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      try {
+        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
+
+        if (data['result']) {
+          String change = DatabaseMgr().localMgr.createChange();
+          
+          final changeResponse = await _securePostJsonRequest('/change/add', {
+            'changeId': change,
+            'objectType': 'book',
+            'operationType': OperationType.update.index,
+            'objectId': bookId
+          });
+          
+          if (bool.parse(changeResponse.body)){
+            DatabaseMgr().localMgr.addChange(change);
+
+            DatabaseMgr().localMgr.updateBookLastUpdate(bookId, DateTime.parse(data['dateTime']));
             return true;
           }
         }

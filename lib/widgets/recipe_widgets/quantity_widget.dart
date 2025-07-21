@@ -46,6 +46,7 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
             ...[
               SizedBox(
                 child: QuantitySelectorWidget(
+                  key: const ValueKey('quantity_selector'),
                   quantity: _quantity,
                   quantityType: _quantityType,
                   isEdition: widget.isEdition,
@@ -64,32 +65,34 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
                 )
               ),
 
-              Spacer(),
+              const Spacer(),
 
               if (widget.showQuantityMultiplier && !widget.isEdition)
                 CalculationButtonWidget(
-                value: _multiplier,
-                onValueChanged: (double value) {
-                  setState(() {
+                  key: const ValueKey('coefficient_button'),
+                  value: _multiplier,
+                  onValueChanged: (double value) {
+                    setState(() {
                     _multiplier = value;
-                  });
-                  if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
-                },
-              )
+                    });
+                    if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
+                  },
+                )
             ]
           else
             ...[
               if (widget.showQuantityMultiplier && !widget.isEdition)
                 CalculationButtonWidget(
-                value: _multiplier,
-                onValueChanged: (double value) {
-                  setState(() {
-                    _multiplier = value;
-                  });
-                  if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
-                },
-              ),
-              Spacer(),
+                  key: const ValueKey('coefficient_button2'),
+                  value: _multiplier,
+                  onValueChanged: (double value) {
+                    setState(() {
+                      _multiplier = value;
+                    });
+                    if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
+                  },
+                ),
+              const Spacer(),
               QuantitySelectorWidget(
                 quantity: _quantity,
                 quantityType: _quantityType,

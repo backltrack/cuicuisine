@@ -26,6 +26,19 @@ class _EmailCheckState extends State<EmailCheck> {
 
   @override
   Widget build(BuildContext context) {
+    void _submitEmail() async {
+      if (await DatabaseMgr().remoteMgr.emailExists(_email)) {
+        Navigator.pushNamed(context,  EmailConnexion.route, arguments: {
+          'email': _email
+        });
+      }
+      else {
+        Navigator.pushNamed(context,  EmailRegistration.route, arguments: {
+          'email': _email
+        });
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(S.of(context).auth_connexion)),
       body: SingleChildScrollView(
@@ -44,24 +57,18 @@ class _EmailCheckState extends State<EmailCheck> {
               },
               icon: FontAwesomeIcons.at,
               autofocus: true,
+              onSubmit: (String val) {
+                if (EmailPasswordValidator.isEmailValid(_email)) {
+                  _submitEmail();
+                }
+              },
             ),
 
             const SizedBox(height: 24),
 
             SocialButton(
               // email sign in button
-              onPressed: EmailPasswordValidator.isEmailValid(_email) ? () async {
-                if (await DatabaseMgr().remoteMgr.emailExists(_email)) {
-                  Navigator.pushNamed(context,  EmailConnexion.route, arguments: {
-                    'email': _email
-                  });
-                }
-                else {
-                  Navigator.pushNamed(context,  EmailRegistration.route, arguments: {
-                    'email': _email
-                  });
-                }
-              } : null,
+              onPressed: EmailPasswordValidator.isEmailValid(_email) ? _submitEmail : null,
               // email sign in button
               child: Text(S.of(context).auth_next),
             )

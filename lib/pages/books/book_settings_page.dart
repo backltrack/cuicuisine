@@ -145,7 +145,14 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                     description: Text('${S.of(context).popup_quit_description}${_book!.name}?')
                 ).then((value) async {
                   if (value != null && value) {
-                    DatabaseMgr().localMgr.removeUserFromBook(_book!);
+                    bool isConnected = await DatabaseMgr().remoteMgr.testConnexion();
+                    if (isConnected) {
+                      bool result = await DatabaseMgr().remoteMgr.revokeUserFromBook(_book!.id);
+                      if (result) {
+                        DatabaseMgr().synchronization.fetchNew();
+                        setState(() {});
+                      }
+                    }
                     
                     Navigator.pop(context);
                   }

@@ -42,6 +42,11 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
     locale = LocaleMgr.getLocale(context);
     setState(() {});
   }
+  void dispose() {
+    super.dispose();
+    // Dispose of any resources if needed
+    print('dispose recipe ingredients widget ${widget.key}');
+  }
   
   String parseQuantity(double quantity) {
     if (quantity.round().toDouble() == quantity) {
@@ -79,7 +84,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
           const SizedBox(height: 12),
           // persons selector
           QuantityEditorWidget(
-            key: UniqueKey(),
+            key: const ValueKey('quantity_editor'),
             quantity: _quantity,
             multiplier: _multiplier,
             quantityType: widget.quantityType,

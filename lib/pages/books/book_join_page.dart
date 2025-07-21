@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cuicuisine/widgets/core_widgets/alert_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -24,6 +23,8 @@ class BookJoinPage extends StatefulWidget {
 class _BookJoinPageState extends State<BookJoinPage> {
   final TextEditingController _controller = TextEditingController();
   bool argsLoaded = false;
+
+  bool isLoaded = false;
 
   final FocusNode focusNode = FocusNode();
 
@@ -84,12 +85,16 @@ class _BookJoinPageState extends State<BookJoinPage> {
     final String? url = ModalRoute.of(context)?.settings.name!;
     String? bookId;
 
-    if (url != null && url.split('/').length > 3) {
-      bookId = url.split('/')[3];
-      _controller.text = bookId;
-    }
-    else {
-      getIdFromClipboard();
+    if (!isLoaded) {
+      isLoaded = true;
+      if (url != null && url.split('/').length > 3) {
+        // extract book id from share link
+        bookId = url.split('/')[3];
+        _controller.text = bookId;
+      }
+      else {
+        getIdFromClipboard();
+      }
     }
 
     return Scaffold(

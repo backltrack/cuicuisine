@@ -34,7 +34,34 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
       isInit = true;
     }
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        await showAlertDialog(
+            context: context,
+            title: S.of(context).popup_loose_data_title,
+            description: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
+                Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
+                Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
+                Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
+              ],
+            ),
+          ).then((value) {
+            if (value != null && value) {
+              Navigator.of(context).pop();
+            }
+            else {
+              return;
+            }
+          });
+      },
+      child: Scaffold(
         appBar: AppBar(
           title: Text(S.of(context).steps_edition_title),
           leading: IconButton(
@@ -106,6 +133,7 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
             }
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
+      )
     );
   }
 }

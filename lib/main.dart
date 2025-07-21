@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:window_size/window_size.dart';
 
 import 'database/database_mgr.dart';
 import 'generated/l10n.dart';
@@ -48,6 +49,12 @@ void main() async {
 
   // ByteData data = await PlatformAssetBundle().load('assets/ca/cuicuisine.crt');
   // SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
+
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    setWindowMinSize(const Size(400, 400));
+    setWindowMaxSize(const Size(900, double.infinity));
+    setWindowFrame(const Rect.fromLTWH(100, 100, 500, 800)); // <--- taille initiale ici
+  }
 
   await DatabaseMgr().initialize();
 

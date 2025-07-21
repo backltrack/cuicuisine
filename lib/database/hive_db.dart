@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 
@@ -33,8 +34,13 @@ class HiveConnector {
 
   Future<void> initialize() async {
     if (!kIsWeb) {
-      final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
-      Hive.init(appDocumentDir.path);
+      if (Platform.isLinux) {
+        Hive.init('${Platform.environment['HOME']}/.local/share/com.exemple.cuicuisine');
+      }
+      else {
+        final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
+        Hive.init(appDocumentDir.path);
+      }
     }
     Hive
       ..registerAdapter(AppUserAdapter())
@@ -461,26 +467,6 @@ class HiveConnector {
     }
     
     book.save();
-  }
-
-  // void addUserToBook(Book book) {
-  //   DatabaseMgr().localMgr.updateBook(book.id, 
-  //     BookUpdate(
-  //       id: book.id,
-  //       users: List.from(book.users)..add(DatabaseMgr().localMgr.getUserId()!)
-  //     )
-  //   );
-  // }
-
-  void removeUserFromBook(Book book) {
-    DatabaseMgr().localMgr.updateBook(
-      book.id,
-      BookUpdate(
-        id: book.id,
-        users: List.from(book.users)..remove(DatabaseMgr().localMgr.getUserId()),
-        access: Map.from(book.access)..removeWhere((key, value) => key == DatabaseMgr().localMgr.getUserId())
-      )
-    );
   }
 
   bool removeOtherUserFromBook(String userId, Book book) {
