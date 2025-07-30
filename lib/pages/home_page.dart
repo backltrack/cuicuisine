@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/material.dart';
@@ -42,6 +44,8 @@ class _HomePageState extends State<HomePage> {
   List<Recipe>? recipes;
   Book? selectedBook;
   AccessLevel userAccess = AccessLevel.read;
+
+  bool askForBookCreation = false;
 
   // filtering variables
   bool _displayFavorites = false;
@@ -108,11 +112,10 @@ class _HomePageState extends State<HomePage> {
       if (books != null) {
         // No book available
         setState(() {
+          askForBookCreation = true;
           // notify that books is empty and not null
           books = [];
         });
-        // add new book
-        addNewBook();
       }
     }
   }
@@ -256,8 +259,24 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Future<void> refreshData() async {
+    await DatabaseMgr().remoteMgr.testConnexion();
+    print("isOnline: ${DatabaseMgr().isOnline}");
+    if (DatabaseMgr().isOnline) {
+      await DatabaseMgr().synchronization.sync();
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (askForBookCreation) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        addNewBook();
+      });
+      askForBookCreation = false;
+    }
+    
     return Scaffold(
         appBar: SearchAppBar(
           myTitle: selectedBook != null ? selectedBook!.name : S.of(context).title,
@@ -290,14 +309,7 @@ class _HomePageState extends State<HomePage> {
           ):
           RefreshIndicator(
             
-            onRefresh: () async {
-              await DatabaseMgr().remoteMgr.testConnexion();
-              print("isOnline: ${DatabaseMgr().isOnline}");
-              if (DatabaseMgr().isOnline) {
-                await DatabaseMgr().synchronization.sync();
-              }
-              setState(() {});
-            },
+            onRefresh: refreshData,
             child: Builder(
               builder: (context) {
                 if (recipes != null && recipes!.isNotEmpty) {
@@ -480,29 +492,43 @@ class _HomePageState extends State<HomePage> {
     return Drawer(
       child: Column(
         children: <Widget>[
-          UserAccountsDrawerHeader(
-              accountName: Text(appUser!.name),
-              accountEmail: Text(appUser.email),
-              currentAccountPicture: Stack(
-                fit: StackFit.expand,
-                children: [
-                  CircleAvatar(
-                    child: Text(getInitials(appUser.name)),
-                  ),
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: Container(
-                      width: 12.0,
-                      height: 12.0,
-                      decoration: BoxDecoration(
-                        color: DatabaseMgr().isOnline ? Colors.green : Colors.red,
-                        shape: BoxShape.circle,
+          Stack(
+            fit: StackFit.loose,
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: Text(appUser!.name),
+                accountEmail: Text(appUser.email),
+                currentAccountPicture: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    CircleAvatar(
+                      child: Text(getInitials(appUser.name)),
+                    ),
+                    Positioned(
+                      top: 4,
+                      right: 4,
+                      child: Container(
+                        width: 12.0,
+                        height: 12.0,
+                        decoration: BoxDecoration(
+                          color: DatabaseMgr().isOnline ? Colors.green : Colors.red,
+                          shape: BoxShape.circle,
+                        )
                       )
                     )
-                  )
-                ],
+                  ]
+                )
               ),
+              if (Platform.isLinux || Platform.isMacOS || Platform.isWindows)
+              Container(
+                alignment: Alignment.topRight,
+                padding: const EdgeInsets.all(4),
+                child: IconButton(
+                  onPressed: refreshData,
+                  icon: const FaIcon(FontAwesomeIcons.arrowsRotate)
+                )
+              )
+            ]
           ),
 
           if (books != null && books!.isNotEmpty)
@@ -554,16 +580,12 @@ class _HomePageState extends State<HomePage> {
                       },
                     ) :
                       addButton;
-                      // index == books!.length ?
-                      //   addButton :
-                      //     joinButton;
                 }
               ),
             )
           else if (books != null && books!.isEmpty)
             ...[
             addButton,
-            //joinButton,
             const Spacer()
             ]
           else
@@ -572,15 +594,6 @@ class _HomePageState extends State<HomePage> {
               const Spacer()
             ],
 
-          /// V1
-          // Divider(),
-          // ListTile(
-          //   title: Text(S.of(context).shopping_list),
-          //   leading: FaIcon(FontAwesomeIcons.shoppingCart),
-          //   onTap: () {
-          //
-          //   },
-          // ),
           const Divider(),
           ListTile(
             title: Text(S.of(context).settings),

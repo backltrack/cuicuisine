@@ -447,7 +447,7 @@ class MongoConnector {
           List<dynamic> tmp = data['changes'];
           print(tmp);
           List<MongoChange> changes = [];
-          tmp.forEach((element) {changes.add(MongoChange.fromJson(element));});
+          for (var element in tmp) {changes.add(MongoChange.fromJson(element));}
           
           for (MongoChange change in changes) {
             if (change.objectType == 'user') {

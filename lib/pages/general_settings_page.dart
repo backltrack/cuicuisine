@@ -151,6 +151,7 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
               );
               if(shouldSignOut != null && shouldSignOut) {
                 DatabaseMgr().localMgr.deleteCredentials();
+                await DatabaseMgr().localMgr.clearAllUserData();
                 Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
               }
             }

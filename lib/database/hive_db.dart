@@ -35,7 +35,7 @@ class HiveConnector {
   Future<void> initialize() async {
     if (!kIsWeb) {
       if (Platform.isLinux) {
-        Hive.init('${Platform.environment['HOME']}/.local/share/com.exemple.cuicuisine');
+        Hive.init('${Platform.environment['HOME']}/.local/share/com.example.cuicuisine/hive');
       }
       else {
         final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
@@ -77,10 +77,20 @@ class HiveConnector {
     if (kDebugMode) print('Hive initialized');
   }
 
-  void clearAll() {
-    _userBox.clear();
-    _bookBox.clear();
-    _recipeBox.clear();
+  Future<void> clearAllUserData() async {
+    await _userBox.clear();
+    await _bookBox.clear();
+    await _recipeBox.clear();
+    await _queueBox.clear();
+    await _queueOperationBox.clear();
+    await _changeBox.clear();
+    await _contextBox.clear();
+    await _bookIngredientsBox.clear();
+    await _webImagesBox.clear();
+
+    if (_queueBox.isEmpty) {
+      _queueBox.add(OperationQueue());
+    }
   }
 
 

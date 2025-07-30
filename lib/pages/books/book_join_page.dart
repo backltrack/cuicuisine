@@ -121,29 +121,31 @@ class _BookJoinPageState extends State<BookJoinPage> {
                 child: const FaIcon(FontAwesomeIcons.paste, size: 20)
               ),
             ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    showQrView = !showQrView;
-                  });
-                },
-                child: const FaIcon(FontAwesomeIcons.qrcode, size: 20)
+            if (Platform.isAndroid) ...[
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      showQrView = !showQrView;
+                    });
+                  },
+                  child: const FaIcon(FontAwesomeIcons.qrcode, size: 20)
+                ),
               ),
-            ),
-            const SizedBox(height: 48),
-            showQrView ? 
-              SizedBox(
-                width: 300,
-                height: 300,
-                child: QRView(
-                  key: qrKey,
-                  onQRViewCreated: _onQRViewCreated
-                )
-              ) :
-              const SizedBox()
+              const SizedBox(height: 48),
+              showQrView ? 
+                SizedBox(
+                  width: 300,
+                  height: 300,
+                  child: QRView(
+                    key: qrKey,
+                    onQRViewCreated: _onQRViewCreated
+                  )
+                ) :
+                const SizedBox()
+            ]
           ],
         )
       ),
@@ -165,12 +167,17 @@ class _BookJoinPageState extends State<BookJoinPage> {
               //await addUserToBook(_controller.text);
               try {
                 await DatabaseMgr().remoteMgr.joinBook(_controller.text);
+                Book? newBook = DatabaseMgr().localMgr.getBook(_controller.text);
+                if (newBook != null) {
+                  Navigator.pop(context, newBook);
+                }
+                else {
+                  Fluttertoast.showToast(msg: S.of(context).connexion_needed2, gravity: ToastGravity.CENTER);
+                }
               }
               catch (e) {
-                return;
+                Fluttertoast.showToast(msg: S.of(context).connexion_needed2, gravity: ToastGravity.CENTER);
               }
-              
-              Navigator.pop(context, DatabaseMgr().localMgr.getBook(_controller.text));
             }
             else {
               Fluttertoast.showToast(msg: S.of(context).book_already_accessible, gravity: ToastGravity.CENTER);

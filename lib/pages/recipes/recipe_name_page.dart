@@ -32,6 +32,14 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
       argsLoaded = true;
     }
 
+    void submit() async {
+      if (_controller.text != "" && _controller.text != currentName) {
+        Navigator.pop(context, beautifyName(_controller.text));
+      } else {
+        Navigator.pop(context);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(S.of(context).recipe_edition_new_name),
@@ -46,19 +54,14 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
           textCapitalization: TextCapitalization.words,
           icon: FontAwesomeIcons.fileLines,
           label: S.of(context).book_creation_name,
+          onSubmit: (_) => submit()
         )
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         label: Text(S.of(context).book_settings_rename),
-        onPressed: () async {
-          if (_controller.text != "" && _controller.text != currentName) {
-            Navigator.pop(context, beautifyName(_controller.text));
-          } else {
-            Navigator.pop(context);
-          }
-        },
-      ),
+        onPressed: submit
+      )
     );
   }
 }

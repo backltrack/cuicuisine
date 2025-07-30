@@ -43,6 +43,29 @@ class _BookNamePageState extends State<BookNamePage> {
       argsLoaded = true;
     }
 
+    void submit() async {
+      if (_controller.text != "" && _controller.text != currentName) {
+        if (isBookCreation) {
+          String? newBookId = DatabaseMgr().localMgr.addNewBook(_controller.text);
+          if (newBookId != null) {
+            Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
+            Navigator.pop(context, newBook);
+          }
+        } else {
+          DatabaseMgr().localMgr.updateBook(
+            bookId,
+            BookUpdate(
+              id: bookId,
+              name: _controller.text
+            )
+          );
+          Navigator.pop(context, "update");
+        }
+      } else {
+        Navigator.pop(context);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isBookCreation ? S.of(context).book_creation_title : S.of(context).book_rename_title),
@@ -56,37 +79,14 @@ class _BookNamePageState extends State<BookNamePage> {
           textCapitalization: TextCapitalization.words,
           icon: FontAwesomeIcons.book,
           label: S.of(context).book_creation_name,
+          onSubmit: (_) => submit()
         )
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         label: Text(isBookCreation ? S.of(context).add_button : S.of(context).book_settings_rename),
-        onPressed: () async {
-          if (_controller.text != "" && _controller.text != currentName) {
-            if (isBookCreation) {
-              String? newBookId = DatabaseMgr().localMgr.addNewBook(_controller.text);
-              if (newBookId != null) {
-                Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
-                // await createRecipe(tutorialRecipe, newBook.id).then((String recipeId) async {
-                //   await addRecipeToBook(recipeId, newBook.id);
-                // });
-                Navigator.pop(context, newBook);
-              }
-            } else {
-              DatabaseMgr().localMgr.updateBook(
-                bookId,
-                BookUpdate(
-                  id: bookId,
-                  name: _controller.text
-                )
-              );
-              Navigator.pop(context, "update");
-            }
-          } else {
-            Navigator.pop(context);
-          }
-        },
-      ),
+        onPressed: submit
+      )
     );
   }
 }

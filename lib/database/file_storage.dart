@@ -22,8 +22,13 @@ class FileStorage {
 
   void init() async {
     if (!kIsWeb) {
-      Directory documentDirectoryPath = await getApplicationDocumentsDirectory();
-      storagePath = documentDirectoryPath.path;  
+      if (Platform.isLinux) {
+        storagePath = '${Platform.environment['HOME']}/.local/share/com.example.cuicuisine/';
+      }
+      else {
+        Directory documentDirectoryPath = await getApplicationDocumentsDirectory();
+        storagePath = documentDirectoryPath.path;
+      }  
     }
   }
 
