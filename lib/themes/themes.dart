@@ -38,7 +38,7 @@ ThemeCollection setThemeCollection(context) {
           )
         ),
 
-        bottomAppBarTheme: const BottomAppBarTheme(
+        bottomAppBarTheme: const BottomAppBarThemeData(
           color: DarkColors.accentColor
         ),
 
@@ -105,7 +105,7 @@ ThemeCollection setThemeCollection(context) {
           )
         ),
 
-        bottomAppBarTheme: const BottomAppBarTheme(
+        bottomAppBarTheme: const BottomAppBarThemeData(
           color: LightColors.accentColor
         ),
 
