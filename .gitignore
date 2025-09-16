@@ -78,8 +78,3 @@ app.*.map.json
 */generated/
 *.g.dart
 
-# unwanted platforms
-ios
-macos
-linux
-windows
