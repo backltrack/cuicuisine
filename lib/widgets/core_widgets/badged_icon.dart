@@ -36,7 +36,7 @@ class _BadgedIconButtonState extends State<BadgedIconButton> {
     return Stack(
       children: [
         IconButton(
-            onPressed: widget.onPressed == null ? () {} : widget.onPressed,
+            onPressed: widget.onPressed ?? () {},
             icon: widget.icon
         ),
         if (!widget.hideBadgeOnNull || widget.hideBadgeOnNull && _badgeNumber > 0) Positioned(
