@@ -123,7 +123,13 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                               child: QuillEditor.basic(
                                 controller: controllers[index],
                                 config: QuillEditorConfig(
-                                  padding: EdgeInsetsGeometry.all(4.0)
+                                  padding: EdgeInsetsGeometry.all(4.0),
+                                  customStyles: DefaultStyles(
+                                    link: DefaultStyles.getInstance(context).link!.copyWith(
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue
+                                    )
+                                  )
                                 ),
                               )
                             ),

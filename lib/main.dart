@@ -105,7 +105,6 @@ class _CuicuisineState extends State<Cuicuisine> {
       } else {
         DatabaseMgr().localMgr.saveWakelock(false);
       }
-      print("Wakelock state: $wakelockState");
     }
   }
 

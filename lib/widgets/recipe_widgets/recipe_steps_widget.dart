@@ -126,6 +126,10 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                         checkBoxReadOnly: false,
                         padding: EdgeInsetsGeometry.all(4.0),
                         customStyles: DefaultStyles(
+                          link: DefaultStyles.getInstance(context).link!.copyWith(
+                            decoration: TextDecoration.underline,
+                            color: Colors.blue
+                          ),
                           paragraph: DefaultTextBlockStyle(
                             DefaultStyles.getInstance(context).paragraph!.style.merge(
                               TextStyle(

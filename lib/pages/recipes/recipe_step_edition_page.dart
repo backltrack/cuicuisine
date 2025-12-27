@@ -83,9 +83,15 @@ class _StepEditionPageState extends State<StepEditionPage> {
           Expanded(
             child: QuillEditor.basic(
               controller: _controller,
-              config: const QuillEditorConfig(
+              config: QuillEditorConfig(
                 autoFocus: true,
-                padding: EdgeInsetsGeometry.all(12.0)
+                padding: EdgeInsetsGeometry.all(12.0),
+                customStyles: DefaultStyles(
+                  link: DefaultStyles.getInstance(context).link!.copyWith(
+                    decoration: TextDecoration.underline,
+                    color: Colors.blue
+                  )
+                )
               )
             ),
           )
