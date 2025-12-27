@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_size/window_size.dart';
 
@@ -132,6 +133,7 @@ class _CuicuisineState extends State<Cuicuisine> {
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
             ],
             supportedLocales: S.delegate.supportedLocales,
             localeResolutionCallback: (locale, supportedLocales) {

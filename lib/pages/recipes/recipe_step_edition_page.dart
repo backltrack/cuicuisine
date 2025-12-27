@@ -1,8 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:html_editor_enhanced/html_editor.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 import '../../generated/l10n.dart';
-import '../../themes/theme_mgr.dart';
 
 class StepEditionPage extends StatefulWidget {
   const StepEditionPage({Key? key}) : super(key: key);
@@ -13,7 +14,15 @@ class StepEditionPage extends StatefulWidget {
 
 class _StepEditionPageState extends State<StepEditionPage> {
 
-  HtmlEditorController htmlEditorController = HtmlEditorController();
+  final QuillController _controller = QuillController.basic();
+
+  bool isInitialized = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,65 +31,71 @@ class _StepEditionPageState extends State<StepEditionPage> {
     final int stepNumber = routeArgs['stepNumber'];
     final String stepDescription = routeArgs['stepDescription'];
 
+    if (!isInitialized) {
+      if (stepDescription.isNotEmpty) {
+        _controller.document = Document.fromJson(jsonDecode(stepDescription));
+
+      }
+      isInitialized = true;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('${S.of(context).step_edition_title} ${stepNumber+1}'),
       ),
-      body: HtmlEditor(
-        controller: htmlEditorController,
-        otherOptions: OtherOptions(
-          height: MediaQuery.of(context).size.height - 100,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.zero,
+      body: Column(
+        children: [
+          QuillSimpleToolbar(
+            controller: _controller,
+            config: const QuillSimpleToolbarConfig(
+              toolbarIconAlignment: WrapAlignment.start,
+              multiRowsDisplay: true,
+              showCodeBlock: false,
+              showQuote: false,
+              showInlineCode: false,
+              showDirection: false,
+              showClearFormat: false,
+              showDividers: true,
+              showSearchButton: false,
+              showUndo: true,
+              showRedo: true,
+              showFontFamily: false,
+              showFontSize: false,
+              showBoldButton: true,
+              showItalicButton: true,
+              showSmallButton: false,
+              showUnderLineButton: true,
+              showLineHeightButton: false,
+              showStrikeThrough: false,
+              showColorButton: true,
+              showBackgroundColorButton: true,
+              showAlignmentButtons: false,
+              showHeaderStyle: false,
+              showListNumbers: true,
+              showListBullets: true,
+              showListCheck: true,
+              showIndent: false,
+              showLink: true,
+              showSubscript: false,
+              showSuperscript: false
+            ),
+          ),
+          Expanded(
+            child: QuillEditor.basic(
+              controller: _controller,
+              config: const QuillEditorConfig(
+                autoFocus: true,
+                padding: EdgeInsetsGeometry.all(12.0)
+              )
+            ),
           )
-        ),
-        htmlEditorOptions: HtmlEditorOptions(
-          darkMode: true,
-          initialText: stepDescription,
-          hint: S.of(context).step_edition_hint,
-          autoAdjustHeight: false,
-        ),
-        htmlToolbarOptions: HtmlToolbarOptions(
-          buttonColor: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color,
-          initiallyExpanded: true,
-          toolbarType: ToolbarType.nativeScrollable,
-          defaultToolbarButtons: [
-            const FontButtons(
-              clearAll: false,
-              subscript: false,
-              superscript: false
-            ),
-            const ColorButtons(),
-            const OtherButtons(
-              codeview: false,
-              fullscreen: false,
-              help: false,
-              copy: false,
-              paste: false
-            ),
-            const ListButtons(
-              listStyles: false
-            ),
-            const ParagraphButtons(
-              caseConverter: false,
-              lineHeight: false,
-              textDirection: false
-            ),
-            const InsertButtons(
-              picture: false,
-              video: false,
-              audio: false,
-              hr: false,
-              otherFile: false,
-              table: false
-            ),
-          ]
-        )
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
           label: Text(S.of(context).recipe_edition_update),
           onPressed: () {
-            Navigator.pop(context, htmlEditorController.getText());
+            String? data = jsonEncode(_controller.document.toDelta().toJson());
+            Navigator.pop(context, data);
           }
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat

@@ -1,9 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_alarm_clock/flutter_alarm_clock.dart';
 
 import '../../models/data_model.dart';
@@ -17,10 +18,33 @@ class RecipeStepsWidget extends StatefulWidget {
 }
 
 class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
-  double _textSize = 14;
+  double _textSize = 16;
+
+  final List<QuillController> controllers = [];
+
+  @override
+  void dispose() {
+    for (QuillController controller in controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    for (QuillController controller in controllers) {
+      controller.dispose();
+    }
+    controllers.clear();
+    for (var step in widget.steps) {
+      controllers.add(QuillController(
+        document: step.step.isNotEmpty ? Document.fromJson(jsonDecode(step.step)) : Document(),
+        selection: const TextSelection.collapsed(offset: 0),
+        readOnly: true
+      ));
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: ThemeMgr.getTheme(context)!.cardColor,
@@ -96,19 +120,37 @@ class _RecipeStepsWidgetState extends State<RecipeStepsWidget> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Html(
-                      data: widget.steps[index].step,
-                      style: {
-                        "*": Style(
-                          fontSize: FontSize(_textSize)
+                    QuillEditor.basic(
+                      controller: controllers[index],
+                      config: QuillEditorConfig(
+                        checkBoxReadOnly: false,
+                        padding: EdgeInsetsGeometry.all(4.0),
+                        customStyles: DefaultStyles(
+                          paragraph: DefaultTextBlockStyle(
+                            DefaultStyles.getInstance(context).paragraph!.style.merge(
+                              TextStyle(
+                                fontSize: _textSize
+                              )
+                            ),
+                            HorizontalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            null
+                          ),
+                          lists: DefaultListBlockStyle(
+                            DefaultStyles.getInstance(context).lists!.style.merge(
+                              TextStyle(
+                                fontSize: _textSize
+                              )
+                            ),
+                            HorizontalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            VerticalSpacing(0, 0),
+                            null,
+                            null
+                          )
                         )
-                      },
-                      onLinkTap: (url, attributes, element) {
-                        if (url != null) {
-                          final Uri uri = Uri.parse(url);
-                          launchUrl(uri);
-                        }
-                      },
+                      ),
                     ),
 
                     const SizedBox(height: 24)

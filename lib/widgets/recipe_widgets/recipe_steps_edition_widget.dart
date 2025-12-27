@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:duration_picker/duration_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:url_launcher/url_launcher.dart';
+import 'package:reorderables/reorderables.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
+import '../../utilities/string_functions.dart';
 import '../../utilities/time_functions.dart';
 import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
 
@@ -27,12 +29,34 @@ class RecipeStepsEditionWidget extends StatefulWidget {
 class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
   List<RecipeStep> newSteps = [];
   bool isInit = false;
+
+  final List<QuillController> controllers = [];
+
+  @override
+  void dispose() {
+    for (QuillController controller in controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
     if (!isInit) {
       newSteps.addAll(widget.steps);
       isInit = true;
+    }
+
+    for (QuillController controller in controllers) {
+      controller.dispose();
+    }
+    controllers.clear();
+    for (var step in widget.steps) {
+      controllers.add(QuillController(
+        document: step.step.isNotEmpty ? Document.fromJson(jsonDecode(step.step)) : Document(),
+        selection: const TextSelection.collapsed(offset: 0),
+        readOnly: true
+      ));
     }
 
     return Container(
@@ -61,103 +85,105 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
           SizedBox(
             width: double.infinity,
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ...List<Widget>.generate(newSteps.length, (index) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ReorderableColumn(
+                  children: [
+                    ...List<Widget>.generate(newSteps.length, (index) {
+                      return Column(
+                        key: UniqueKey(),
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                              "${S.of(context).steps_widget_step} ${index+1}",
-                              style: ThemeMgr.getTheme(context)!.textTheme.displaySmall
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  "${S.of(context).steps_widget_step} ${index+1}",
+                                  style: ThemeMgr.getTheme(context)!.textTheme.displaySmall
+                              ),
+                              CircularIconButton(
+                                icon: FaIcon(FontAwesomeIcons.trashCan, size: 18, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+                                color: ThemeMgr.getTheme(context)!.colorScheme.surface,
+                                onPressed: () {
+                                  if (widget.onRemoveStep != null) {
+                                    widget.onRemoveStep!(index);
+                                  }
+                                },
+                              )
+                            ],
                           ),
-                          CircularIconButton(
-                            icon: FaIcon(FontAwesomeIcons.trashCan, size: 18, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
-                            color: ThemeMgr.getTheme(context)!.colorScheme.background,
-                            onPressed: () {
-                              if (widget.onRemoveStep != null) {
-                                widget.onRemoveStep!(index);
-                              }
+
+                          const SizedBox(height: 4),
+
+                          WidgetSelectionOverlay(
+                            widget: Container(
+                              constraints: const BoxConstraints(
+                                  minHeight: 56
+                              ),
+                              child: QuillEditor.basic(
+                                controller: controllers[index],
+                                config: QuillEditorConfig(
+                                  padding: EdgeInsetsGeometry.all(4.0)
+                                ),
+                              )
+                            ),
+                            borderRadius: 2,
+                            margin: 2,
+                            editModeController: true,
+                            opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
+                            onTap: () {
+                              Navigator.pushNamed(context, "${ModalRoute.of(context)!.settings.name!}/$index", arguments: {
+                                "stepNumber": index,
+                                "stepDescription": newSteps[index].step
+                              }).then((value) {
+                                print(value);
+                                if (value != null) {
+                                  if (widget.onStepChanged != null) {
+                                    widget.onStepChanged!({
+                                      'step': value.toString(),
+                                      'index': index
+                                    });
+                                  }
+                                }
+                              });
                             },
-                          )
-                        ],
-                      ),
-
-                      const SizedBox(height: 4),
-
-                      WidgetSelectionOverlay(
-                        widget: Container(
-                          constraints: const BoxConstraints(
-                              minHeight: 56
                           ),
-                          child: Html(
-                            data: newSteps[index].step.isNotEmpty ? newSteps[index].step : "step description",
-                            onLinkTap: (String? url, Map<String, String> attributes, dom.Element? element) async {
-                              print("url:$url");
-                              // TODO: url links issue
-                              if (url != null && url.isNotEmpty) {
-                                
-                                final Uri uri = Uri.parse(url);
-                                await launchUrl(uri);
-                              }
-                            }
-                          )
-                        ),
-                        borderRadius: 2,
-                        margin: 2,
-                        editModeController: true,
-                        opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
-                        onTap: () {
-                          Navigator.pushNamed(context, "${ModalRoute.of(context)!.settings.name!}/$index", arguments: {
-                            "stepNumber": index,
-                            "stepDescription": newSteps[index].step
-                          }).then((value) async {
-                            if (value != null) {
-                              if (widget.onStepChanged != null) {
+
+                          const SizedBox(height: 8),
+
+                          InkWell(
+                            onTap: () async {
+                              var resultingDuration = await showDurationPicker(
+                                context: context,
+                                initialTime: Duration(minutes: newSteps[index].time),
+                                // snapToMins: 5.0,
+                              );
+                              if (resultingDuration != null)
+                              {
                                 setState(() {
-                                  widget.onStepChanged!({
-                                    'step': value.toString().trim().replaceAll("<p></p>", "").replaceAll("<div><br></div>", ""),
-                                    'index': index
-                                  });
+                                  newSteps[index].time = resultingDuration.inMinutes;
                                 });
                               }
-                            }
-                          });
-                        },
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      InkWell(
-                        onTap: () async {
-                          var resultingDuration = await showDurationPicker(
-                            context: context,
-                            initialTime: Duration(minutes: newSteps[index].time),
-                            // snapToMins: 5.0,
-                          );
-                          if (resultingDuration != null)
-                          {
-                            setState(() {
-                              newSteps[index].time = resultingDuration.inMinutes;
-                            });
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            IconButton(
-                              onPressed: null,
-                              icon: FaIcon(Icons.timer_outlined, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
-                            ),
-                            Text(minutesToTime(newSteps[index].time))
-                          ],
-                        )
-                      ),
-                    ],
-                  );
-                }),
+                            },
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  onPressed: null,
+                                  icon: FaIcon(Icons.timer_outlined, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+                                ),
+                                Text(minutesToTime(newSteps[index].time))
+                              ],
+                            )
+                          ),
+                        ],
+                      );
+                    })
+                  ],
+                  onReorder: (int oldIndex, int newIndex) {
+                    newSteps = moveListItem(newSteps, oldIndex, newIndex) as List<RecipeStep>;
+                    setState(() {});
+                  },
+                ),
 
                 // Last item: Add Button
                 MyOutlinedButton(

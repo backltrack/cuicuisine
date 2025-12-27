@@ -120,7 +120,7 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
         ),
         floatingActionButton: FloatingActionButton.extended(
             label: Text(S.of(context).recipe_edition_update),
-            onPressed: () async {
+            onPressed: () {
               DatabaseMgr().localMgr.updateRecipe(
                 recipeId,
                 RecipeUpdate(

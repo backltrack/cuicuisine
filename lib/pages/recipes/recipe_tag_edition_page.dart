@@ -59,6 +59,9 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
     final List<String> currentTags = routeArgs['currentTags']!;
     final String recipeId = routeArgs['id']!;
 
+    List<String> tags = defaultTags[locale]! + customTags;
+    tags.sort((a, b) => removeDiacritics(a).compareTo(removeDiacritics(b)));
+
     if (shouldInitialize) {
       _selectedTags.clear();
       _selectedTags.addAll(currentTags);
@@ -178,21 +181,15 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
           Expanded(
               child: ListView.builder(
                 controller: _scrollController,
-                itemCount: defaultTags[locale]!.length + customTags.length + 2,
+                itemCount: tags.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == defaultTags[locale]!.length + customTags.length + 1) {
+                  if (index == tags.length) {
+                    // space for floating button
                     return const SizedBox(height: 80);
-                  } 
-                  else if (index == customTags.length) {
-                    return customTags.isNotEmpty ? const Divider() : const SizedBox();
-                  }
-                  else if (index < customTags.length) {
-                    return _search != "" && removeDiacritics(customTags[index].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
-                    listTile(customTags[index]) : const SizedBox();
                   }
                   else {
-                    return _search != "" && removeDiacritics(defaultTags[locale]![index-customTags.length-1].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
-                    listTile(defaultTags[locale]![index-customTags.length-1]) : const SizedBox();
+                    return _search != "" && removeDiacritics(tags[index].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
+                    listTile(tags[index]) : const SizedBox();
                   }
                 },
               )
