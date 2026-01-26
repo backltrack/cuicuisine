@@ -58,7 +58,7 @@ class _IngredientEditionTileState extends State<IngredientEditionTile> {
 
     return Container(
         decoration: BoxDecoration(
-            color: ThemeMgr.getTheme(context)!.colorScheme.background,
+            color: ThemeMgr.getTheme(context)!.colorScheme.surface,
             borderRadius: BorderRadius.circular(4)
         ),
         margin: const EdgeInsets.symmetric(vertical: 4),

@@ -203,7 +203,7 @@ class _RecipePageState extends State<RecipePage> {
                           recipeId: recipe.id,
                       ),
                       editModeController: isEditMode,
-                      opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
+                      opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                       borderRadius: 0,
                       margin: 0,
                       onTap: () {
@@ -257,7 +257,7 @@ class _RecipePageState extends State<RecipePage> {
                         cookingTime: recipe.cookingTime
                     ),
                     editModeController: isEditMode,
-                    opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
+                    opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                     onTap: () {
                       Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/time", arguments: {
                         "id": recipe.id,
@@ -283,7 +283,7 @@ class _RecipePageState extends State<RecipePage> {
                 WidgetSelectionOverlay(
                     widget: RecipeTagsWidget(key: UniqueKey(), tags: recipe.tags),
                     editModeController: isEditMode,
-                    opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
+                    opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                     onTap: () {
                       Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/tags", arguments: {
                         "currentTags": recipe.tags,
@@ -305,40 +305,42 @@ class _RecipePageState extends State<RecipePage> {
                     },
                 ),
                 WidgetSelectionOverlay(
-                    widget: RecipeIngredientsWidget(
-                      key: ValueKey('recipe_ingredients_${recipe.id}'),
-                      ingredients: recipe.recipeIngredients,
-                      defaultQuantity: recipe.quantity,
-                      quantityType: recipe.quantityType,
-                    ),
-                    editModeController: isEditMode,
-                    opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
-                    onTap: () {
-                      Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/ingredients", arguments: {
-                        "id": recipe.id,
-                        "ingredients": recipe.recipeIngredients,
-                        "quantity": recipe.quantity,
-                        "quantityType": recipe.quantityType
-                      }).then((value) async {
-                        if (value != null && value == 'update') {
-                          // make refresh recipes
-                          updateRecipes = "reloadRecipes";
+                  key: ValueKey('recipe_ingredients_overlay_${recipe.id}'),
+                  widget: RecipeIngredientsWidget(
+                    key: ValueKey('recipe_ingredients_${recipe.id}'),
+                    ingredients: recipe.recipeIngredients,
+                    defaultQuantity: recipe.quantity,
+                    quantityType: recipe.quantityType,
+                  ),
+                  editModeController: isEditMode,
+                  opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
+                  onTap: () {
+                    Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/ingredients", arguments: {
+                      "id": recipe.id,
+                      "ingredients": recipe.recipeIngredients,
+                      "quantity": recipe.quantity,
+                      "quantityType": recipe.quantityType
+                    }).then((value) async {
+                      if (value != null && value == 'update') {
+                        // make refresh recipes
+                        updateRecipes = "reloadRecipes";
 
-                          // reload local recipe
-                          Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
-                          if (tmpRecipe != null) {
-                            setState(() {
-                              recipe = tmpRecipe;
-                            });
-                          }
+                        // reload local recipe
+                        Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                        if (tmpRecipe != null) {
+                          setState(() {
+                            recipe = tmpRecipe;
+                            print("${recipe.quantityType}, ${recipe.quantity})");
+                          });
                         }
-                      });
-                    },
+                      }
+                    });
+                  },
                 ),
                 WidgetSelectionOverlay(
                   widget: RecipeStepsWidget(steps: recipe.steps),
                   editModeController: isEditMode,
-                  opacity: ThemeMgr.isDarkTheme(context) ? 0.9 : 0.6,
+                  opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                   onTap: () {
                     Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/steps", arguments: {
                       "recipeId": recipe.id,

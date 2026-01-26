@@ -21,12 +21,12 @@ ThemeCollection setThemeCollection(context) {
         colorScheme: ColorScheme.fromSeed(
           seedColor: DarkColors.accentColor,
           secondary: DarkColors.menuColor,
-          background: DarkColors.backgroundColor,
+          surface: DarkColors.backgroundColor,
           brightness: Brightness.light,
         ),
 
         appBarTheme: AppBarTheme(
-          color: DarkColors.accentColor,
+          backgroundColor: DarkColors.accentColor,
           titleTextStyle: TextStyle(
             color: DarkColors.writingColor,
             fontSize: 20,
@@ -88,12 +88,12 @@ ThemeCollection setThemeCollection(context) {
         colorScheme: ColorScheme.fromSeed(
           seedColor: LightColors.accentColor,
           secondary: LightColors.menuColor,
-          background: LightColors.backgroundColor,
+          surface: LightColors.backgroundColor,
           brightness: Brightness.light,
         ),
 
         appBarTheme: AppBarTheme(
-          color: DarkColors.accentColor,
+          backgroundColor: LightColors.accentColor,
           titleTextStyle: TextStyle(
             color: DarkColors.writingColor,
             fontSize: 20,

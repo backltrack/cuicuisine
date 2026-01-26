@@ -66,7 +66,7 @@ class _IngredientTileState extends State<IngredientTile> {
 
     return Container(
         decoration: BoxDecoration(
-            color: ThemeMgr.getTheme(context)!.colorScheme.background,
+            color: ThemeMgr.getTheme(context)!.colorScheme.surface,
             borderRadius: BorderRadius.circular(4)
         ),
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -90,7 +90,7 @@ class _IngredientTileState extends State<IngredientTile> {
             ),
             if (compatibleUnits.length > 1)
               PopupMenuButton(
-                icon: const FaIcon(FontAwesomeIcons.balanceScaleRight, size: 20),
+                icon: const FaIcon(FontAwesomeIcons.scaleBalanced, size: 20),
                 itemBuilder: (context) => List<PopupMenuItem>.generate(compatibleUnits.length, (unitIndex) => PopupMenuItem(
                   child: Text(compatibleUnits[unitIndex], style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
                   onTap: () {

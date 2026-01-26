@@ -51,15 +51,11 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
                   quantityType: _quantityType,
                   isEdition: widget.isEdition,
                   onTypeChanged: (String newType) {
-                    setState(() {
                       _quantityType = newType;
-                    });
                     if (widget.onTypeChanged != null) widget.onTypeChanged!(_quantityType);
                   },
                   onQuantityChanged: (int newQuantity) {
-                    setState(() {
                       _quantity = newQuantity;
-                    });
                     if (widget.onQuantityChanged != null) widget.onQuantityChanged!(_quantity);
                   },
                 )
@@ -72,9 +68,7 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
                   key: const ValueKey('coefficient_button'),
                   value: _multiplier,
                   onValueChanged: (double value) {
-                    setState(() {
                     _multiplier = value;
-                    });
                     if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
                   },
                 )
@@ -86,9 +80,7 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
                   key: const ValueKey('coefficient_button2'),
                   value: _multiplier,
                   onValueChanged: (double value) {
-                    setState(() {
-                      _multiplier = value;
-                    });
+                    _multiplier = value;
                     if (widget.onMultiplierChanged != null) widget.onMultiplierChanged!(_multiplier);
                   },
                 ),
@@ -97,14 +89,10 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
                 quantity: _quantity,
                 quantityType: _quantityType,
                 onTypeChanged: (String newType) {
-                  setState(() {
                     _quantityType = newType;
-                  });
                 },
                 onQuantityChanged: (int newQuantity) {
-                  setState(() {
                     _quantity = newQuantity;
-                  });
                 },
               )
             ]

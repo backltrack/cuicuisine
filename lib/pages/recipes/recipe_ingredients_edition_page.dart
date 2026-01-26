@@ -90,6 +90,7 @@ class _RecipeIngredientsEditionPageState extends State<RecipeIngredientsEditionP
         child: Column(
           children: [
             RecipeIngredientsEditionWidget(
+              key: UniqueKey(),
               ingredients: ingredients,
               defaultQuantity: quantity,
               quantityType: quantityType,

@@ -43,7 +43,7 @@ class RecipeTimeWidget extends StatelessWidget {
           Container(
             height: 50,
             child: VerticalDivider(
-              color: ThemeMgr.getTheme(context)!.colorScheme.background,
+              color: ThemeMgr.getTheme(context)!.colorScheme.surface,
               thickness: 2,
               width: 12,
             ),

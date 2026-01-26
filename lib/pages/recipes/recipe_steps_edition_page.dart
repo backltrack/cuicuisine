@@ -6,6 +6,7 @@ import 'package:html_editor_enhanced/html_editor.dart';
 
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
+import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/recipe_widgets/recipe_steps_edition_widget.dart';
 
@@ -111,6 +112,11 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
                   onRemoveStep: (int index) {
                     setState(() {
                       newSteps.removeAt(index);
+                    });
+                  },
+                  onReorderSteps: (int oldIndex, int newIndex) {
+                    setState(() {
+                      newSteps = moveListItem(newSteps, oldIndex, newIndex) as List<RecipeStep>;
                     });
                   },
                 ),

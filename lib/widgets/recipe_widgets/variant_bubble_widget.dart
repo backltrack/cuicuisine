@@ -40,7 +40,7 @@ class _VariantWidgetState extends State<VariantWidget> {
         padding: const EdgeInsets.only(left: 12),
         margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
         decoration: BoxDecoration(
-            color: ThemeMgr.getTheme(context)!.colorScheme.background,
+            color: ThemeMgr.getTheme(context)!.colorScheme.surface,
             borderRadius: BorderRadius.circular(12)
         ),
         child: Row(

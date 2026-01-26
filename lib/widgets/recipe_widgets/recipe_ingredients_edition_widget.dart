@@ -83,15 +83,11 @@ class _RecipeIngredientsEditionWidgetState extends State<RecipeIngredientsEditio
             isEdition: true,
             onQuantityChanged: (int value) {
               widget.onNumberChanged(value);
-              setState(() {
                 _quantity = value;
-              });
             },
             onTypeChanged: (String value) {
               widget.onQuantityTypeChanged(value);
-              setState(() {
                 _quantityType = value;
-              });
             },
           ),
 
@@ -124,31 +120,6 @@ class _RecipeIngredientsEditionWidgetState extends State<RecipeIngredientsEditio
               icon: FontAwesomeIcons.plus,
               onPressed: widget.onAddIngredient
           )
-          // Container(
-          //   height: MediaQuery.of(context).size.height-400,
-          //   child: ListView.builder(
-          //       padding: EdgeInsets.zero,
-          //       itemCount: _ingredients.length + 1,
-          //       itemBuilder: (context, int index) {
-          //         if (index < _ingredients.length) {
-          //           Ingredient ingredient = _ingredients[index];
-          //
-          //           return IngredientEditionTile(
-          //               ingredient: ingredient,
-          //               locale: locale!,
-          //               onEdit: () {},//widget.onEdit(index),
-          //               onRemove: widget.onRemove(index)
-          //           );
-          //         } else {
-          //           return MyOutlinedButton(
-          //               text: S.of(context).add_button,
-          //               icon: FontAwesomeIcons.plus,
-          //               onPressed: widget.onAddIngredient
-          //           );
-          //         }
-          //       }
-          //   )
-          // )
         ],
       ),
     );

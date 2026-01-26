@@ -46,13 +46,11 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
                 padding: EdgeInsets.zero,
                 onPressed: () {
                   if (_quantity > 1) {
-                    setState(() {
                       _quantity = _quantity - 1;
-                    });
                     if (widget.onQuantityChanged != null) widget.onQuantityChanged!(_quantity);
                   }
                 },
-                icon: Icon(Icons.remove, color: ThemeMgr.getTheme(context)!.colorScheme.background)
+                icon: Icon(Icons.remove, color: ThemeMgr.getTheme(context)!.colorScheme.surface)
             ),
             widget.isEdition ?
             TextButton(
@@ -61,9 +59,7 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
                 if (newType != null) {
                   print(newType);
                   if (newType != "" && newType != _quantityType) {
-                    setState(() {
-                      _quantityType = newType;
-                    });
+                    _quantityType = newType;
                     if (widget.onTypeChanged != null) widget.onTypeChanged!(_quantityType);
                   }
                 }
@@ -72,23 +68,21 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
                   widget.quantityType != "" ?
                   _quantity.toString() + "  " + _quantityType
                       : _quantity.toString() + "  " + S.of(context).ingredient_widget_quantity_type,
-                  style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.background)),
+                  style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.surface)),
             )
                 : Text(
                 widget.quantityType != "" ?
                 _quantity.toString() + "  " + _quantityType
                     : _quantity.toString() + "  " + S.of(context).ingredient_widget_quantity_type,
-                style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.background)
+                style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.surface)
             ),
             IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () {
-                  setState(() {
                     _quantity = _quantity + 1;
-                  });
                   if (widget.onQuantityChanged != null) widget.onQuantityChanged!(_quantity);
                 },
-                icon: Icon(Icons.add, color: ThemeMgr.getTheme(context)!.colorScheme.background)
+                icon: Icon(Icons.add, color: ThemeMgr.getTheme(context)!.colorScheme.surface)
             )
           ],
         ),

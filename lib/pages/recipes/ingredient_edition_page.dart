@@ -151,7 +151,7 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
                 ),
 
                 PopupMenuButton(
-                  icon: const FaIcon(FontAwesomeIcons.scaleUnbalancedFlip, size: 20),
+                  icon: const FaIcon(FontAwesomeIcons.scaleBalanced, size: 20),
                   itemBuilder: (context) => List<PopupMenuItem>.generate(unitMgr.getAllUnits().length, (unitIndex) => PopupMenuItem(
                     child: Text(unitMgr.getAllUnits()[unitIndex], style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
                     onTap: () {

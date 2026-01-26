@@ -7,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:reorderables/reorderables.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
-import '../../utilities/string_functions.dart';
 import '../../utilities/time_functions.dart';
 import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
 
@@ -20,7 +19,8 @@ class RecipeStepsEditionWidget extends StatefulWidget {
   final Function(Map<String, dynamic>)? onStepChanged;
   final Function(RecipeStep)? onAddStep;
   final Function(int)? onRemoveStep;
-  RecipeStepsEditionWidget({Key? key, required this.steps, this.onStepChanged, this.onAddStep, this.onRemoveStep}) : super(key: key);
+  final Function(int, int)? onReorderSteps;
+  RecipeStepsEditionWidget({Key? key, required this.steps, this.onStepChanged, this.onAddStep, this.onRemoveStep, this.onReorderSteps}) : super(key: key);
 
   @override
   _RecipeStepsEditionWidgetState createState() => _RecipeStepsEditionWidgetState();
@@ -123,6 +123,8 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                               child: QuillEditor.basic(
                                 controller: controllers[index],
                                 config: QuillEditorConfig(
+                                  expands: false,
+                                  scrollable: false,
                                   padding: EdgeInsetsGeometry.all(4.0),
                                   customStyles: DefaultStyles(
                                     link: DefaultStyles.getInstance(context).link!.copyWith(
@@ -166,9 +168,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                               );
                               if (resultingDuration != null)
                               {
-                                setState(() {
-                                  newSteps[index].time = resultingDuration.inMinutes;
-                                });
+                                newSteps[index].time = resultingDuration.inMinutes;
                               }
                             },
                             child: Row(
@@ -186,8 +186,9 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                     })
                   ],
                   onReorder: (int oldIndex, int newIndex) {
-                    newSteps = moveListItem(newSteps, oldIndex, newIndex) as List<RecipeStep>;
-                    setState(() {});
+                    if (widget.onReorderSteps != null) {
+                      widget.onReorderSteps!(oldIndex, newIndex);
+                    }
                   },
                 ),
 
@@ -197,9 +198,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                   icon: FontAwesomeIcons.plus,
                   onPressed: () {
                     if (widget.onAddStep != null ) {
-                      setState(() {
-                        widget.onAddStep!(RecipeStep(step: ''));
-                      });
+                      widget.onAddStep!(RecipeStep(step: ''));
                     }
                   },
                 )

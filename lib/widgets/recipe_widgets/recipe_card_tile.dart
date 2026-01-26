@@ -113,7 +113,7 @@ class _RecipeCardTileState extends State<RecipeCardTile> {
       //           children: [
       //             CircleAvatar(
       //               maxRadius: (cardHeight + spacing) / 2,
-      //               backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.background,
+      //               backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
       //             ),
       //             Container(
       //               margin: EdgeInsetsDirectional.all(spacing),

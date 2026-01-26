@@ -133,7 +133,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(color: ThemeMgr.getTheme(context)!.colorScheme.background, spreadRadius: 8)]
+                boxShadow: [BoxShadow(color: ThemeMgr.getTheme(context)!.colorScheme.surface, spreadRadius: 8)]
               ),
               child: () {
                 if (widget.recipe.pictures.isEmpty) {

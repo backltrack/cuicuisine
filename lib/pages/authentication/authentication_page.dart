@@ -133,7 +133,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                     offset: Offset(0, animationTranslation!.value),
                     child: CircleAvatar(
                         radius: 128 / 2 + 36,
-                        backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.background,
+                        backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
                         child: Image.asset('assets/icons/splash_icon.png', width: 128)
                     )
                 )
@@ -265,7 +265,7 @@ class LoadingScreen extends StatelessWidget {
       child: Center(
         child: CircleAvatar(
           radius: 128 / 2 + 36,
-          backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.background,
+          backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
           child: Image.asset('assets/icons/splash_icon.png', width: 128)
         ),
       ),
