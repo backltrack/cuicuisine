@@ -4,6 +4,24 @@ import 'data_model.dart';
 
   part 'sync_model.g.dart';
 
+enum OperationResultAction {
+  requeue,
+  delete;
+  
+  static getActionFromStatusCode(int statusCode) {
+    switch (statusCode) {
+      case 403:
+      case 404:
+      case 409:
+        return delete;
+      case 500:
+        return requeue;
+      default:
+        return requeue;
+    }
+  }
+}
+
 @HiveType(typeId: 12)
 enum OperationType {
   @HiveField(0)

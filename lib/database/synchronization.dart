@@ -24,26 +24,26 @@ class Synchronization {
       // server document more recent -> conflict
     
     Operation? ope = _localMgr.getFirstOperation();
-    print(_localMgr.getQueueLength());
+    print("operation queue length: ${_localMgr.getQueueLength()}");
     List<Operation> failedOperations = [];
 
     while (ope != null) {
-      bool success = false;
+      OperationResultAction operationResultAction = OperationResultAction.requeue;
       switch (ope.type) {
         case OperationType.create:
-          success = await createObject(ope.object);
+          operationResultAction = await createObject(ope.object);
         case OperationType.update:
-          success = await updateObject(ope.object);
+          operationResultAction = await updateObject(ope.object);
         case OperationType.delete:
-          success = await deleteObject(ope.object);
+          operationResultAction = await deleteObject(ope.object);
       }
-      if (!success) {
+      if (operationResultAction == OperationResultAction.requeue) {
         failedOperations.add(ope);
       }
 
-      print(_localMgr.getQueueLength());
+      print("operation queue length: ${_localMgr.getQueueLength()}");
       ope = _localMgr.getFirstOperation();
-      print(_localMgr.getQueueLength());
+      print("operation queue length: ${_localMgr.getQueueLength()}");
     }
 
     if (failedOperations.isEmpty) {
@@ -51,6 +51,16 @@ class Synchronization {
     }
     else {
       for (Operation ope in failedOperations) {
+
+        print("re-adding failed operation to queue: ${ope.type} ${ope.object}");
+        if (ope.object is RecipeUpdate && ope.type == OperationType.update) {
+          RecipeUpdate update = ope.object as RecipeUpdate;
+          print("${update.toJson()}");
+        }
+        if (ope.object is BookUpdate && ope.type == OperationType.update) {
+          BookUpdate update = ope.object as BookUpdate;
+          print("${update.toJson()}");
+        }
         _localMgr.addQueueOperation(type: ope.type, object: ope.object, pushAfter: false);
       }
       return false;
@@ -59,10 +69,14 @@ class Synchronization {
 
   Future<bool> fetchNew() async {
     String? lastChange = DatabaseMgr().localMgr.getLastChange();
+    print("Last change: $lastChange");
 
     if (lastChange != null) {
       // already sync before
-      await DatabaseMgr().remoteMgr.getLatestChanges(lastChange);
+      bool result = await DatabaseMgr().remoteMgr.getLatestChanges(lastChange);
+      if (!result) {
+        await DatabaseMgr().remoteMgr.fetchAllFromUser();
+      }
     }
     else {
       await DatabaseMgr().remoteMgr.fetchAllFromUser();
@@ -82,7 +96,7 @@ class Synchronization {
     return true;
   }
 
-  Future<bool> createObject(object) async {
+  Future<OperationResultAction> createObject(object) async {
     if (object is Book) {
       return await _remoteMgr.createBook(object);
     }
@@ -93,10 +107,10 @@ class Synchronization {
       return await _remoteMgr.uploadImage(object);
     }
 
-    return false;
+    return OperationResultAction.requeue;
   }
 
-  Future<bool> updateObject(object) async {
+  Future<OperationResultAction> updateObject(object) async {
     if (object is UserUpdate) {
       return await _remoteMgr.updateUser(object);
     }
@@ -107,10 +121,10 @@ class Synchronization {
       return await _remoteMgr.updateRecipe(object);
     }
 
-    return false;
+    return OperationResultAction.requeue;
   }
 
-  Future<bool> deleteObject(object) async {
+  Future<OperationResultAction> deleteObject(object) async {
     if (object is AppUser) {
 
     }
@@ -124,6 +138,6 @@ class Synchronization {
       return await _remoteMgr.deleteImage(object.recipeId, object.imageId);
     }
 
-    return true;
+    return OperationResultAction.requeue;
   }
 }

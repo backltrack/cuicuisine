@@ -295,7 +295,7 @@ class HiveConnector {
     try {
       Book? book = _bookBox.values.firstWhere((book) => book.id == bookId);
       return book;
-    } on Exception {
+    } catch (e) {
       return null;
     }
   }
@@ -608,8 +608,7 @@ class HiveConnector {
       recipe.isDirty = true;
       print(recipe.toJson());
       await recipe.save();
-    }
-    catch (e) {
+    } catch (e) {
       print(e);
       return;
     }

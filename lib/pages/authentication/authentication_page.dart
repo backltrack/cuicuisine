@@ -75,7 +75,6 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         await DatabaseMgr().synchronization.sync();
         // goto home page
         if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
-        // if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(TestPage.route, (Route<dynamic> route) => false);
       }
       else {
         print('need to register');
