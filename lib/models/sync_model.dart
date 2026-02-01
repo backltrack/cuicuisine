@@ -9,9 +9,12 @@ enum OperationResultAction {
   delete;
   
   static getActionFromStatusCode(int statusCode) {
+    print("Getting action from status code: $statusCode");
     switch (statusCode) {
       case 403:
+        return delete;
       case 404:
+        return delete;
       case 409:
         return delete;
       case 500:

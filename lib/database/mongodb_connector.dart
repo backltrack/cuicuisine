@@ -44,8 +44,8 @@ class MongoConnector {
     });
   }
 
-  Future<dynamic> _secureGetRequest(String endpoint, {int trials=3}) async {
-    if (client == null) { return; }
+  Future<Response?> _secureGetRequest(String endpoint, {int trials=3}) async {
+    if (client == null) { return null; }
     print("GET $endpoint");
 
     Uri serverUri = Uri.parse(server);
@@ -75,8 +75,8 @@ class MongoConnector {
     }
   }
 
-  Future<dynamic> _secureDeleteRequest(String endpoint, Object data, {int trials=3}) async {
-    if (client == null) { return; }
+  Future<Response?> _secureDeleteRequest(String endpoint, Object data, {int trials=3}) async {
+    if (client == null) { return null; }
     print("DELETE $endpoint");
     
     Uri serverUri = Uri.parse(server);
@@ -108,8 +108,8 @@ class MongoConnector {
     }
   }
 
-  Future<dynamic> _securePostJsonRequest(String endpoint, Map<String, dynamic> data, {int trials=3}) async {
-    if (client == null) { return; }
+  Future<Response?> _securePostJsonRequest(String endpoint, Map<String, dynamic> data, {int trials=3}) async {
+    if (client == null) { return null; }
     print("POST Json $endpoint");
     
     Uri serverUri = Uri.parse(server);
@@ -141,8 +141,8 @@ class MongoConnector {
     }
   }
 
-  Future<dynamic> _securePostMultipartRequest(String endpoint, File file, List<MapEntry<String, String>> form, {int trials=3}) async {
-    if (client == null) { return; }
+  Future<StreamedResponse?> _securePostMultipartRequest(String endpoint, File file, List<MapEntry<String, String>> form, {int trials=3}) async {
+    if (client == null) { return null; }
     print("POST Multipart $endpoint");
     
     Uri serverUri = Uri.parse(server);
@@ -368,7 +368,7 @@ class MongoConnector {
     });
 
     if (response != null && response.statusCode == 200) {
-      return response.body != null && jsonDecode(utf8.decode(response.bodyBytes));
+      return jsonDecode(utf8.decode(response.bodyBytes));
     }
     return false;
   }
@@ -427,7 +427,7 @@ class MongoConnector {
   Future<bool> deleteUser() async {
     final response = await _secureDeleteRequest("/users/me/delete", {});
     if (response != null && response.statusCode == 200) {
-      if (response.body != null && jsonDecode(utf8.decode(response.bodyBytes))) {
+      if (jsonDecode(utf8.decode(response.bodyBytes))) {
         return true;
       }
     }
@@ -437,76 +437,76 @@ class MongoConnector {
 
   Future<bool> getLatestChanges(String lastChange) async {
     final response = await _secureGetRequest('/change/get/$lastChange');
-
+    print("Get latest changes response:");
+    print(response!=null ? response.statusCode : "no response");
     if (response != null && response.statusCode == 200) {
-      if (response.body != null) {
-        Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
-        print(data);
+      Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
+      print(data);
 
       if (data['result']) {
-          List<dynamic> tmp = data['changes'];
-          print(tmp);
-          if (tmp.isEmpty) {
-            print("no new changes");
-            return true;
-          }
-          List<MongoChange> changes = [];
-          for (var element in tmp) {changes.add(MongoChange.fromJson(element));}
-          
-          for (MongoChange change in changes) {
-            if (change.objectType == 'user') {
-              AppUser user = await fetchUser();
-              AppUser? currentUser = DatabaseMgr().localMgr.getUser();
-
-              if (currentUser != null) {
-                currentUser.copyFromUser(user);
-                currentUser.save();
-              }
-            }
-            else if (change.objectType == 'book') {
-              if (change.operationType == OperationType.delete) {
-                DatabaseMgr().localMgr.deleteBook(change.objectId);
-              }
-              else {
-                Book book = await fetchBook(change.objectId);
-                Book? localBook = DatabaseMgr().localMgr.getBook(book.id);
-
-                if (localBook != null) {
-                  localBook.copyFromBook(book);
-                  localBook.save();
-                }
-                else {
-                  DatabaseMgr().localMgr.addBook(book, addToQueue: false);
-                }
-              }
-            }
-            else if (change.objectType == 'recipe') {
-              if (change.operationType == OperationType.delete) {
-                DatabaseMgr().localMgr.deleteRecipe(change.objectId);
-              }
-              else {
-                Recipe recipe = await fetchRecipe(change.objectId);
-                Recipe? localRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
-
-                if (localRecipe != null) {
-                  localRecipe.copyFromRecipe(recipe);
-                  localRecipe.save();
-                }
-                else {
-                  DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
-                }
-
-                removeExtraImages(recipe);
-                downloadMissingImages(recipe);
-              }
-            }
-
-            // add change to local list
-            DatabaseMgr().localMgr.addChange(change.changeId);
-          }
+        List<dynamic> tmp = data['changes'];
+        print(tmp);
+        if (tmp.isEmpty) {
+          print("no new changes");
           return true;
         }
+        List<MongoChange> changes = [];
+        for (var element in tmp) {changes.add(MongoChange.fromJson(element));}
+        
+        for (MongoChange change in changes) {
+          if (change.objectType == 'user') {
+            AppUser user = await fetchUser();
+            AppUser? currentUser = DatabaseMgr().localMgr.getUser();
+
+            if (currentUser != null) {
+              currentUser.copyFromUser(user);
+              currentUser.save();
+            }
+          }
+          else if (change.objectType == 'book') {
+            if (change.operationType == OperationType.delete) {
+              DatabaseMgr().localMgr.deleteBook(change.objectId, addToQueue: false);
+            }
+            else {
+              Book book = await fetchBook(change.objectId);
+              Book? localBook = DatabaseMgr().localMgr.getBook(book.id);
+
+              if (localBook != null) {
+                localBook.copyFromBook(book);
+                localBook.save();
+              }
+              else {
+                DatabaseMgr().localMgr.addBook(book, addToQueue: false);
+              }
+            }
+          }
+          else if (change.objectType == 'recipe') {
+            if (change.operationType == OperationType.delete) {
+              DatabaseMgr().localMgr.deleteRecipe(change.objectId, addToQueue: false);
+            }
+            else {
+              Recipe recipe = await fetchRecipe(change.objectId);
+              Recipe? localRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
+
+              if (localRecipe != null) {
+                localRecipe.copyFromRecipe(recipe);
+                localRecipe.save();
+              }
+              else {
+                DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+              }
+
+              await removeExtraImages(recipe);
+              await downloadMissingImages(recipe);
+            }
+          }
+
+          // add change to local list
+          DatabaseMgr().localMgr.addChange(change.changeId);
+        }
+        return true;
       }
+      print("Change not found");
     }
     return false;
   }
@@ -518,7 +518,7 @@ class MongoConnector {
 
       Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       if (data.keys.contains('books') && data.keys.contains('recipes') && data.keys.contains('lastChange')) {
-        DatabaseMgr().localMgr.clearBooks();
+        await DatabaseMgr().localMgr.clearBooks();
         DatabaseMgr().localMgr.clearRecipes();
 
         List<dynamic> bookIds = data['books'];
@@ -532,8 +532,8 @@ class MongoConnector {
           Recipe? recipe = await fetchRecipe(recipeId);
           DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
           
-          removeExtraImages(recipe);
-          downloadMissingImages(recipe);
+          await removeExtraImages(recipe);
+          await downloadMissingImages(recipe);
         }
 
         String? lastChange = data['lastChange'];
@@ -590,7 +590,7 @@ class MongoConnector {
             'objectId': userUpdate.id
           });
           
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)) {
             DatabaseMgr().localMgr.addChange(change);
             
             DatabaseMgr().localMgr.updateUserLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
@@ -654,7 +654,7 @@ class MongoConnector {
             'objectId': book.id
           });
           
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)) {
             DatabaseMgr().localMgr.addChange(change);
             return OperationResultAction.delete;
           }
@@ -695,7 +695,7 @@ class MongoConnector {
             'objectId': bookUpdate.id
           });
           
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)){
             DatabaseMgr().localMgr.addChange(change);
 
             DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
@@ -732,7 +732,7 @@ class MongoConnector {
             'objectId': bookId
           });
           
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)){
             DatabaseMgr().localMgr.addChange(change);
 
             DatabaseMgr().localMgr.updateBookLastUpdate(bookId, DateTime.parse(data['dateTime']));
@@ -798,7 +798,7 @@ class MongoConnector {
             'objectId': book.id
           });
 
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)){
               DatabaseMgr().localMgr.addChange(change);
               return OperationResultAction.delete;
           }
@@ -832,7 +832,7 @@ class MongoConnector {
   Future<Recipe> fetchRecipe(String recipeId) async {
     final response = await _secureGetRequest('/recipes/get/$recipeId');
 
-    if (response != null && response.statusCode == 200 && response.body != null) {
+    if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       return Recipe.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
@@ -894,7 +894,7 @@ class MongoConnector {
             'objectId': bookId
           });
           
-          if (bool.parse(changeRecipeResponse.body) && bool.parse(changeBookResponse.body)){
+          if (changeRecipeResponse != null && bool.parse(changeRecipeResponse.body) && changeBookResponse != null && bool.parse(changeBookResponse.body)){
             DatabaseMgr().localMgr.addChange(changeRecipe);
             DatabaseMgr().localMgr.addChange(changeBook);
             return OperationResultAction.delete;
@@ -938,7 +938,7 @@ class MongoConnector {
             'objectId': recipeUpdate.id
           });
           
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)){
             DatabaseMgr().localMgr.addChange(change);
 
             DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
@@ -982,7 +982,7 @@ class MongoConnector {
             'objectId': recipe.id
           });
 
-          if (bool.parse(changeResponse.body)){
+          if (changeResponse != null && bool.parse(changeResponse.body)){
               DatabaseMgr().localMgr.addChange(change);
               return OperationResultAction.delete;
           }
@@ -1001,22 +1001,27 @@ class MongoConnector {
   }
 
   Future<OperationResultAction> uploadImage(RecipeImage recipeImage) async {
+    print("Uploading image ${recipeImage.imageId} for recipe ${recipeImage.recipeId}");
     final response = await _securePostMultipartRequest('/image/upload',
       File(recipeImage.path),
       [MapEntry('recipeId', recipeImage.recipeId), MapEntry('imageId', recipeImage.imageId)]
     );
 
     if (response != null && response.statusCode == 200) {
+      print("HTTP RESPONSE RECEIVED");
       try {
-        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
+        dynamic data = jsonDecode(utf8.decode(await response.stream.toBytes()));
 
         if (data == null) {
+          print("DATA NULL");
           return OperationResultAction.requeue;
         }
 
         if (data['result']) {
+          print("UPLOAD SUCCESS");
           return OperationResultAction.delete;
         }
+        print("UPLOAD FAILED with status code ${data['statusCode']}");
         return OperationResultAction.getActionFromStatusCode(data['statusCode']);
       }
       catch (e) {

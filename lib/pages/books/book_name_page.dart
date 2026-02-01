@@ -46,7 +46,7 @@ class _BookNamePageState extends State<BookNamePage> {
     void submit() async {
       if (_controller.text != "" && _controller.text != currentName) {
         if (isBookCreation) {
-          String? newBookId = DatabaseMgr().localMgr.addNewBook(_controller.text);
+          String? newBookId = await DatabaseMgr().localMgr.addNewBook(_controller.text);
           if (newBookId != null) {
             Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
             Navigator.pop(context, newBook);

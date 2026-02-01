@@ -305,9 +305,8 @@ class _RecipePageState extends State<RecipePage> {
                     },
                 ),
                 WidgetSelectionOverlay(
-                  key: ValueKey('recipe_ingredients_overlay_${recipe.id}'),
                   widget: RecipeIngredientsWidget(
-                    key: ValueKey('recipe_ingredients_${recipe.id}'),
+                    key: UniqueKey(),
                     ingredients: recipe.recipeIngredients,
                     defaultQuantity: recipe.quantity,
                     quantityType: recipe.quantityType,
@@ -330,7 +329,7 @@ class _RecipePageState extends State<RecipePage> {
                         if (tmpRecipe != null) {
                           setState(() {
                             recipe = tmpRecipe;
-                            print("${recipe.quantityType}, ${recipe.quantity})");
+                            print("Update recipe: ${recipe.quantityType}, ${recipe.quantity})");
                           });
                         }
                       }

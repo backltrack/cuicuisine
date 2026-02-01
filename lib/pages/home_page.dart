@@ -265,7 +265,32 @@ class _HomePageState extends State<HomePage> {
     if (DatabaseMgr().isOnline) {
       await DatabaseMgr().synchronization.sync();
     }
-    setState(() {});
+    // reload books
+    books = DatabaseMgr().localMgr.getUserBooks();
+    // set selected book
+    if (selectedBook != null) {
+      Book? foundBook = findBookFromId(selectedBook!.id);
+      if (foundBook != null) {
+        selectedBook = foundBook;
+      } else {
+        // current book has been deleted
+        if (books!.isNotEmpty) {
+          print('set first as default');
+          selectedBook = books![0];
+        } else {
+          print('no more book');
+          selectedBook = null;
+          return;
+        }
+      }
+      // reload recipes
+      recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+      await DatabaseMgr().localMgr.updateTagsAndIngredients();
+      // get user access
+      userAccess = DatabaseMgr().localMgr.getUserAccess(selectedBook!.id) ?? AccessLevel.read;
+
+      setState(() {});
+    }
   }
 
   @override
@@ -308,7 +333,6 @@ class _HomePageState extends State<HomePage> {
             title: Text(S.of(context).book_choice),
           ):
           RefreshIndicator(
-            
             onRefresh: refreshData,
             child: Builder(
               builder: (context) {
@@ -422,7 +446,7 @@ class _HomePageState extends State<HomePage> {
 
         floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read) ? null : FloatingActionButton(
           onPressed: () async {
-            String newRecipeId = DatabaseMgr().localMgr.addNewRecipe(name: "", bookId: selectedBook!.id);
+            String newRecipeId = await DatabaseMgr().localMgr.addNewRecipe(name: "", bookId: selectedBook!.id);
             // Edit recipe
             await Navigator.of(context).pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
               'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),

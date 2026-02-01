@@ -32,6 +32,7 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print("Building quantity selector widget with quantity $_quantity and quantity type $_quantityType");
     return Container(
         height: 35,
         //width: double.infinity,

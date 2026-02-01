@@ -23,7 +23,7 @@ class Synchronization {
       // Queue document more recent -> push
       // server document more recent -> conflict
     
-    Operation? ope = _localMgr.getFirstOperation();
+    Operation? ope = await _localMgr.getFirstOperation();
     print("operation queue length: ${_localMgr.getQueueLength()}");
     List<Operation> failedOperations = [];
 
@@ -42,7 +42,7 @@ class Synchronization {
       }
 
       print("operation queue length: ${_localMgr.getQueueLength()}");
-      ope = _localMgr.getFirstOperation();
+      ope = await _localMgr.getFirstOperation();
       print("operation queue length: ${_localMgr.getQueueLength()}");
     }
 
@@ -60,6 +60,10 @@ class Synchronization {
         if (ope.object is BookUpdate && ope.type == OperationType.update) {
           BookUpdate update = ope.object as BookUpdate;
           print("${update.toJson()}");
+        }
+        if (ope.object is RecipeImage && ope.type == OperationType.create) {
+          RecipeImage update = ope.object as RecipeImage;
+          print(update.path);
         }
         _localMgr.addQueueOperation(type: ope.type, object: ope.object, pushAfter: false);
       }

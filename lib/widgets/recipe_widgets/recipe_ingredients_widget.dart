@@ -65,6 +65,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print("Building recipe ingredients widget with quantity $_quantity and quantity type ${widget.quantityType}");
 
     return locale == null ? const Center(child: CircularProgressIndicator()) :
     Container(
@@ -84,7 +85,6 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
           const SizedBox(height: 12),
           // persons selector
           QuantityEditorWidget(
-            key: const ValueKey('quantity_editor'),
             quantity: _quantity,
             multiplier: _multiplier,
             quantityType: widget.quantityType,

@@ -39,6 +39,7 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print("Building quantity editor widget with quantity $_quantity and quantity type $_quantityType");
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -46,7 +47,6 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
             ...[
               SizedBox(
                 child: QuantitySelectorWidget(
-                  key: const ValueKey('quantity_selector'),
                   quantity: _quantity,
                   quantityType: _quantityType,
                   isEdition: widget.isEdition,
