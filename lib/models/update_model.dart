@@ -14,17 +14,22 @@ class UserUpdate implements DatabaseObject {
   String? email;
   @HiveField(3)
   List<String>? favoriteRecipes;
+  @HiveField(4)
+  late DateTime requestDate;
 
   UserUpdate({
     required this.id,
     this.name,
     this.email,
     this.favoriteRecipes
-  });
+  }) {
+    requestDate = DateTime.now().toUtc();
+  }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {
-      'id': id
+      'id': id,
+      'requestDate': requestDate.toIso8601String()
     };
 
     if (name != null) {
@@ -57,6 +62,8 @@ class BookUpdate implements DatabaseObject {
   List<String>? bookIngredients;
   @HiveField(6)
   List<String>? tags;
+  @HiveField(7)
+  late DateTime requestDate;
 
   BookUpdate({
     required this.id,
@@ -66,11 +73,14 @@ class BookUpdate implements DatabaseObject {
     this.access,
     this.bookIngredients,
     this.tags
-  });
+  }) {
+    requestDate = DateTime.now().toUtc();
+  }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {
-      'id': id
+      'id': id,
+      'requestDate': requestDate.toIso8601String()
     };
 
     if (name != null) {
@@ -120,6 +130,8 @@ class RecipeUpdate implements DatabaseObject {
   List<RecipeStep>? steps;
   @HiveField(11)
   List<Variant>? variants;
+  @HiveField(12)
+  late DateTime requestDate;
 
   RecipeUpdate({
     required this.id,
@@ -134,11 +146,14 @@ class RecipeUpdate implements DatabaseObject {
     this.recipeIngredients,
     this.steps,
     this.variants
-  });
+  }) {
+    requestDate = DateTime.now().toUtc();
+  }
 
   Map<String,dynamic> toJson() {
     Map<String,dynamic> json = {
-      'id': id
+      'id': id,
+      'requestDate': requestDate.toIso8601String()
     };
 
     if (name != null && name != "") {

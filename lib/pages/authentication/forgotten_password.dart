@@ -1,10 +1,10 @@
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/widgets/core_widgets/password_check_info.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/social_button.dart';
 
 import '../../generated/l10n.dart';
@@ -62,10 +62,10 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
                   setState(() {
                     isSent = true;
                   });
-                  Fluttertoast.showToast(msg: S.of(context).auth_renewal_email_sent);
+                  ToastNotifier().showInfo(S.of(context).auth_renewal_email_sent);
                 }
                 else {
-                  Fluttertoast.showToast(msg: result.reason);
+                  ToastNotifier().showError(result.reason);
                 }
 
               } : null,
@@ -110,7 +110,7 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
                       Navigator.pop(context);
                     }
                     else {
-                      Fluttertoast.showToast(msg: result.reason);
+                      ToastNotifier().showError(result.reason);
                     }
                   } : null,
                   child: Text(S.of(context).change_password),

@@ -105,7 +105,7 @@ Map<String,List<String>> defaultIngredients = {
 //   persons: 2,
 //   recipeIngredients: [],
 //   steps: [RecipeStep(step: S.current.new_recipe_step)],
-//   creationDate: DateTime.now()
+//   creationDate: DateTime.now().toUtc()
 // );
 
 // Recipe tutorialRecipe = Recipe(
@@ -131,5 +131,5 @@ Map<String,List<String>> defaultIngredients = {
 //     RecipeStep(step: S.current.tutorial_recipe_step2),
 //     RecipeStep(step: S.current.tutorial_recipe_step3),
 //   ],
-//   creationDate: DateTime.now()
+//   creationDate: DateTime.now().toUtc()
 // );

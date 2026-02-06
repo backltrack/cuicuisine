@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
 import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/core_widgets/animated_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
@@ -59,7 +59,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
       }
       else {
-        Fluttertoast.showToast(msg: S.of(context).connexion_needed);
+        ToastNotifier().showWarning(S.of(context).connexion_needed);
       }
   }
 
@@ -94,7 +94,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
           tryOfflineConnexion();
         } 
         else {
-          Fluttertoast.showToast(msg: S.of(context).offline_refused_toast);
+          ToastNotifier().showWarning(S.of(context).offline_refused_toast);
         }
       }
     }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/password_check_info.dart';
 import '../../widgets/core_widgets/social_button.dart';
@@ -65,7 +65,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                   Navigator.pop(context);
                 }
                 else {
-                  Fluttertoast.showToast(msg: S.of(context).change_password_issue);
+                  ToastNotifier().showError(S.of(context).change_password_issue);
                 }
               } : null,
               // email sign in button

@@ -1,10 +1,10 @@
 import 'package:cuicuisine/widgets/core_widgets/password_check_info.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/social_button.dart';
 
@@ -144,13 +144,13 @@ class _EmailRegistrationState extends State<EmailRegistration> {
                   },
                   onFailure: (String reason) {
                     if (reason == "Email already exists") {
-                      Fluttertoast.showToast(msg: "An account using this email address already exists.");
+                      ToastNotifier().showInfo("An account using this email address already exists.");
                     }
                     if (reason == "Incorrect password") {
-                      Fluttertoast.showToast(msg: "Password doesn't satisfy security contraints");
+                      ToastNotifier().showError("Password doesn't satisfy security contraints");
                     }
                     else {
-                      Fluttertoast.showToast(msg: "Registration failed, please try later.");
+                      ToastNotifier().showError("Registration failed, please try later.");
                     }
                   }
                 );

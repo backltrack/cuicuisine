@@ -6,6 +6,7 @@ import 'package:cuicuisine/database/file_storage.dart';
 import 'package:cuicuisine/models/sync_model.dart';
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:cuicuisine/security/rsa.dart';
+import 'package:cuicuisine/utilities/toast_notifier.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -215,16 +216,18 @@ class MongoConnector {
         headers: {
           'accept': 'application/json'
       });
-      
-      DatabaseMgr().isOnline = response.body == "true";
-      return response.body == "true";
-    } on SocketException catch (e) {
+
+      bool wasOnline = DatabaseMgr().isOnline;
+      bool result = bool.parse(response.body);
+      if (wasOnline != result) {
+        DatabaseMgr().isOnline = result;
+        ToastNotifier().showInfo(result ? "Back online" : "You are offline");
+      }
+      return result;
+    } catch (e) {
       print(e);
       DatabaseMgr().isOnline = false;
-      return false;
-    } on TimeoutException catch (e) {
-      print(e);
-      DatabaseMgr().isOnline = false;
+      ToastNotifier().showError("You are offline");
       return false;
     }
   }
@@ -485,7 +488,11 @@ class MongoConnector {
               DatabaseMgr().localMgr.deleteRecipe(change.objectId, addToQueue: false);
             }
             else {
-              Recipe recipe = await fetchRecipe(change.objectId);
+              Recipe? recipe = await fetchRecipe(change.objectId);
+              if (recipe == null) {
+                print("Failed to fetch recipe with id ${change.objectId}");
+                return false;
+              }
               Recipe? localRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
 
               if (localRecipe != null) {
@@ -530,10 +537,15 @@ class MongoConnector {
         List<dynamic> recipeIds = data['recipes'];
         for (String recipeId in recipeIds) {
           Recipe? recipe = await fetchRecipe(recipeId);
-          DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
-          
-          await removeExtraImages(recipe);
-          await downloadMissingImages(recipe);
+          if (recipe != null) {
+            DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+            
+            await removeExtraImages(recipe);
+            await downloadMissingImages(recipe);
+          }
+          else {
+            print("Failed to fetch recipe with id $recipeId");
+          }
         }
 
         String? lastChange = data['lastChange'];
@@ -565,7 +577,7 @@ class MongoConnector {
     }
   }
 
-  Future<OperationResultAction> updateUser(UserUpdate userUpdate) async {
+  Future<OperationResult> updateUser(UserUpdate userUpdate) async {
     final response = await _securePostJsonRequest('/users/me/update', 
       userUpdate.toJson()
     );
@@ -577,7 +589,7 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
 
         if (data['result']) {
@@ -594,17 +606,18 @@ class MongoConnector {
             DatabaseMgr().localMgr.addChange(change);
             
             DatabaseMgr().localMgr.updateUserLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
-            return OperationResultAction.delete;
+            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
-        return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
 
@@ -624,7 +637,7 @@ class MongoConnector {
     } 
   }
 
-  Future<OperationResultAction> createBook(Book book) async {
+  Future<OperationResult> createBook(Book book) async {
     final response = await _securePutRequest('/books/create', 
       {
         'id': book.id,
@@ -639,7 +652,7 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         print(data);
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
         if (data['result']) {
 
@@ -656,21 +669,23 @@ class MongoConnector {
           
           if (changeResponse != null && bool.parse(changeResponse.body)) {
             DatabaseMgr().localMgr.addChange(change);
-            return OperationResultAction.delete;
+            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
-        return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+        print("book creation FAILED with status code ${data['status_code']}");
+        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
-  Future<OperationResultAction> updateBook(BookUpdate bookUpdate) async {
+  Future<OperationResult> updateBook(BookUpdate bookUpdate) async {
     final response = await _securePostJsonRequest('/books/update', 
       bookUpdate.toJson()
     );
@@ -682,7 +697,7 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
 
         if (data['result']) {
@@ -699,18 +714,20 @@ class MongoConnector {
             DatabaseMgr().localMgr.addChange(change);
 
             DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
-            return OperationResultAction.delete;
+            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
-        return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+        print("Book update FAILED with status code ${data['status_code']}");
+        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<bool> revokeUserFromBook(String bookId) async {
@@ -775,7 +792,7 @@ class MongoConnector {
     return null;
   }
 
-  Future<OperationResultAction> deleteBook(Book book) async {
+  Future<OperationResult> deleteBook(Book book) async {
     final response = await _secureDeleteRequest('/books/delete',
       book.id
     );
@@ -786,7 +803,7 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
         if (data['result']) {
           String change = DatabaseMgr().localMgr.createChange();
@@ -800,23 +817,25 @@ class MongoConnector {
 
           if (changeResponse != null && bool.parse(changeResponse.body)){
               DatabaseMgr().localMgr.addChange(change);
-              return OperationResultAction.delete;
+              return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
-        return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<Map<String, String>> getBookUserNames(String bookId) async {
     final response = await _secureGetRequest('/books/get_users/$bookId');
-
+    print("Get book user names response:");
+    print(response!=null ? response.statusCode : "no response");
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
@@ -829,21 +848,26 @@ class MongoConnector {
 
   // Recipe
 
-  Future<Recipe> fetchRecipe(String recipeId) async {
+  Future<Recipe?> fetchRecipe(String recipeId) async {
     final response = await _secureGetRequest('/recipes/get/$recipeId');
 
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      return Recipe.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      try {
+        return Recipe.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+      }
+      catch (e) {
+        print(e);
+        return null;
+      }
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to fetch recipe');
+      print("Failed to fetch recipe with status code ${response?.statusCode}");
+      return null;
     } 
   }
 
-  Future<OperationResultAction> createRecipe(Recipe recipe) async {
+  Future<OperationResult> createRecipe(Recipe recipe) async {
     String bookId = DatabaseMgr().localMgr.loadCurrentBook()!;
 
     final response = await _securePutRequest('/recipes/create', 
@@ -861,7 +885,7 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
 
         if (data['result']) {
@@ -897,23 +921,25 @@ class MongoConnector {
           if (changeRecipeResponse != null && bool.parse(changeRecipeResponse.body) && changeBookResponse != null && bool.parse(changeBookResponse.body)){
             DatabaseMgr().localMgr.addChange(changeRecipe);
             DatabaseMgr().localMgr.addChange(changeBook);
-            return OperationResultAction.delete;
+            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
         else {
-          return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+          print("Recipe creation FAILED with status code ${data['status_code']}");
+          UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+          return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
         }
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
-  Future<OperationResultAction> updateRecipe(RecipeUpdate recipeUpdate) async {
+  Future<OperationResult> updateRecipe(RecipeUpdate recipeUpdate) async {
     final response = await _securePostJsonRequest('/recipes/update', 
       recipeUpdate.toJson()
     );
@@ -923,9 +949,10 @@ class MongoConnector {
       // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
+        print(data);
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
         
         if (data['result']) {
@@ -940,25 +967,26 @@ class MongoConnector {
           
           if (changeResponse != null && bool.parse(changeResponse.body)){
             DatabaseMgr().localMgr.addChange(change);
-
             DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
-            return OperationResultAction.delete;
+            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
         else {
-          return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+          print("Recipe update FAILED with status code ${data['status_code']}");
+          UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+          return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
         }
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
-  Future<OperationResultAction> deleteRecipe(Recipe recipe) async {
+  Future<OperationResult> deleteRecipe(Recipe recipe) async {
     final response = await _secureDeleteRequest('/recipes/delete',
       recipe.id
     );
@@ -969,7 +997,7 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
         
         if (data['result']) {
@@ -984,23 +1012,25 @@ class MongoConnector {
 
           if (changeResponse != null && bool.parse(changeResponse.body)){
               DatabaseMgr().localMgr.addChange(change);
-              return OperationResultAction.delete;
+              return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
           }
         }
         else {
-          return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+          print("Recipe deletion FAILED with status code ${data['status_code']}");
+          UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+          return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
         }
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
-  Future<OperationResultAction> uploadImage(RecipeImage recipeImage) async {
+  Future<OperationResult> uploadImage(RecipeImage recipeImage) async {
     print("Uploading image ${recipeImage.imageId} for recipe ${recipeImage.recipeId}");
     final response = await _securePostMultipartRequest('/image/upload',
       File(recipeImage.path),
@@ -1014,23 +1044,24 @@ class MongoConnector {
 
         if (data == null) {
           print("DATA NULL");
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
 
         if (data['result']) {
           print("UPLOAD SUCCESS");
-          return OperationResultAction.delete;
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        print("UPLOAD FAILED with status code ${data['statusCode']}");
-        return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+        print("UPLOAD FAILED with status code ${data['status_code']}");
+        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<MultipartFile?> downloadImage(String recipeId, String imageId) async {
@@ -1045,7 +1076,7 @@ class MongoConnector {
     return null;
   }
 
-  Future<OperationResultAction> deleteImage(String recipeId, String imageId) async {
+  Future<OperationResult> deleteImage(String recipeId, String imageId) async {
     final response = await _secureDeleteRequest('/image/delete', {
       'recipeId': recipeId,
       'imageId': imageId
@@ -1056,21 +1087,22 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
 
         if (data == null) {
-          return OperationResultAction.requeue;
+          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
         }
 
         if (data['result']) {
-          return OperationResultAction.delete;
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        return OperationResultAction.getActionFromStatusCode(data['statusCode']);
+        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
+        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
       }
       catch (e) {
         print(e);
-        return OperationResultAction.requeue;
+        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<bool> downloadMissingImages(Recipe recipe) async {

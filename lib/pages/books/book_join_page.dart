@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
 import '../../models/data_model.dart';
@@ -172,15 +172,15 @@ class _BookJoinPageState extends State<BookJoinPage> {
                   Navigator.pop(context, newBook);
                 }
                 else {
-                  Fluttertoast.showToast(msg: S.of(context).connexion_needed2, gravity: ToastGravity.CENTER);
+                  ToastNotifier().showError(S.of(context).connexion_needed2);
                 }
               }
               catch (e) {
-                Fluttertoast.showToast(msg: S.of(context).connexion_needed2, gravity: ToastGravity.CENTER);
+                ToastNotifier().showError(S.of(context).connexion_needed2);
               }
             }
             else {
-              Fluttertoast.showToast(msg: S.of(context).book_already_accessible, gravity: ToastGravity.CENTER);
+              ToastNotifier().showInfo(S.of(context).book_already_accessible);
             }
 
           } else {

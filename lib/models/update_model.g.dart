@@ -21,13 +21,13 @@ class UserUpdateAdapter extends TypeAdapter<UserUpdate> {
       name: fields[1] as String?,
       email: fields[2] as String?,
       favoriteRecipes: (fields[3] as List?)?.cast<String>(),
-    );
+    )..requestDate = fields[4] as DateTime;
   }
 
   @override
   void write(BinaryWriter writer, UserUpdate obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +35,9 @@ class UserUpdateAdapter extends TypeAdapter<UserUpdate> {
       ..writeByte(2)
       ..write(obj.email)
       ..writeByte(3)
-      ..write(obj.favoriteRecipes);
+      ..write(obj.favoriteRecipes)
+      ..writeByte(4)
+      ..write(obj.requestDate);
   }
 
   @override
@@ -67,13 +69,13 @@ class BookUpdateAdapter extends TypeAdapter<BookUpdate> {
       access: (fields[4] as Map?)?.cast<String, AccessLevel>(),
       bookIngredients: (fields[5] as List?)?.cast<String>(),
       tags: (fields[6] as List?)?.cast<String>(),
-    );
+    )..requestDate = fields[7] as DateTime;
   }
 
   @override
   void write(BinaryWriter writer, BookUpdate obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -87,7 +89,9 @@ class BookUpdateAdapter extends TypeAdapter<BookUpdate> {
       ..writeByte(5)
       ..write(obj.bookIngredients)
       ..writeByte(6)
-      ..write(obj.tags);
+      ..write(obj.tags)
+      ..writeByte(7)
+      ..write(obj.requestDate);
   }
 
   @override
@@ -124,13 +128,13 @@ class RecipeUpdateAdapter extends TypeAdapter<RecipeUpdate> {
       recipeIngredients: (fields[9] as List?)?.cast<Ingredient>(),
       steps: (fields[10] as List?)?.cast<RecipeStep>(),
       variants: (fields[11] as List?)?.cast<Variant>(),
-    );
+    )..requestDate = fields[12] as DateTime;
   }
 
   @override
   void write(BinaryWriter writer, RecipeUpdate obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -154,7 +158,9 @@ class RecipeUpdateAdapter extends TypeAdapter<RecipeUpdate> {
       ..writeByte(10)
       ..write(obj.steps)
       ..writeByte(11)
-      ..write(obj.variants);
+      ..write(obj.variants)
+      ..writeByte(12)
+      ..write(obj.requestDate);
   }
 
   @override

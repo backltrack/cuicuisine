@@ -1,8 +1,8 @@
 import 'package:cuicuisine/widgets/core_widgets/password_check_info.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../database/database_mgr.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/social_button.dart';
 
@@ -57,10 +57,10 @@ class _EmailConnexionState extends State<EmailConnexion> {
           setState(() {
             showForgottenButton = true;
           });
-          Fluttertoast.showToast(msg: "Invalid email, do you want to register?");
+          ToastNotifier().showInfo("Invalid email, do you want to register?");
         },
         onInvalidPassword: () {
-          Fluttertoast.showToast(msg: "Invalid passward, try again!");
+          ToastNotifier().showWarning("Invalid password, try again!");
         },
         onSuccess: (AppUser user) async {
           await DatabaseMgr().synchronization.sync();

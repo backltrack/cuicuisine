@@ -1,3 +1,4 @@
+import '../utilities/toast_notifier.dart';
 import './database_mgr.dart';
 import '../models/data_model.dart';
 import '../models/update_model.dart';
@@ -27,23 +28,55 @@ class Synchronization {
     print("operation queue length: ${_localMgr.getQueueLength()}");
     List<Operation> failedOperations = [];
 
+    int successCount = 0;
+    int notAuthorizedCount = 0;
+    int notFoundCount = 0;
+    int conflictCount = 0;
+
     while (ope != null) {
-      OperationResultAction operationResultAction = OperationResultAction.requeue;
+      OperationResult operationResult = OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+
       switch (ope.type) {
         case OperationType.create:
-          operationResultAction = await createObject(ope.object);
+          operationResult = await createObject(ope.object);
         case OperationType.update:
-          operationResultAction = await updateObject(ope.object);
+          operationResult = await updateObject(ope.object);
         case OperationType.delete:
-          operationResultAction = await deleteObject(ope.object);
+          operationResult = await deleteObject(ope.object);
       }
-      if (operationResultAction == OperationResultAction.requeue) {
+      print("${ope.id}: ${operationResult.action} ${operationResult.status}");
+      if (operationResult.action == OperationResultAction.requeue) {
         failedOperations.add(ope);
       }
+      else {
+        switch (operationResult.status) {
+          case UpdateStatus.success:
+            successCount++;
+          case UpdateStatus.notAuthorized:
+            notAuthorizedCount++;
+          case UpdateStatus.notFound:
+            notFoundCount++;
+          case UpdateStatus.conflict:
+            conflictCount++;
+          case UpdateStatus.error:
+            // should never happen
+            throw UnimplementedError();
+        }
+      }
 
-      print("operation queue length: ${_localMgr.getQueueLength()}");
       ope = await _localMgr.getFirstOperation();
-      print("operation queue length: ${_localMgr.getQueueLength()}");
+    }
+    if (successCount > 0) {
+      ToastNotifier().showSuccess("$successCount operations pushed");
+    }
+    if (notAuthorizedCount > 0) {
+      ToastNotifier().showError("$notAuthorizedCount operations failed: not authorized");
+    }
+    if (notFoundCount > 0) {
+      ToastNotifier().showError("$notFoundCount operations failed: not found");
+    }
+    if (conflictCount > 0) {
+      ToastNotifier().showError("$conflictCount operations failed: conflict");
     }
 
     if (failedOperations.isEmpty) {
@@ -67,6 +100,8 @@ class Synchronization {
         }
         _localMgr.addQueueOperation(type: ope.type, object: ope.object, pushAfter: false);
       }
+      ToastNotifier().showWarning("${failedOperations.length} operations failed to push, re-queued");
+
       return false;
     }
   }
@@ -92,15 +127,19 @@ class Synchronization {
     // send all local document type, id, last update
     // server sends back all new or updated documents
     // refresh UI
+    bool isOnline = await DatabaseMgr().remoteMgr.testConnexion();
+    if (!isOnline) {
+      return false;
+    }
+
     await fetchNew();
 
-    //push queue
     await pushQueue();
 
     return true;
   }
 
-  Future<OperationResultAction> createObject(object) async {
+  Future<OperationResult> createObject(object) async {
     if (object is Book) {
       return await _remoteMgr.createBook(object);
     }
@@ -111,10 +150,10 @@ class Synchronization {
       return await _remoteMgr.uploadImage(object);
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
-  Future<OperationResultAction> updateObject(object) async {
+  Future<OperationResult> updateObject(object) async {
     if (object is UserUpdate) {
       return await _remoteMgr.updateUser(object);
     }
@@ -125,10 +164,10 @@ class Synchronization {
       return await _remoteMgr.updateRecipe(object);
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
-  Future<OperationResultAction> deleteObject(object) async {
+  Future<OperationResult> deleteObject(object) async {
     if (object is AppUser) {
 
     }
@@ -142,6 +181,6 @@ class Synchronization {
       return await _remoteMgr.deleteImage(object.recipeId, object.imageId);
     }
 
-    return OperationResultAction.requeue;
+    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 }

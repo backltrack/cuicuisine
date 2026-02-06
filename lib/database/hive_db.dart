@@ -590,7 +590,7 @@ class HiveConnector {
   }
 
   Future<String> addNewRecipe({String name="", required String bookId}) async {
-    Recipe recipe = Recipe(id: ObjectId().hexString, name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [], steps: [], creationDate: DateTime.now());
+    Recipe recipe = Recipe(id: ObjectId().hexString, name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [], steps: [], creationDate: DateTime.now().toUtc());
     await addRecipe(recipe);
 
     Book? book = getBook(bookId);

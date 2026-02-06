@@ -80,6 +80,10 @@ ThemeCollection setThemeCollection(context) {
         ),
         popupMenuTheme: const PopupMenuThemeData(
           color: DarkColors.tileBackgroundColor
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: DarkColors.tileBackgroundColor,
+          titleTextStyle: const TextStyle(color: DarkColors.writingColor, fontSize: 20)
         )
       ),
       AppThemes.Light: ThemeData(
@@ -141,6 +145,16 @@ ThemeCollection setThemeCollection(context) {
             side: const BorderSide(width: 1, color: LightColors.writingColor),
             textStyle: const TextStyle(color: LightColors.writingColor),
           ),
+        ),
+        drawerTheme: DrawerThemeData(
+          backgroundColor: LightColors.backgroundColor
+        ),
+        popupMenuTheme: PopupMenuThemeData(
+          color: LightColors.tileBackgroundColor
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: LightColors.tileBackgroundColor,
+          titleTextStyle: const TextStyle(color: LightColors.writingColor, fontSize: 20)
         )
       )
     },

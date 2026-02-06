@@ -26,7 +26,7 @@ class AppUser extends HiveObject implements DatabaseObject {
     this.favoriteRecipes = const [],
     this.lastUpdate
   }) {
-    lastUpdate ??= DateTime.now();
+    lastUpdate ??= DateTime.now().toUtc();
   }
 
   Map<String, dynamic> toJson() {
@@ -94,7 +94,7 @@ class Book extends HiveObject implements DatabaseObject {
     this.bookIngredients = const [],
     this.lastUpdate
   }) {
-    lastUpdate ??= DateTime.now();
+    lastUpdate ??= DateTime.now().toUtc();
   }
 
   Map<String,String> toJson() {
@@ -207,7 +207,7 @@ class Recipe extends HiveObject implements DatabaseObject {
     this.lastUpdate,
     this.isDirty=true
   }) {
-    lastUpdate ??= DateTime.now();
+    lastUpdate ??= DateTime.now().toUtc();
   }
 
   factory Recipe.fromJson(Map<String, dynamic> data) {

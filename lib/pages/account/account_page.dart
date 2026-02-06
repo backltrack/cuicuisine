@@ -1,13 +1,13 @@
 import 'package:cuicuisine/models/data_model.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../database/database_mgr.dart';
 import '../../themes/theme_mgr.dart';
 
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
+import '../../utilities/toast_notifier.dart';
 import 'remove_account.dart';
 
 class AccountPage extends StatefulWidget {
@@ -65,7 +65,7 @@ class _AccountPageState extends State<AccountPage> {
                   onPressed: DatabaseMgr().isOnline ? () {
                     Navigator.pushNamed(context, UpdatePassword.route);
                   } : () {
-                    Fluttertoast.showToast(msg: S.of(context).connexion_needed2);
+                    ToastNotifier().showWarning(S.of(context).connexion_needed2);
                   },
                   icon: const FaIcon(FontAwesomeIcons.pen)
                 )
@@ -83,8 +83,8 @@ class _AccountPageState extends State<AccountPage> {
               onTap: DatabaseMgr().isOnline ? () {
                 Navigator.pushNamed(context, RemoveAccountPage.route);
               } : () {
-              Fluttertoast.showToast(msg: S.of(context).connexion_needed2);
-            }
+                ToastNotifier().showWarning(S.of(context).connexion_needed2);
+              }
           )
         ]
       )

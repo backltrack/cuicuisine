@@ -4,25 +4,60 @@ import 'data_model.dart';
 
   part 'sync_model.g.dart';
 
+enum UpdateStatus {
+  success,
+  notAuthorized,
+  notFound,
+  conflict,
+  error;
+
+  static UpdateStatus getStatusFromCode(int code) {
+    switch (code) {
+      case 0:
+        return UpdateStatus.success;
+      case 1:
+        return UpdateStatus.notAuthorized;
+      case 2:
+        return UpdateStatus.notFound;
+      case 3:
+        return UpdateStatus.conflict;
+      default:
+        return UpdateStatus.error;
+    }
+  }
+}
+
 enum OperationResultAction {
   requeue,
   delete;
   
-  static getActionFromStatusCode(int statusCode) {
-    print("Getting action from status code: $statusCode");
-    switch (statusCode) {
-      case 403:
+  static getActionFromUpdateStatus(UpdateStatus status) {
+    print("Getting action from status: $status");
+    switch (status) {
+      case UpdateStatus.success:
+        // delete operation because it was successful
         return delete;
-      case 404:
+      case UpdateStatus.notAuthorized:
+        // delete operation because it cannot be performed
         return delete;
-      case 409:
+      case UpdateStatus.notFound:
+        // delete operation because it cannot be performed
         return delete;
-      case 500:
-        return requeue;
-      default:
+      case UpdateStatus.conflict:
+        // delete operation because it cannot be performed
+        return delete;
+      case UpdateStatus.error:
+        // requeue operation because it might work later
         return requeue;
     }
   }
+}
+
+class OperationResult {
+  OperationResultAction action;
+  UpdateStatus status;
+
+  OperationResult({required this.action, required this.status});
 }
 
 @HiveType(typeId: 12)

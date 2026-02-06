@@ -35,6 +35,9 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
       // build is ready to render
       isReady = true;
       // build UI
+      print("Book settings page is ready to render");
+      print("User names: $userNames");
+      print("Is mounted: $mounted");
       if (mounted) setState(() {});
     }
   }

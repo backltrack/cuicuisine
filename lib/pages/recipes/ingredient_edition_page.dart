@@ -1,7 +1,6 @@
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/default_data.dart';
@@ -9,6 +8,7 @@ import '../../models/data_model.dart';
 import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/string_functions.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/my_type_ahead_text_field.dart';
 
@@ -50,11 +50,7 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
             setState(() {
               expansionTileState = true;
             });
-            Fluttertoast.showToast(
-                msg: S
-                    .of(context)
-                    .ingredient_density_updated
-            );
+            ToastNotifier().showInfo(S.of(context).ingredient_density_updated);
           }
         }
         // reinit if empty name
@@ -205,9 +201,7 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
                 double.tryParse(densityTextEditingController.text) ?? 0;
             Navigator.pop(context, ingredient);
           } else {
-            Fluttertoast.showToast(
-                msg: S.of(context).error_name_empty
-            );
+            ToastNotifier().showError(S.of(context).error_name_empty);
           }
         }
       ),
