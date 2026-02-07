@@ -52,7 +52,7 @@ void main() async {
   // ByteData data = await PlatformAssetBundle().load('assets/ca/cuicuisine.crt');
   // SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
 
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+  if (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS) {
     setWindowMinSize(const Size(400, 400));
     setWindowMaxSize(const Size(900, double.infinity));
     setWindowFrame(const Rect.fromLTWH(100, 100, 500, 800)); // <--- taille initiale ici
