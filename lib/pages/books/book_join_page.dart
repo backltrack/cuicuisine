@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:clipboard/clipboard.dart';
@@ -38,6 +39,13 @@ class _BookJoinPageState extends State<BookJoinPage> {
   @override
   void reassemble() {
     super.reassemble();
+    if (!kIsWeb) {
+      if (Platform.isAndroid) {
+        qrViewController!.pauseCamera();
+      } else if (Platform.isIOS) {
+        qrViewController!.resumeCamera();
+      }
+    }
     if (Platform.isAndroid) {
       qrViewController!.pauseCamera();
     } else if (Platform.isIOS) {
