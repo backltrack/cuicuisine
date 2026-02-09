@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import 'update_model.dart';
@@ -400,15 +401,19 @@ class Tag extends HiveObject {
   @HiveField(0)
   String name;
   @HiveField(1)
+  String category;
+  @HiveField(2)
   int index;
 
   Tag({
     required this.name,
+    required this.category,
     required this.index
   });
 
   Map<String, dynamic> toJson() => {
     'name': name,
+    'category': category,
     'index': index
   };
 }

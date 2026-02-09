@@ -670,6 +670,76 @@ class S {
     );
   }
 
+  /// `État de la synchronisation`
+  String get general_settings_synchronization {
+    return Intl.message(
+      'État de la synchronisation',
+      name: 'general_settings_synchronization',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `État de la synchronisation`
+  String get synchronization_status_title {
+    return Intl.message(
+      'État de la synchronisation',
+      name: 'synchronization_status_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `À jour`
+  String get synchronization_status_up_to_date {
+    return Intl.message(
+      'À jour',
+      name: 'synchronization_status_up_to_date',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Synchronisation nécessaire`
+  String get synchronization_status_need_sync {
+    return Intl.message(
+      'Synchronisation nécessaire',
+      name: 'synchronization_status_need_sync',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `État: `
+  String get synchronization_status {
+    return Intl.message(
+      'État: ',
+      name: 'synchronization_status',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `État inconnu`
+  String get synchronization_status_failure {
+    return Intl.message(
+      'État inconnu',
+      name: 'synchronization_status_failure',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `File d'attente: `
+  String get synchronization_queue {
+    return Intl.message(
+      'File d\'attente: ',
+      name: 'synchronization_queue',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Supprimer mon compte`
   String get remove_account {
     return Intl.message(

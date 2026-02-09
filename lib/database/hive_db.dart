@@ -888,7 +888,7 @@ class HiveConnector {
 
   // QUEUE //
 
-  Future<Operation?> getOperationFromId(String id) async {
+  Future<Operation?> popOperationFromId(String id) async {
     Operation? ope;
     int index = 0;
     for (Operation item in _queueOperationBox.values) {
@@ -928,7 +928,7 @@ class HiveConnector {
 
     if (operationId != null) {
       print(operationId);
-      Operation? ope = await getOperationFromId(operationId);
+      Operation? ope = await popOperationFromId(operationId);
       if (ope != null) {
         return ope;
       }
@@ -943,6 +943,7 @@ class HiveConnector {
   }
 
   int getOperationLength() {
+    //debug purpose: to check if there is a desync between queue and operations
     return _queueOperationBox.length;
   }
 

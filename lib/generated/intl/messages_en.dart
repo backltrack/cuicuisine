@@ -119,6 +119,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Server address"),
         "general_settings_signout":
             MessageLookupByLibrary.simpleMessage("Sign out"),
+        "general_settings_synchronization":
+            MessageLookupByLibrary.simpleMessage("Synchronization status"),
         "general_settings_theme":
             MessageLookupByLibrary.simpleMessage("Switch theme"),
         "images_edition_title":
@@ -246,6 +248,18 @@ class MessageLookup extends MessageLookupByLibrary {
         "steps_edition_title": MessageLookupByLibrary.simpleMessage("Steps"),
         "steps_widget_step": MessageLookupByLibrary.simpleMessage("Step"),
         "steps_widget_title": MessageLookupByLibrary.simpleMessage("Steps"),
+        "synchronization_queue":
+            MessageLookupByLibrary.simpleMessage("Queue: "),
+        "synchronization_status":
+            MessageLookupByLibrary.simpleMessage("Status: "),
+        "synchronization_status_failure":
+            MessageLookupByLibrary.simpleMessage("Unknown status"),
+        "synchronization_status_need_sync":
+            MessageLookupByLibrary.simpleMessage("Need synchronization"),
+        "synchronization_status_title":
+            MessageLookupByLibrary.simpleMessage("Synchronization status"),
+        "synchronization_status_up_to_date":
+            MessageLookupByLibrary.simpleMessage("Up to date"),
         "time_minutes_abr": MessageLookupByLibrary.simpleMessage("min"),
         "time_widget_cooking": MessageLookupByLibrary.simpleMessage("Cooking"),
         "time_widget_preparation":

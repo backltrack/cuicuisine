@@ -437,6 +437,17 @@ class MongoConnector {
     return false;
   }
 
+  Future<int?> getNewerChangesCount(String lastChange) async {
+    final response = await _secureGetRequest('/change/newer_count/$lastChange');
+    print(response!=null ? response.statusCode : "no response");
+    if (response != null && response.statusCode == 200) {
+      int? count = int.tryParse(utf8.decode(response.bodyBytes));
+      if (count != null) {
+        return count;
+      }
+    }
+    return null;
+  }
 
   Future<bool> getLatestChanges(String lastChange) async {
     final response = await _secureGetRequest('/change/get/$lastChange');

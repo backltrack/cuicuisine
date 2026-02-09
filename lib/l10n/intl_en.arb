@@ -77,6 +77,14 @@
   "general_settings_export": "Owned books export",
   "general_settings_import": "Books Import",
   "general_settings_server": "Server address",
+  "general_settings_synchronization": "Synchronization status",
+
+  "synchronization_status_title": "Synchronization status",
+  "synchronization_status_up_to_date": "Up to date",
+  "synchronization_status_need_sync": "Need synchronization",
+  "synchronization_queue": "Queue: ",
+  "synchronization_status_failure": "Unknown status",
+  "synchronization_status": "Status: ",
 
   "remove_account": "Remove my account",
   "remove_button": "Remove",

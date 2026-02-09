@@ -1,21 +1,23 @@
+import 'package:cuicuisine/database/synchronization.dart';
 import 'package:cuicuisine/pages/account/account_page.dart';
 
-import '../database/database_mgr.dart';
-import '../l10n/localeMgr.dart';
-import '../themes/theme_mgr.dart';
+import '../../database/database_mgr.dart';
+import '../../l10n/localeMgr.dart';
+import '../../themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import '../generated/l10n.dart';
-import 'authentication/authentication_page.dart';
-import '../themes/themes.dart';
-import '../utilities/import_export.dart';
-import '../widgets/core_widgets/alert_dialog.dart';
+import '../../generated/l10n.dart';
+import '../authentication/authentication_page.dart';
+import '../../themes/themes.dart';
+import '../../utilities/import_export.dart';
+import '../../widgets/core_widgets/alert_dialog.dart';
+import 'synchronization_status_page.dart';
 
 class GeneralSettingsPage extends StatefulWidget {
   static const String route = "/settings";
 
-  GeneralSettingsPage({Key? key}) : super(key: key);
+  const GeneralSettingsPage({Key? key}) : super(key: key);
 
   @override
   _GeneralSettingsPageState createState() => _GeneralSettingsPageState();
@@ -111,23 +113,14 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
             }
           ),
           const Divider(),
-          /// V1
-          // Import
-          // Container(
-          //     padding: EdgeInsets.all(12),
-          //     child: Row(
-          //       children: [
-          //         Text(S.of(context).general_settings_import, style: getTheme(context)!.textTheme.headline2),
-          //         Spacer(),
-          //         IconButton(
-          //           icon: FaIcon(FontAwesomeIcons.fileImport),
-          //           onPressed: () async {
-          //             await importJson(DatabaseMgr().localMgr.getUser()!.id);
-          //           },
-          //         )
-          //       ],
-          //     )
-          // ),
+          // Synchronization
+          ListTile(
+            title: Text(S.of(context).general_settings_synchronization, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+            trailing: const FaIcon(FontAwesomeIcons.arrowsRotate),
+            onTap: () {
+              Navigator.pushNamed(context, SynchronizationStatusPage.route);
+            }
+          ),
           const Spacer(),
           const Divider(),
           // remove account

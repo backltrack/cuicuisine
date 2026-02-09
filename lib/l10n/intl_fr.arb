@@ -77,6 +77,14 @@
   "general_settings_export": "Exporter mes livres",
   "general_settings_import": "Importer des livres",
   "general_settings_server": "Adresse serveur",
+  "general_settings_synchronization": "État de la synchronisation",
+
+  "synchronization_status_title": "État de la synchronisation",
+  "synchronization_status_up_to_date": "À jour",
+  "synchronization_status_need_sync": "Synchronisation nécessaire",
+  "synchronization_status": "État: ",
+  "synchronization_status_failure": "État inconnu",
+  "synchronization_queue": "File d'attente: ",
 
   "remove_account": "Supprimer mon compte",
   "remove_button": "Supprimer",

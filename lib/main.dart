@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cuicuisine/database/synchronization.dart';
 import 'package:cuicuisine/pages/account/account_page.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:flutter/foundation.dart';
@@ -26,7 +27,7 @@ import 'pages/books/book_join_page.dart';
 import 'pages/books/book_name_page.dart';
 import 'pages/books/book_settings_page.dart';
 import 'pages/books/book_share_page.dart';
-import 'pages/general_settings_page.dart';
+import 'pages/settings/general_settings_page.dart';
 import 'pages/home_page.dart';
 import 'pages/item_selector_page.dart';
 import 'pages/recipes/ingredient_edition_page.dart';
@@ -39,6 +40,7 @@ import 'pages/recipes/recipe_step_edition_page.dart';
 import 'pages/recipes/recipe_steps_edition_page.dart';
 import 'pages/recipes/recipe_tag_edition_page.dart';
 import 'pages/recipes/recipe_time_edition_page.dart';
+import 'pages/settings/synchronization_status_page.dart';
 import 'themes/themes.dart';
 
 void main() async {
@@ -155,7 +157,8 @@ class _CuicuisineState extends State<Cuicuisine> {
                 EmailRegistration.route: (ctx) => EmailRegistration(),
                 ForgottenPasswordPage.route: (ctx) => const ForgottenPasswordPage(),
                 HomePage.route: (ctx) => HomePage(),
-                GeneralSettingsPage.route: (ctx) => GeneralSettingsPage(),
+                GeneralSettingsPage.route: (ctx) => const GeneralSettingsPage(),
+                SynchronizationStatusPage.route: (ctx) => const SynchronizationStatusPage(),
                 AccountPage.route: (ctx) => const AccountPage(),
                 UpdatePassword.route: (ctx) => const UpdatePassword(),
                 RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),

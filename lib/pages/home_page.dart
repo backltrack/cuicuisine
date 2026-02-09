@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +15,7 @@ import '../generated/l10n.dart';
 import 'books/book_join_page.dart';
 import 'books/book_name_page.dart';
 import 'books/book_settings_page.dart';
-import 'general_settings_page.dart';
+import 'settings/general_settings_page.dart';
 import 'recipes/recipe_page.dart';
 
 import '../widgets/book_widgets/book_new_join_dialog.dart';
