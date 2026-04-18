@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../l10n/localeMgr.dart';
+import '../../models/data_model.dart';
 import '../../widgets/core_widgets/my_outlined_button.dart';
 import '../../widgets/recipe_widgets/recipe_tags_widget.dart';
 import '../../widgets/core_widgets/search_app_bar.dart';
@@ -23,32 +24,32 @@ class RecipeTagEditionPage extends StatefulWidget {
 class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
   bool shouldInitialize = true;
 
-  List<String> _selectedTags = [];
+  List<Tag> _selectedTags = [];
 
   String locale = 'en';
 
   String _search = "";
 
-  List<String> customTags = [];
+  List<Tag> tags = [];
 
   @override
   void initState() {
     super.initState();
 
     locale = LocaleMgr.getLocale(context);
-    customTags = computeCustomTags();
+    tags = computetags();
     setState(() {});
   }
 
-  List<String> computeCustomTags() {
-    final List<String> customTags = [];
-    for (String tag in DatabaseMgr().localMgr.getBookTags()) {
-      if (! defaultTags[locale]!.contains(tag.trim().toLowerCase())) {
-        customTags.add(tag);
+  List<Tag> computetags() {
+    final List<Tag> tags = [];
+    for (Tag tag in DatabaseMgr().localMgr.getBookTags()) {
+      if (! defaultTags[locale]!.contains(tag.name.trim().toLowerCase())) {
+        tags.add(tag);
       }
     }
-    customTags.sort();
-    return customTags;
+    tags.sort();
+    return tags;
   }
 
   @override
@@ -56,11 +57,10 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
 
     // load params
     final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final List<String> currentTags = routeArgs['currentTags']!;
+    final List<Tag> currentTags = routeArgs['currentTags']!;
     final String recipeId = routeArgs['id']!;
 
-    List<String> tags = defaultTags[locale]! + customTags;
-    tags.sort((a, b) => removeDiacritics(a).compareTo(removeDiacritics(b)));
+    tags.sort((a, b) => removeDiacritics(a.name).compareTo(removeDiacritics(b.name)));
 
     if (shouldInitialize) {
       _selectedTags.clear();
@@ -137,7 +137,7 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             recipeId,
             RecipeUpdate(
               id: recipeId,
-              tags: _selectedTags
+              tags: List.generate(_selectedTags.length, (index) => _selectedTags[index].id)
             )
           );
 
@@ -149,7 +149,7 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
           RecipeTagsWidget(
             tags: _selectedTags,
             isEditable: true,
-            onRemove: (String val) {
+            onRemove: (Tag val) {
               setState(() {
                 _selectedTags.remove(val);
               });
@@ -165,10 +165,10 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             onPressed: () async {
               var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/new');
               if (result != null) {
-                if (!customTags.contains(result.toString())) {
+                if (List.generate(tags.length, (index) => tags[index].name).contains(result.toString())) {
                   setState(() {
-                    customTags.add(result.toString());
-                    _selectedTags.add(result.toString());
+                    tags.add(Tag.newTag(result.toString(), ''));
+                    _selectedTags.add(Tag.newTag(result.toString(), ''));
                   });
                 }
               }
@@ -188,7 +188,7 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
                     return const SizedBox(height: 80);
                   }
                   else {
-                    return _search != "" && removeDiacritics(tags[index].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
+                    return _search != "" && removeDiacritics(tags[index].name.toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
                     listTile(tags[index]) : const SizedBox();
                   }
                 },

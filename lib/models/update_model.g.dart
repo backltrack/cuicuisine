@@ -68,7 +68,7 @@ class BookUpdateAdapter extends TypeAdapter<BookUpdate> {
       users: (fields[3] as List?)?.cast<String>(),
       access: (fields[4] as Map?)?.cast<String, AccessLevel>(),
       bookIngredients: (fields[5] as List?)?.cast<String>(),
-      tags: (fields[6] as List?)?.cast<String>(),
+      tags: (fields[6] as List?)?.cast<Tag>(),
     )..requestDate = fields[7] as DateTime;
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/tag_item.dart';
@@ -8,9 +9,9 @@ import 'package:reorderables/reorderables.dart';
 import '../../generated/l10n.dart';
 
 class RecipeTagsWidget extends StatefulWidget {
-  final List<String> tags;
+  final List<Tag> tags;
   final bool isEditable;
-  final Function(String)? onRemove;
+  final Function(Tag)? onRemove;
   const RecipeTagsWidget({Key? key, required this.tags, this.isEditable=false, this.onRemove}) : super(key: key);
 
   @override
@@ -18,7 +19,7 @@ class RecipeTagsWidget extends StatefulWidget {
 }
 
 class _RecipeTagsWidgetState extends State<RecipeTagsWidget> {
-  List<String> _currentTags = [];
+  List<Tag> _currentTags = [];
 
   @override
   void initState() {
@@ -35,7 +36,7 @@ class _RecipeTagsWidgetState extends State<RecipeTagsWidget> {
         key: UniqueKey(),
         margin: EdgeInsets.only(right: 4),
         child:TagItem(
-          title: "#" + _currentTags[index],
+          title: "#${_currentTags[index].name}",
           onRemove: widget.isEditable ? () {
             if (widget.onRemove != null) widget.onRemove!(_currentTags[index]);
           } : null
@@ -54,7 +55,7 @@ class _RecipeTagsWidgetState extends State<RecipeTagsWidget> {
         ReorderableRow(
           children: tagWidgetsList,
           onReorder: (int oldIndex, int newIndex) {
-            _currentTags = moveListItem(_currentTags, oldIndex, newIndex) as List<String>;
+            _currentTags = moveListItem(_currentTags, oldIndex, newIndex) as List<Tag>;
             setState(() {});
           },
         )

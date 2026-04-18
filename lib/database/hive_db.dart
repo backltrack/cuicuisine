@@ -376,8 +376,7 @@ class HiveConnector {
     return null;
   }
 
-  Future<void> updateTagsAndIngredients() async {
-    List<String> tags = [];
+  Future<void> updateBookIngredients() async {
     List<String> ingredients = [];
 
     await _bookIngredientsBox.clear();
@@ -390,11 +389,6 @@ class HiveConnector {
         for (String recipeId in recipeIds) {
           Recipe? recipe = getRecipe(recipeId);
           if (recipe != null) {
-            for (String tag in recipe.tags) {
-              if (!tags.contains(tag)) {
-                tags.add(tag);
-              }
-            }
             for (Ingredient ingredient in recipe.recipeIngredients) {
               if (!ingredients.contains(ingredient.name.trim().toLowerCase())) {
                 ingredients.add(ingredient.name.trim().toLowerCase());
@@ -406,18 +400,41 @@ class HiveConnector {
           }
         }
         await _contextBox.clear();
-        await _contextBox.put('tags', tags);
         await _contextBox.put('ingredients', ingredients);
       }
     }
   }
 
-  List<String> getBookTags() {
-    var tags = _contextBox.get('tags');
-    if (tags != null) {
-      return List<String>.from(tags);
+  List<Tag> getBookTags() {
+    List<Tag> tags = [];
+
+    String? currentBookId = loadCurrentBook();
+    if (currentBookId != null) {
+      Book? book = getBook(currentBookId);
+      if (book != null) {
+        tags = book.tags;
+      }
     }
-    return [];
+
+    return tags;
+  }
+
+  List<Tag> getRecipeTags(String recipeId) {
+    List<Tag> tags = [];
+
+    Recipe? recipe = getRecipe(recipeId);
+    if (recipe != null) {
+      Book? currentBook = DatabaseMgr().localMgr.loadCurrentBook() != null ? getBook(DatabaseMgr().localMgr.loadCurrentBook()!) : null;
+      if (currentBook != null && currentBook.recipeIds.contains(recipeId)) {
+        for (Tag tag in currentBook.tags) {
+          if (recipe.tags.contains(tag.id)) {
+             tags.add(tag);
+          }
+        }
+      }
+    }
+
+    return tags;
   }
 
   List<String> getBookIngredients() {

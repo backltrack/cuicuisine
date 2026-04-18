@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
           selectedBook = foundBook;
           //get recipes and set tags and ingredients names to book
           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-          await DatabaseMgr().localMgr.updateTagsAndIngredients();
+          await DatabaseMgr().localMgr.updateBookIngredients();
           // get user access
           userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? AccessLevel.read;
           // refresh UI
@@ -217,7 +217,7 @@ class _HomePageState extends State<HomePage> {
     DatabaseMgr().localMgr.saveCurrentBook(book.id);
     //get recipes and set tags and ingredients names to book
     recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
-    await DatabaseMgr().localMgr.updateTagsAndIngredients();
+    await DatabaseMgr().localMgr.updateBookIngredients();
     // get user access
     userAccess = DatabaseMgr().localMgr.getUserAccess(book.id) ?? AccessLevel.read;
     // refresh UI
@@ -284,7 +284,7 @@ class _HomePageState extends State<HomePage> {
       }
       // reload recipes
       recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-      await DatabaseMgr().localMgr.updateTagsAndIngredients();
+      await DatabaseMgr().localMgr.updateBookIngredients();
       // get user access
       userAccess = DatabaseMgr().localMgr.getUserAccess(selectedBook!.id) ?? AccessLevel.read;
 
@@ -367,7 +367,7 @@ class _HomePageState extends State<HomePage> {
                         if (result != null && result == "reloadRecipes") {
                           print('reload');
                           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                          await DatabaseMgr().localMgr.updateTagsAndIngredients();
+                          await DatabaseMgr().localMgr.updateBookIngredients();
                           // refresh UI
                           setState(() {});
                         } else if (result != null && result == "reloadBooks") {
@@ -460,7 +460,7 @@ class _HomePageState extends State<HomePage> {
             }
             // reload recipes
             recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-            await DatabaseMgr().localMgr.updateTagsAndIngredients();
+            await DatabaseMgr().localMgr.updateBookIngredients();
             // update UI
             setState(() {});
           },

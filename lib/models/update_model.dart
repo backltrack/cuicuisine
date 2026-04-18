@@ -61,7 +61,7 @@ class BookUpdate implements DatabaseObject {
   @HiveField(5)
   List<String>? bookIngredients;
   @HiveField(6)
-  List<String>? tags;
+  List<Tag>? tags;
   @HiveField(7)
   late DateTime requestDate;
 
@@ -99,6 +99,9 @@ class BookUpdate implements DatabaseObject {
     if (users != null) {
       json['users'] = users!;
     }
+    if (tags != null) {
+      json['tags'] = List<Map>.generate(tags!.length, (index) => tags![index].toJson());
+    }
 
     return json;
   }
@@ -119,7 +122,7 @@ class RecipeUpdate implements DatabaseObject {
   @HiveField(5)
   int? waitingTime;
   @HiveField(6)
-  List<String>? tags;
+  List<String>? tags; // tags ids from book tag list
   @HiveField(7)
   int? quantity;
   @HiveField(8)

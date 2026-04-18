@@ -68,7 +68,7 @@ class BookAdapter extends TypeAdapter<Book> {
       recipeIds: (fields[2] as List).cast<String>(),
       users: (fields[3] as List).cast<String>(),
       access: (fields[4] as Map).cast<String, AccessLevel>(),
-      tags: (fields[6] as List).cast<String>(),
+      tags: (fields[6] as List).cast<Tag>(),
       bookIngredients: (fields[5] as List).cast<String>(),
       lastUpdate: fields[7] as DateTime?,
     );
@@ -275,13 +275,14 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
       quantity: fields[1] as double,
       unit: fields[2] as String,
       density: fields[3] as double,
+      category: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Ingredient obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
@@ -289,7 +290,9 @@ class IngredientAdapter extends TypeAdapter<Ingredient> {
       ..writeByte(2)
       ..write(obj.unit)
       ..writeByte(3)
-      ..write(obj.density);
+      ..write(obj.density)
+      ..writeByte(4)
+      ..write(obj.category);
   }
 
   @override
@@ -314,19 +317,22 @@ class TagAdapter extends TypeAdapter<Tag> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Tag(
-      name: fields[0] as String,
-      index: fields[1] as int,
+      id: fields[0] as String,
+      name: fields[1] as String,
+      category: fields[2] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, Tag obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.name)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.index);
+      ..write(obj.name)
+      ..writeByte(2)
+      ..write(obj.category);
   }
 
   @override

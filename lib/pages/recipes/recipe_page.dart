@@ -281,12 +281,12 @@ class _RecipePageState extends State<RecipePage> {
                     }
                 ),
                 WidgetSelectionOverlay(
-                    widget: RecipeTagsWidget(key: UniqueKey(), tags: recipe.tags),
+                    widget: RecipeTagsWidget(key: UniqueKey(), tags: DatabaseMgr().localMgr.getRecipeTags(recipe.id)),
                     editModeController: isEditMode,
                     opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                     onTap: () {
                       Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/tags", arguments: {
-                        "currentTags": recipe.tags,
+                        "currentTags": DatabaseMgr().localMgr.getRecipeTags(recipe.id),
                         "id": recipe.id
                       }).then((value) async {
                         if (value != null && value == 'update') {

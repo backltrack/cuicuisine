@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:uuid/v4.dart';
 
 import 'update_model.dart';
 
@@ -81,7 +81,7 @@ class Book extends HiveObject implements DatabaseObject {
   @HiveField(5)
   List<String> bookIngredients;
   @HiveField(6)
-  List<String> tags;
+  List<Tag> tags;
   @HiveField(7)
   DateTime? lastUpdate;
 
@@ -99,34 +99,25 @@ class Book extends HiveObject implements DatabaseObject {
   }
 
   Map<String,String> toJson() {
-    Map<String, int> _access = {};
-    for (String userId in access.keys.toList()) {
-      _access[userId] = access[userId]!.index;
-    }
-
     return {
       'id': id,
       'name': name,
       'recipeIds': recipeIds.toString(),
-      'access': _access.toString(),
-      'users': users.toString()
+      'access': Map<String, int>.fromEntries(access.entries.map((entry) => MapEntry(entry.key, entry.value.index))).toString(),
+      'users': users.toString(),
+      'tags': List<Map>.generate(tags.length, (index) => tags[index].toJson()).toString()
     };
   }
 
   factory Book.fromJson(Map<String, dynamic> data) {
-    // parse access
-    Map<String, AccessLevel> access = {};
-    for (String userId in data['access'].keys.toList()) {
-      access[userId] = AccessLevel.values[data['access'][userId]];
-    }
-
     return Book(
       id: data['id'],
       name: data['name'],
       users: List.generate(data['users'].length, (index) => data['users'][index] as String),
-      access: access,
+      access: Map<String, AccessLevel>.fromEntries(Map<String, int>.from(data['access']).entries.map((entry) => MapEntry(entry.key, AccessLevel.values[entry.value]))),
       recipeIds: List.generate(data['recipeIds'].length, (index) => data['recipeIds'][index] as String),
-      lastUpdate: DateTime.parse(data['lastUpdate'])
+      lastUpdate: DateTime.parse(data['lastUpdate']),
+      tags: List.generate(data['tags'].length, (index) => Tag.fromJson(data['tags'][index]))
     );
   }
 
@@ -137,7 +128,8 @@ class Book extends HiveObject implements DatabaseObject {
       access: book.access,
       recipeIds: [...book.recipeIds],
       users: [...book.users],
-      lastUpdate: book.lastUpdate
+      lastUpdate: book.lastUpdate,
+      tags: List.generate(book.tags.length, (index) => book.tags[index].copy())
     );
   }
 
@@ -147,6 +139,7 @@ class Book extends HiveObject implements DatabaseObject {
     recipeIds = [...book.recipeIds];
     access = book.access;
     lastUpdate = book.lastUpdate;
+    tags = List.generate(book.tags.length, (index) => book.tags[index].copy());
   }
 
   void copyFromUpdate(BookUpdate bookUpdate) {
@@ -154,6 +147,7 @@ class Book extends HiveObject implements DatabaseObject {
     recipeIds = bookUpdate.recipeIds != null ? [...bookUpdate.recipeIds!] : recipeIds;
     access = bookUpdate.access ?? access;
     users = bookUpdate.users != null ? [...bookUpdate.users!] : users;
+    tags = bookUpdate.tags != null ? List.generate(bookUpdate.tags!.length, (index) => bookUpdate.tags![index].copy()) : tags;
   }
 }
 
@@ -172,7 +166,7 @@ class Recipe extends HiveObject implements DatabaseObject {
   @HiveField(5)
   int waitingTime;
   @HiveField(6)
-  List<String> tags;
+  List<String> tags; // tags ids from book tag list
   @HiveField(7)
   int quantity;
   @HiveField(8)
@@ -212,30 +206,6 @@ class Recipe extends HiveObject implements DatabaseObject {
   }
 
   factory Recipe.fromJson(Map<String, dynamic> data) {
-    // parse ingredients
-    List<Ingredient> snapIngredients = [];
-    for (Map<String, dynamic> ingredient in data['recipeIngredients']) {
-      snapIngredients.add(
-          Ingredient(
-              name: ingredient['name'],
-              quantity: double.parse(ingredient['quantity'].toString()),
-              unit: ingredient['unit'],
-              density: double.parse(ingredient['density'].toString())
-          )
-      );
-    }
-
-    // parse Steps
-    List<RecipeStep> snapSteps = [];
-    for (Map<String, dynamic> step in data['steps']) {
-      snapSteps.add(
-        RecipeStep(
-          step: step['step'],
-          time: int.parse(step['time'].toString())
-        )
-      );
-    }
-
     return Recipe(
       id: data['id'],
       pictures: List.generate(data['pictures'].length, (index) => data['pictures'][index] as String),
@@ -246,9 +216,9 @@ class Recipe extends HiveObject implements DatabaseObject {
       tags: List.generate(data['tags'].length, (index) => data['tags'][index] as String),
       quantity: data['quantity'],
       quantityType: data['quantityType'] ?? "",
-      recipeIngredients: snapIngredients,
-      steps: snapSteps,
-      variants: List.generate(data['variants'].length, (index) => Variant.fromDocument(data['variants'][index])),
+      recipeIngredients: List.generate(data['recipeIngredients'].length, (index) => Ingredient.fromJson(data['recipeIngredients'][index])),
+      steps: List.generate(data['steps'].length, (index) => RecipeStep.fromJson(data['steps'][index])),
+      variants: List.generate(data['variants'].length, (index) => Variant.fromJson(data['variants'][index])),
       creationDate: DateTime.parse(data['creationDate']),
       lastUpdate: DateTime.parse(data['lastUpdate'])
     );
@@ -297,9 +267,9 @@ class Recipe extends HiveObject implements DatabaseObject {
     tags = [...recipe.tags];
     quantity = recipe.quantity;
     quantityType = recipe.quantityType;
-    recipeIngredients = [...recipe.recipeIngredients];
-    steps = [...recipe.steps];
-    variants = [...recipe.variants];
+    recipeIngredients = List.generate(recipe.recipeIngredients.length, (index) => recipe.recipeIngredients[index].copy());
+    steps = List.generate(recipe.steps.length, (index) => recipe.steps[index].copy());
+    variants = List.generate(recipe.variants.length, (index) => recipe.variants[index].copy());
     lastUpdate = recipe.lastUpdate;
   }
 
@@ -312,9 +282,9 @@ class Recipe extends HiveObject implements DatabaseObject {
     tags = recipeUpdate.tags != null ? [...recipeUpdate.tags!] : tags;
     quantity = recipeUpdate.quantity ?? quantity;
     quantityType = recipeUpdate.quantityType ?? quantityType;
-    recipeIngredients = recipeUpdate.recipeIngredients != null ? [...recipeUpdate.recipeIngredients!] : recipeIngredients;
-    steps = recipeUpdate.steps != null ? [...recipeUpdate.steps!] : steps;
-    variants = recipeUpdate.variants != null ? [...recipeUpdate.variants!] : variants;
+    recipeIngredients = recipeUpdate.recipeIngredients != null ? List.generate(recipeUpdate.recipeIngredients!.length, (index) => recipeUpdate.recipeIngredients![index].copy()) : recipeIngredients;
+    steps = recipeUpdate.steps != null ? List.generate(recipeUpdate.steps!.length, (index) => recipeUpdate.steps![index].copy()) : steps;
+    variants = recipeUpdate.variants != null ? List.generate(recipeUpdate.variants!.length, (index) => recipeUpdate.variants![index].copy()) : variants;
   }
 
   int getTotalTime() {
@@ -343,12 +313,16 @@ class Variant extends HiveObject {
     "initials": initials
   };
 
-  factory Variant.fromDocument(Map<String, dynamic> data) {
+  factory Variant.fromJson(Map<String, dynamic> data) {
     return Variant(
       variant: data['variant'] as String,
       userId: data['userId'] as String,
       initials: data['initials'] as String
     );
+  }
+
+  Variant copy() {
+    return Variant(variant: variant, userId: userId, initials: initials);
   }
 }
 
@@ -368,6 +342,17 @@ class RecipeStep extends HiveObject {
     'step': step,
     'time': time
   };
+
+  factory RecipeStep.fromJson(Map<String, dynamic> data) {
+    return RecipeStep(
+      step: data['step'] as String,
+      time: int.parse(data['time'].toString())
+    );
+  }
+
+  RecipeStep copy() {
+    return RecipeStep(step: step, time: time);
+  }
 }
 
 @HiveType(typeId: 5)
@@ -380,42 +365,76 @@ class Ingredient extends HiveObject {
   String unit;
   @HiveField(3)
   double density;
+  @HiveField(4)
+  String? category;
 
   Ingredient({
     required this.name,
     required this.quantity,
     required this.unit,
-    this.density=0.0
+    this.density=0.0,
+    this.category
   });
 
   Map<String, dynamic> toJson() => {
     'name': name,
     'quantity': quantity,
     'unit': unit,
-    'density': density
+    'density': density,
+    'category': category
   };
+
+  factory Ingredient.fromJson(Map<String, dynamic> data) {
+    return Ingredient(
+      name: data['name'] as String,
+      quantity: double.parse(data['quantity'].toString()),
+      unit: data['unit'] as String,
+      density: double.parse(data['density'].toString()),
+      category: data['category'] as String?
+    );
+  }
+
+  Ingredient copy() {
+    return Ingredient(name: name, quantity: quantity, unit: unit, density: density, category: category);
+  }
 }
 
 @HiveType(typeId: 6)
 class Tag extends HiveObject {
   @HiveField(0)
-  String name;
+  String id;
   @HiveField(1)
-  String category;
+  String name;
   @HiveField(2)
-  int index;
+  String category;
 
   Tag({
+    required this.id,
     required this.name,
-    required this.category,
-    required this.index
+    required this.category
   });
 
   Map<String, dynamic> toJson() => {
+    'id': id,
     'name': name,
-    'category': category,
-    'index': index
+    'category': category
   };
+
+  factory Tag.fromJson(Map<String, dynamic> data) {
+    return Tag(
+      id: data['id'] as String,
+      name: data['name'] as String,
+      category: data['category'] as String
+    );
+  }
+
+  factory Tag.newTag(String name, String category) {
+    return Tag(id: UuidV4().generate(), name: name, category: category);
+  }
+
+  Tag copy() {
+    return Tag(id: id, name: name, category: category);
+  }
 }
 
 @HiveType(typeId: 7)
