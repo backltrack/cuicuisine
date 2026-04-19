@@ -429,12 +429,7 @@ class MongoConnector {
 
   Future<bool> deleteUser() async {
     final response = await _secureDeleteRequest("/users/me/delete", {});
-    if (response != null && response.statusCode == 200) {
-      if (jsonDecode(utf8.decode(response.bodyBytes))) {
-        return true;
-      }
-    }
-    return false;
+    return response != null && response.statusCode == 200;
   }
 
   Future<int?> getNewerChangesCount(String lastChange) async {
@@ -457,7 +452,7 @@ class MongoConnector {
       Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       print(data);
 
-      if (data['result']) {
+      if (data['success']) {
         List<dynamic> tmp = data['changes'];
         print(tmp);
         if (tmp.isEmpty) {
@@ -589,44 +584,33 @@ class MongoConnector {
   }
 
   Future<OperationResult> updateUser(UserUpdate userUpdate) async {
-    final response = await _securePostJsonRequest('/users/me/update', 
-      userUpdate.toJson()
-    );
+    final response = await _securePostJsonRequest('/users/me/update', userUpdate.toJson());
 
     if (response != null && response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
+        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'user',
+          'operationType': OperationType.update.index,
+          'objectId': userUpdate.id
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          DatabaseMgr().localMgr.updateUserLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-
-        if (data['result']) {
-          String change = DatabaseMgr().localMgr.createChange();
-          
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'user',
-            'operationType': OperationType.update.index,
-            'objectId': userUpdate.id
-          });
-          
-          if (changeResponse != null && bool.parse(changeResponse.body)) {
-            DatabaseMgr().localMgr.addChange(change);
-            
-            DatabaseMgr().localMgr.updateUserLastUpdate(userUpdate.id, DateTime.parse(data['dateTime']));
-            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
-        }
-        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+    }
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
     }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
@@ -649,95 +633,66 @@ class MongoConnector {
   }
 
   Future<OperationResult> createBook(Book book) async {
-    final response = await _securePutRequest('/books/create', 
-      {
-        'id': book.id,
-        'name': book.name
-      }
-    );
+    final response = await _securePutRequest('/books/create', {'id': book.id, 'name': book.name});
 
     if (response != null && response.statusCode == 201) {
-      // If the server did return a 201 CREATED response,
-      // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        print(data);
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-        }
-        if (data['result']) {
+        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
-          DatabaseMgr().localMgr.updateBookLastUpdate(book.id, DateTime.parse(data['lastUpdate']));
-
-          String change = DatabaseMgr().localMgr.createChange();
-          
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'book',
-            'operationType': OperationType.create.index,
-            'objectId': book.id
-          });
-          
-          if (changeResponse != null && bool.parse(changeResponse.body)) {
-            DatabaseMgr().localMgr.addChange(change);
-            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
+        DatabaseMgr().localMgr.updateBookLastUpdate(book.id, DateTime.parse(data['lastUpdate']));
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'book',
+          'operationType': OperationType.create.index,
+          'objectId': book.id
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        print("book creation FAILED with status code ${data['status_code']}");
-        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<OperationResult> updateBook(BookUpdate bookUpdate) async {
-    final response = await _securePostJsonRequest('/books/update', 
-      bookUpdate.toJson()
-    );
+    final response = await _securePostJsonRequest('/books/update', bookUpdate.toJson());
 
     if (response != null && response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
+        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'book',
+          'operationType': OperationType.update.index,
+          'objectId': bookUpdate.id
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-
-        if (data['result']) {
-          String change = DatabaseMgr().localMgr.createChange();
-          
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'book',
-            'operationType': OperationType.update.index,
-            'objectId': bookUpdate.id
-          });
-          
-          if (changeResponse != null && bool.parse(changeResponse.body)){
-            DatabaseMgr().localMgr.addChange(change);
-
-            DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
-            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
-        }
-        print("Book update FAILED with status code ${data['status_code']}");
-        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
@@ -745,37 +700,24 @@ class MongoConnector {
     final response = await _secureGetRequest('/books/revokeme/$bookId');
 
     if (response != null && response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-
-        if (data['result']) {
-          String change = DatabaseMgr().localMgr.createChange();
-          
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'book',
-            'operationType': OperationType.update.index,
-            'objectId': bookId
-          });
-          
-          if (changeResponse != null && bool.parse(changeResponse.body)){
-            DatabaseMgr().localMgr.addChange(change);
-
-            DatabaseMgr().localMgr.updateBookLastUpdate(bookId, DateTime.parse(data['dateTime']));
-            return true;
-          }
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'book',
+          'operationType': OperationType.update.index,
+          'objectId': bookId
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          DatabaseMgr().localMgr.updateBookLastUpdate(bookId, DateTime.parse(data['dateTime']));
+          return true;
         }
-
-        return false;
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return false;
       }
     }
-
     return false;
   }
 
@@ -804,42 +746,30 @@ class MongoConnector {
   }
 
   Future<OperationResult> deleteBook(Book book) async {
-    final response = await _secureDeleteRequest('/books/delete',
-      book.id
-    );
+    final response = await _secureDeleteRequest('/books/delete', book.id);
 
     if (response != null && response.statusCode == 200) {
-
       try {
-        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'book',
+          'operationType': OperationType.delete.index,
+          'objectId': book.id
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        if (data['result']) {
-          String change = DatabaseMgr().localMgr.createChange();
-
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'book',
-            'operationType': OperationType.delete.index,
-            'objectId': book.id
-          });
-
-          if (changeResponse != null && bool.parse(changeResponse.body)){
-              DatabaseMgr().localMgr.addChange(change);
-              return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
-        }
-        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
@@ -881,197 +811,130 @@ class MongoConnector {
   Future<OperationResult> createRecipe(Recipe recipe) async {
     String bookId = DatabaseMgr().localMgr.loadCurrentBook()!;
 
-    final response = await _securePutRequest('/recipes/create', 
-      {
-        'id': recipe.id,
-        'name': recipe.name,
-        'bookId': bookId
-      }
-    );
+    final response = await _securePutRequest('/recipes/create', {
+      'id': recipe.id,
+      'name': recipe.name,
+      'bookId': bookId
+    });
 
     if (response != null && response.statusCode == 201) {
-      // If the server did return a 201 CREATED response,
-      // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
+        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+        DatabaseMgr().localMgr.updateRecipeLastUpdate(recipe.id, DateTime.parse(data['lastUpdate']));
+        Book? book = DatabaseMgr().localMgr.getBook(bookId);
+        if (book != null) {
+          Book newBook = await fetchBook(bookId);
+          book.copyFromBook(newBook);
+          book.save();
         }
 
-        if (data['result']) {
-          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipe.id, DateTime.parse(data['lastUpdate']));
-
-          Book? book = DatabaseMgr().localMgr.getBook(bookId);
-          if (book != null) {
-            Book newBook = await fetchBook(bookId);
-            book.copyFromBook(newBook);
-            book.save();
-          }
-          
-          // change recipe
-          String changeRecipe = DatabaseMgr().localMgr.createChange();
-          
-          final changeRecipeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': changeRecipe,
-            'objectType': 'recipe',
-            'operationType': OperationType.create.index,
-            'objectId': recipe.id
-          });
-
-          // change book
-          String changeBook = DatabaseMgr().localMgr.createChange();
-          
-          final changeBookResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': changeBook,
-            'objectType': 'book',
-            'operationType': OperationType.update.index,
-            'objectId': bookId
-          });
-          
-          if (changeRecipeResponse != null && bool.parse(changeRecipeResponse.body) && changeBookResponse != null && bool.parse(changeBookResponse.body)){
-            DatabaseMgr().localMgr.addChange(changeRecipe);
-            DatabaseMgr().localMgr.addChange(changeBook);
-            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
+        String changeRecipe = DatabaseMgr().localMgr.createChange();
+        final changeRecipeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': changeRecipe,
+          'objectType': 'recipe',
+          'operationType': OperationType.create.index,
+          'objectId': recipe.id
+        });
+        String changeBook = DatabaseMgr().localMgr.createChange();
+        final changeBookResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': changeBook,
+          'objectType': 'book',
+          'operationType': OperationType.update.index,
+          'objectId': bookId
+        });
+        if (changeRecipeResponse != null && bool.parse(changeRecipeResponse.body) &&
+            changeBookResponse != null && bool.parse(changeBookResponse.body)) {
+          DatabaseMgr().localMgr.addChange(changeRecipe);
+          DatabaseMgr().localMgr.addChange(changeBook);
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        else {
-          print("Recipe creation FAILED with status code ${data['status_code']}");
-          UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-          return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-        }
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<OperationResult> updateRecipe(RecipeUpdate recipeUpdate) async {
-    final response = await _securePostJsonRequest('/recipes/update', 
-      recipeUpdate.toJson()
-    );
+    final response = await _securePostJsonRequest('/recipes/update', recipeUpdate.toJson());
 
     if (response != null && response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        print(data);
+        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'recipe',
+          'operationType': OperationType.update.index,
+          'objectId': recipeUpdate.id
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        
-        if (data['result']) {
-          String change = DatabaseMgr().localMgr.createChange();
-          
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'recipe',
-            'operationType': OperationType.update.index,
-            'objectId': recipeUpdate.id
-          });
-          
-          if (changeResponse != null && bool.parse(changeResponse.body)){
-            DatabaseMgr().localMgr.addChange(change);
-            DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
-            return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
-        }
-        else {
-          print("Recipe update FAILED with status code ${data['status_code']}");
-          UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-          return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-        }
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<OperationResult> deleteRecipe(Recipe recipe) async {
-    final response = await _secureDeleteRequest('/recipes/delete',
-      recipe.id
-    );
+    final response = await _secureDeleteRequest('/recipes/delete', recipe.id);
 
     if (response != null && response.statusCode == 200) {
-      
       try {
-        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+        String change = DatabaseMgr().localMgr.createChange();
+        final changeResponse = await _securePostJsonRequest('/change/add', {
+          'changeId': change,
+          'objectType': 'recipe',
+          'operationType': OperationType.delete.index,
+          'objectId': recipe.id
+        });
+        if (changeResponse != null && bool.parse(changeResponse.body)) {
+          DatabaseMgr().localMgr.addChange(change);
+          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
-        
-        if (data['result']) {
-          String change = DatabaseMgr().localMgr.createChange();
-
-          final changeResponse = await _securePostJsonRequest('/change/add', {
-            'changeId': change,
-            'objectType': 'recipe',
-            'operationType': OperationType.delete.index,
-            'objectId': recipe.id
-          });
-
-          if (changeResponse != null && bool.parse(changeResponse.body)){
-              DatabaseMgr().localMgr.addChange(change);
-              return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-          }
-        }
-        else {
-          print("Recipe deletion FAILED with status code ${data['status_code']}");
-          UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-          return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-        }
-      }
-      catch (e) {
+      } catch (e) {
         print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
       }
+      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
   Future<OperationResult> uploadImage(RecipeImage recipeImage) async {
-    print("Uploading image ${recipeImage.imageId} for recipe ${recipeImage.recipeId}");
     final response = await _securePostMultipartRequest('/image/upload',
       File(recipeImage.path),
       [MapEntry('recipeId', recipeImage.recipeId), MapEntry('imageId', recipeImage.imageId)]
     );
 
     if (response != null && response.statusCode == 200) {
-      print("HTTP RESPONSE RECEIVED");
-      try {
-        dynamic data = jsonDecode(utf8.decode(await response.stream.toBytes()));
-
-        if (data == null) {
-          print("DATA NULL");
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-        }
-
-        if (data['result']) {
-          print("UPLOAD SUCCESS");
-          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-        }
-        print("UPLOAD FAILED with status code ${data['status_code']}");
-        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-      }
-      catch (e) {
-        print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-      }
+      return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 
@@ -1094,25 +957,12 @@ class MongoConnector {
     });
 
     if (response != null && response.statusCode == 200) {
-      try {
-        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-
-        if (data == null) {
-          return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-        }
-
-        if (data['result']) {
-          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
-        }
-        UpdateStatus status = UpdateStatus.getStatusFromCode(data['status_code']);
-        return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
-      }
-      catch (e) {
-        print(e);
-        return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-      }
+      return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
     }
-
+    if (response != null) {
+      final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
+      return OperationResult(action: OperationResultAction.getActionFromUpdateStatus(status), status: status);
+    }
     return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
   }
 

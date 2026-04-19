@@ -2,6 +2,7 @@ import 'package:diacritic/diacritic.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
+import '../../models/data_model.dart';
 import '../../utilities/string_functions.dart';
 import '../../widgets/recipe_widgets/filter_bottom_menu.dart';
 import '../../widgets/core_widgets/search_app_bar.dart';
@@ -26,7 +27,7 @@ class _ItemSelectorState extends State<ItemSelector> {
 
     // load params
     final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final List<String> items = routeArgs['items']!;
+    final List<dynamic> items = routeArgs['items']!;
     final String itemType = routeArgs['itemType'];
 
     // init already filtered ingredients
@@ -39,7 +40,7 @@ class _ItemSelectorState extends State<ItemSelector> {
         }
       } else if (itemType == "tags") {
         for (int i = 0; i < items.length; i++) {
-          if (FilterBottomMenu.mandatoryTags.contains(items[i])) {
+          if (FilterBottomMenu.mandatoryTags.any((t) => t.id == (items[i] as Tag).id)) {
             _selectedIndices.add(i);
           }
         }
@@ -67,17 +68,17 @@ class _ItemSelectorState extends State<ItemSelector> {
       floatingActionButton: FloatingActionButton.extended(
         label: Text(S.of(context).add_button),
         onPressed: () {
-          List<String> _filteredIngredients = [];
-          for (int index in _selectedIndices) {
-            _filteredIngredients.add(items[index]);
-          }
           setState(() {
             if (itemType == "ingredients") {
               FilterBottomMenu.mandatoryIngredients.clear();
-              FilterBottomMenu.mandatoryIngredients.addAll(_filteredIngredients);
+              FilterBottomMenu.mandatoryIngredients.addAll(
+                _selectedIndices.map((i) => items[i] as String).toList()
+              );
             } else if (itemType == "tags") {
               FilterBottomMenu.mandatoryTags.clear();
-              FilterBottomMenu.mandatoryTags.addAll(_filteredIngredients);
+              FilterBottomMenu.mandatoryTags.addAll(
+                _selectedIndices.map((i) => items[i] as Tag).toList()
+              );
             }
           });
           Navigator.pop(context);
@@ -86,9 +87,10 @@ class _ItemSelectorState extends State<ItemSelector> {
       body: ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
-          return _search != "" && removeDiacritics(items[index].toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
+          final String displayName = itemType == "tags" ? (items[index] as Tag).name : items[index] as String;
+          return _search != "" && removeDiacritics(displayName.toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
             ListTile(
-              title: Text(itemType == "ingredients" ? beautifyName(items[index]) : items[index]),
+              title: Text(itemType == "ingredients" ? beautifyName(displayName) : displayName),
               trailing: IconButton(
                   onPressed: () {
                     setState(() {

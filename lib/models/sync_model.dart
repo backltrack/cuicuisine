@@ -25,6 +25,22 @@ enum UpdateStatus {
         return UpdateStatus.error;
     }
   }
+
+  static UpdateStatus getStatusFromHttpCode(int code) {
+    switch (code) {
+      case 200:
+      case 201:
+        return UpdateStatus.success;
+      case 403:
+        return UpdateStatus.notAuthorized;
+      case 404:
+        return UpdateStatus.notFound;
+      case 409:
+        return UpdateStatus.conflict;
+      default:
+        return UpdateStatus.error;
+    }
+  }
 }
 
 enum OperationResultAction {

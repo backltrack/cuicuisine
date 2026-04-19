@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:duration_picker/duration_picker.dart';
 
 import '../../themes/colors.dart';
-
+import '../../models/data_model.dart';
 import '../../utilities/time_functions.dart';
 import '../../generated/l10n.dart';
 import '../../pages/item_selector_page.dart';
@@ -16,7 +16,7 @@ class FilterBottomMenu extends StatefulWidget {
   static int time = 0;
   static bool isTimeMax = true;
   static List<String> mandatoryIngredients = [];
-  static List<String> mandatoryTags = [];
+  static List<Tag> mandatoryTags = [];
 
   final VoidCallback? onReset;
 
@@ -54,7 +54,7 @@ class _FilterBottomMenuState extends State<FilterBottomMenu> {
       // add tags
       for (int i=0; i < FilterBottomMenu.mandatoryTags.length; i++) {
         _filterItems.add({
-          'title': "#${FilterBottomMenu.mandatoryTags[i]}",
+          'title': "#${FilterBottomMenu.mandatoryTags[i].name}",
           'variable': FilterBottomMenu.mandatoryTags,
           'index': i
         });

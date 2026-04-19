@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   int _time = 0;
   bool _isTimeMax = false;
   List<String> _mandatoryIngredients = [];
-  List<String> _mandatoryTags = [];
+  List<Tag> _mandatoryTags = [];
   
   // sort and display variables
   String _sortingMethod = "alphaDown";
@@ -385,8 +385,8 @@ class _HomePageState extends State<HomePage> {
 
                       // tags test
                       bool tagCondition = true;
-                      for (String tag in _mandatoryTags) {
-                        tagCondition = tagCondition && sortedData[index].tags.contains(tag);
+                      for (Tag tag in _mandatoryTags) {
+                        tagCondition = tagCondition && sortedData[index].tags.contains(tag.id);
                       }
                       // ingredient test
                       bool ingredientCondition = true;
