@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
     books = DatabaseMgr().localMgr.getUserBooks();
 
     // set default Book
-    String? defaultBook = DatabaseMgr().localMgr.loadCurrentBook();
+    String? defaultBook = DatabaseMgr().localMgr.getCurrentBookId();
 
     // select book and load recipes
     if (books != null && books!.isNotEmpty) {
@@ -214,7 +214,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> setBookAsDefaultAndRefresh(Book book) async {
     selectedBook = book;
     // store new default book
-    DatabaseMgr().localMgr.saveCurrentBook(book.id);
+    DatabaseMgr().localMgr.saveCurrentBookId(book.id);
     //get recipes and set tags and ingredients names to book
     recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
     await DatabaseMgr().localMgr.updateBookIngredients();

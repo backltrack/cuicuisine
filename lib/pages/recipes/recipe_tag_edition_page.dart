@@ -71,9 +71,9 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
 
     ScrollController _scrollController = ScrollController();
 
-    Widget listTile(tag) {
+    Widget listTile(Tag tag) {
       return ListTile(
-        title: Text(tag),
+        title: Text(tag.name),
         trailing: IconButton(
             onPressed: () {
               if (_selectedTags.contains(tag)) {
@@ -165,11 +165,21 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             onPressed: () async {
               var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/new');
               if (result != null) {
-                if (List.generate(tags.length, (index) => tags[index].name).contains(result.toString())) {
-                  setState(() {
-                    tags.add(Tag.newTag(result.toString(), ''));
-                    _selectedTags.add(Tag.newTag(result.toString(), ''));
-                  });
+                if (!List.generate(tags.length, (index) => tags[index].name).contains(result.toString())) {
+                  String? currentBookId = DatabaseMgr().localMgr.getCurrentBookId();
+                  if (currentBookId != null) {
+                    setState(() {
+                      Tag newTag = Tag.newTag(result.toString(), '');
+                      tags.add(newTag);
+
+                      DatabaseMgr().localMgr.updateBook(currentBookId, 
+                        BookUpdate(id: currentBookId, tags: tags)
+                      );
+                      tags = computetags();
+                      
+                      _selectedTags.add(newTag);
+                    });
+                  }
                 }
               }
             },

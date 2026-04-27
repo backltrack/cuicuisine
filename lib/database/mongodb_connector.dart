@@ -638,9 +638,9 @@ class MongoConnector {
     if (response != null && response.statusCode == 201) {
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-
-        DatabaseMgr().localMgr.updateBookLastUpdate(book.id, DateTime.parse(data['lastUpdate']));
+        if (data != null) {
+          DatabaseMgr().localMgr.updateBookLastUpdate(book.id, DateTime.parse(data['lastUpdate']));
+        }
         String change = DatabaseMgr().localMgr.createChange();
         final changeResponse = await _securePostJsonRequest('/change/add', {
           'changeId': change,
@@ -650,12 +650,12 @@ class MongoConnector {
         });
         if (changeResponse != null && bool.parse(changeResponse.body)) {
           DatabaseMgr().localMgr.addChange(change);
-          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
         print(e);
       }
-      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+      // Server confirmed creation (201): always delete from queue regardless of change registration
+      return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
     }
     if (response != null) {
       final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);
@@ -809,7 +809,7 @@ class MongoConnector {
   }
 
   Future<OperationResult> createRecipe(Recipe recipe) async {
-    String bookId = DatabaseMgr().localMgr.loadCurrentBook()!;
+    String bookId = DatabaseMgr().localMgr.getCurrentBookId()!;
 
     final response = await _securePutRequest('/recipes/create', {
       'id': recipe.id,
@@ -820,14 +820,16 @@ class MongoConnector {
     if (response != null && response.statusCode == 201) {
       try {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
-        if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
-
-        DatabaseMgr().localMgr.updateRecipeLastUpdate(recipe.id, DateTime.parse(data['lastUpdate']));
+        if (data != null) {
+          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipe.id, DateTime.parse(data['lastUpdate']));
+        }
         Book? book = DatabaseMgr().localMgr.getBook(bookId);
         if (book != null) {
           Book newBook = await fetchBook(bookId);
           book.copyFromBook(newBook);
-          book.save();
+          // Guard against server-side duplicates caused by retried create operations
+          book.recipeIds = book.recipeIds.toSet().toList();
+          await book.save();
         }
 
         String changeRecipe = DatabaseMgr().localMgr.createChange();
@@ -848,12 +850,12 @@ class MongoConnector {
             changeBookResponse != null && bool.parse(changeBookResponse.body)) {
           DatabaseMgr().localMgr.addChange(changeRecipe);
           DatabaseMgr().localMgr.addChange(changeBook);
-          return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
         print(e);
       }
-      return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+      // Server confirmed creation (201): always delete from queue regardless of change registration
+      return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
     }
     if (response != null) {
       final status = UpdateStatus.getStatusFromHttpCode(response.statusCode);

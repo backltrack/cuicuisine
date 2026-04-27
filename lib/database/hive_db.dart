@@ -134,11 +134,11 @@ class HiveConnector {
     return null;
   }
 
-  Future<void> saveCurrentBook(String id) async {
+  Future<void> saveCurrentBookId(String id) async {
     await _settingBox.put('currentBook', id);
   }
 
-  String? loadCurrentBook() {
+  String? getCurrentBookId() {
     var currentBook = _settingBox.get('currentBook');
     if (currentBook is String) {
       return currentBook;
@@ -343,7 +343,7 @@ class HiveConnector {
   Future<void> addBook(Book book, {bool addToQueue=true}) async {
     try {
       await _bookBox.add(book);
-      await saveCurrentBook(book.id);
+      await saveCurrentBookId(book.id);
 
       if (addToQueue) {
         addQueueOperation(type: OperationType.create, object: book);
@@ -381,7 +381,7 @@ class HiveConnector {
 
     await _bookIngredientsBox.clear();
 
-    String? currentBookId = loadCurrentBook();
+    String? currentBookId = getCurrentBookId();
     if (currentBookId != null) {
       Book? book = getBook(currentBookId);
       if (book != null) {
@@ -408,7 +408,7 @@ class HiveConnector {
   List<Tag> getBookTags() {
     List<Tag> tags = [];
 
-    String? currentBookId = loadCurrentBook();
+    String? currentBookId = getCurrentBookId();
     if (currentBookId != null) {
       Book? book = getBook(currentBookId);
       if (book != null) {
@@ -424,7 +424,7 @@ class HiveConnector {
 
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
-      Book? currentBook = DatabaseMgr().localMgr.loadCurrentBook() != null ? getBook(DatabaseMgr().localMgr.loadCurrentBook()!) : null;
+      Book? currentBook = DatabaseMgr().localMgr.getCurrentBookId() != null ? getBook(DatabaseMgr().localMgr.getCurrentBookId()!) : null;
       if (currentBook != null && currentBook.recipeIds.contains(recipeId)) {
         for (Tag tag in currentBook.tags) {
           if (recipe.tags.contains(tag.id)) {
@@ -458,9 +458,9 @@ class HiveConnector {
     book.id = newId;
     await book.save();
 
-    String? currentBookId = loadCurrentBook();
+    String? currentBookId = getCurrentBookId();
     if (currentBookId != null && currentBookId == id) {
-      await saveCurrentBook(newId);
+      await saveCurrentBookId(newId);
     }
   }
 
@@ -564,11 +564,13 @@ class HiveConnector {
 
   List<Recipe> getRecipesFromBook(String bookId) {
     List<Recipe> recipes = [];
+    Set<String> seenIds = {};
 
     Book? book = getBook(bookId);
     print("$bookId => $book");
     if (book != null) {
       for (String recipeId in book.recipeIds) {
+        if (!seenIds.add(recipeId)) continue;
         Recipe? recipe = getRecipe(recipeId);
         if (recipe != null) {
           recipes.add(recipe);

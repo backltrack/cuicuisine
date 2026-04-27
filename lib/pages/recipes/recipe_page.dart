@@ -49,7 +49,7 @@ class _RecipePageState extends State<RecipePage> {
   void initState() {
     super.initState();
 
-    _currentBookId = DatabaseMgr().localMgr.loadCurrentBook()!;
+    _currentBookId = DatabaseMgr().localMgr.getCurrentBookId()!;
     currentBook = DatabaseMgr().localMgr.getBook(_currentBookId)!;
     userAccess = currentBook.access[DatabaseMgr().localMgr.getUserId()] ?? AccessLevel.read;
 
