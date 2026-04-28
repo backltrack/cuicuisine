@@ -38,11 +38,10 @@ class MongoConnector {
   }
 
   // helper
-  retryFuture(future, delay) {
+  Future<dynamic> retryFuture(Function future, int delay) async {
     print("retrying in $delay ms");
-    Future.delayed(Duration(milliseconds: delay), () {
-      future();
-    });
+    await Future.delayed(Duration(milliseconds: delay));
+    return await future();
   }
 
   Future<Response?> _secureGetRequest(String endpoint, {int trials=3}) async {
@@ -204,6 +203,7 @@ class MongoConnector {
         DatabaseMgr().isOnline = false;
         return null;
       }
+      print(e);
       print("try again : $trials");
       return await retryFuture(() => _securePutRequest(endpoint, data, trials: trials - 1), 1000);
     }
@@ -469,12 +469,12 @@ class MongoConnector {
 
             if (currentUser != null) {
               currentUser.copyFromUser(user);
-              currentUser.save();
+              await currentUser.save();
             }
           }
           else if (change.objectType == 'book') {
             if (change.operationType == OperationType.delete) {
-              DatabaseMgr().localMgr.deleteBook(change.objectId, addToQueue: false);
+              await DatabaseMgr().localMgr.deleteBook(change.objectId, addToQueue: false);
             }
             else {
               Book book = await fetchBook(change.objectId);
@@ -482,16 +482,16 @@ class MongoConnector {
 
               if (localBook != null) {
                 localBook.copyFromBook(book);
-                localBook.save();
+                await localBook.save();
               }
               else {
-                DatabaseMgr().localMgr.addBook(book, addToQueue: false);
+                await DatabaseMgr().localMgr.addBook(book, addToQueue: false);
               }
             }
           }
           else if (change.objectType == 'recipe') {
             if (change.operationType == OperationType.delete) {
-              DatabaseMgr().localMgr.deleteRecipe(change.objectId, addToQueue: false);
+              await DatabaseMgr().localMgr.deleteRecipe(change.objectId, addToQueue: false);
             }
             else {
               Recipe? recipe = await fetchRecipe(change.objectId);
@@ -503,10 +503,10 @@ class MongoConnector {
 
               if (localRecipe != null) {
                 localRecipe.copyFromRecipe(recipe);
-                localRecipe.save();
+                await localRecipe.save();
               }
               else {
-                DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+                await DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
               }
 
               await removeExtraImages(recipe);
@@ -532,20 +532,20 @@ class MongoConnector {
       Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
       if (data.keys.contains('books') && data.keys.contains('recipes') && data.keys.contains('lastChange')) {
         await DatabaseMgr().localMgr.clearBooks();
-        DatabaseMgr().localMgr.clearRecipes();
+        await DatabaseMgr().localMgr.clearRecipes();
 
         List<dynamic> bookIds = data['books'];
         for (String bookId in bookIds) {
           Book? book = await fetchBook(bookId);
-          DatabaseMgr().localMgr.addBook(book, addToQueue: false);
+          await DatabaseMgr().localMgr.addBook(book, addToQueue: false);
         }
 
         List<dynamic> recipeIds = data['recipes'];
         for (String recipeId in recipeIds) {
           Recipe? recipe = await fetchRecipe(recipeId);
           if (recipe != null) {
-            DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
-            
+            await DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+
             await removeExtraImages(recipe);
             await downloadMissingImages(recipe);
           }
