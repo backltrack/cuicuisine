@@ -5,7 +5,8 @@ import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
 class RecipeNamePage extends StatefulWidget {
-  const RecipeNamePage({Key? key}) : super(key: key);
+  final String currentName;
+  const RecipeNamePage({Key? key, required this.currentName}) : super(key: key);
 
   @override
   _RecipeNamePageState createState() => _RecipeNamePageState();
@@ -16,6 +17,14 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
   bool argsLoaded = false;
 
   @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _controller.text = widget.currentName;
+    });
+  }
+
+  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
@@ -23,17 +32,9 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
 
   @override
   Widget build(BuildContext context) {
-    // load params
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    String currentName = routeArgs['currentName']!;
-
-    if (!argsLoaded) {
-      _controller.text = currentName;
-      argsLoaded = true;
-    }
 
     void submit() async {
-      if (_controller.text != "" && _controller.text != currentName) {
+      if (_controller.text != "" && _controller.text != widget.currentName) {
         Navigator.pop(context, beautifyName(_controller.text));
       } else {
         Navigator.pop(context);

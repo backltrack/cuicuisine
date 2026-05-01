@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../models/data_model.dart';
 import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
-import '../../utilities/string_functions.dart';
 
 class IngredientTile extends StatefulWidget {
   final Ingredient ingredient;
@@ -34,7 +33,7 @@ class _IngredientTileState extends State<IngredientTile> {
 
     setState(() {
       ingredient = widget.ingredient;
-      currentUnit = ingredient.unit;
+      currentUnit = ingredient.getUnit();
       unitMgr = Unit(widget.locale);
     });
   }
@@ -79,13 +78,13 @@ class _IngredientTileState extends State<IngredientTile> {
                 child: parseQuantity(quantity) == '0' ? const SizedBox() :
                   Text([
                     parseQuantity(quantity),
-                    if (ingredient.unit != "none" && ingredient.unit != "quantity") currentUnit
+                    if (ingredient.getUnit() != "none" && ingredient.getUnit() != "quantity") currentUnit
                   ].join(" "), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge)
             ),
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Text(beautifyName(ingredient.name), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                child: Text(ingredient.getName(), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
               )
             ),
             if (compatibleUnits.length > 1)

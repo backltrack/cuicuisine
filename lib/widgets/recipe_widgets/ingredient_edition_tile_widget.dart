@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
 import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
-import '../../utilities/string_functions.dart';
 
 class IngredientEditionTile extends StatefulWidget {
   final Ingredient ingredient;
@@ -70,13 +70,13 @@ class _IngredientEditionTileState extends State<IngredientEditionTile> {
                 width: MediaQuery.of(context).size.width / 5,
                 child: Text([
                   parseQuantity(quantity),
-                  if (ingredient.unit != "none" && ingredient.unit != "quantity") ingredient.unit
+                  if (ingredient.getUnit() != "none" && ingredient.getUnit() != "quantity") ingredient.getUnit()
                 ].join(" "), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge)
             ),
             Expanded(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  child: Text(beautifyName(ingredient.name), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                  child: Text(ingredient.getName(), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
                 )
             ),
             IconButton(

@@ -1,3 +1,4 @@
+import 'package:cuicuisine/pages/recipes/recipe_name_page.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/foundation.dart';
@@ -94,7 +95,6 @@ class _HomePageState extends State<HomePage> {
           selectedBook = foundBook;
           //get recipes and set tags and ingredients names to book
           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-          await DatabaseMgr().localMgr.updateBookIngredients();
           // get user access
           userAccess = selectedBook!.access[DatabaseMgr().localMgr.getUserId()] ?? AccessLevel.read;
           // refresh UI
@@ -217,7 +217,6 @@ class _HomePageState extends State<HomePage> {
     DatabaseMgr().localMgr.saveCurrentBookId(book.id);
     //get recipes and set tags and ingredients names to book
     recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
-    await DatabaseMgr().localMgr.updateBookIngredients();
     // get user access
     userAccess = DatabaseMgr().localMgr.getUserAccess(book.id) ?? AccessLevel.read;
     // refresh UI
@@ -284,7 +283,6 @@ class _HomePageState extends State<HomePage> {
       }
       // reload recipes
       recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-      await DatabaseMgr().localMgr.updateBookIngredients();
       // get user access
       userAccess = DatabaseMgr().localMgr.getUserAccess(selectedBook!.id) ?? AccessLevel.read;
 
@@ -367,7 +365,6 @@ class _HomePageState extends State<HomePage> {
                         if (result != null && result == "reloadRecipes") {
                           print('reload');
                           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                          await DatabaseMgr().localMgr.updateBookIngredients();
                           // refresh UI
                           setState(() {});
                         } else if (result != null && result == "reloadBooks") {
@@ -393,7 +390,7 @@ class _HomePageState extends State<HomePage> {
                       for (String ingredient in _mandatoryIngredients) {
                         ingredientCondition =
                             ingredientCondition && List<String>.generate(sortedData[index].recipeIngredients.length,
-                                (int i) => sortedData[index].recipeIngredients[i].name.toLowerCase().trim()).contains(ingredient.toLowerCase().trim());
+                                (int i) => removeDiacritics(sortedData[index].recipeIngredients[i].getName()).toLowerCase().trim()).contains(removeDiacritics(ingredient.toLowerCase().trim()));
                       }
 
                       if (_mandatoryTags.isNotEmpty && tagCondition || _mandatoryTags.isEmpty) {
@@ -445,24 +442,29 @@ class _HomePageState extends State<HomePage> {
 
         floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read) ? null : FloatingActionButton(
           onPressed: () async {
-            String newRecipeId = await DatabaseMgr().localMgr.addNewRecipe(name: "", bookId: selectedBook!.id);
-            // Edit recipe
-            await Navigator.of(context).pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
-              'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),
-              'isNewRecipe': true
+            await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => RecipeNamePage(currentName: "")
+            )).then((value) async { 
+              if (value != null && value is String) {
+                String newRecipeId = await DatabaseMgr().localMgr.addNewRecipe(name: value, bookId: selectedBook!.id);
+                // Edit recipe
+                await Navigator.of(context).pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
+                  'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),
+                  'isNewRecipe': true
+                });
+                // reload
+                books = DatabaseMgr().localMgr.getUserBooks();
+                // set updated Book
+                Book? foundBook = findBookFromId(selectedBook!.id);
+                if (foundBook != null) {
+                  selectedBook = foundBook;
+                }
+                // reload recipes
+                recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+                // update UI
+                setState(() {});
+              }
             });
-            // reload
-            books = DatabaseMgr().localMgr.getUserBooks();
-            // set updated Book
-            Book? foundBook = findBookFromId(selectedBook!.id);
-            if (foundBook != null) {
-              selectedBook = foundBook;
-            }
-            // reload recipes
-            recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-            await DatabaseMgr().localMgr.updateBookIngredients();
-            // update UI
-            setState(() {});
           },
           child: const Icon(Icons.add),
           

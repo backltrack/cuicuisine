@@ -1600,6 +1600,36 @@ class S {
     );
   }
 
+  /// `Créer un nouveau BookIngredient`
+  String get ingredient_create_new_book_ingredient {
+    return Intl.message(
+      'Créer un nouveau BookIngredient',
+      name: 'ingredient_create_new_book_ingredient',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Réinitialiser`
+  String get ingredient_reset_overrides {
+    return Intl.message(
+      'Réinitialiser',
+      name: 'ingredient_reset_overrides',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Sélectionne un ingrédient existant ou crée-en un nouveau`
+  String get ingredient_select_or_create {
+    return Intl.message(
+      'Sélectionne un ingrédient existant ou crée-en un nouveau',
+      name: 'ingredient_select_or_create',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Étapes`
   String get steps_edition_title {
     return Intl.message(

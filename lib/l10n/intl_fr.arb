@@ -188,6 +188,9 @@
   "ingredient_quantity": "Quantité",
   "ingredient_unit": "Unité",
   "ingredient_density_updated": "Densité de l'ingrédient mise à jour",
+  "ingredient_create_new_book_ingredient": "Créer un nouveau BookIngredient",
+  "ingredient_reset_overrides": "Réinitialiser",
+  "ingredient_select_or_create": "Sélectionne un ingrédient existant ou crée-en un nouveau",
 
   "steps_edition_title": "Étapes",
   "step_edition_title": "Étape",

@@ -68,7 +68,6 @@ class HiveConnector {
     _queueOperationBox = await Hive.openBox('queueOperations');
     _changeBox = await Hive.openBox('changes');
     _contextBox = await Hive.openBox('context');
-    _bookIngredientsBox = await Hive.openBox('bookIngredients');
     _webImagesBox = await Hive.openBox('webImages');
 
     if (_queueBox.isEmpty) {
@@ -85,7 +84,6 @@ class HiveConnector {
     await _queueOperationBox.clear();
     await _changeBox.clear();
     await _contextBox.clear();
-    await _bookIngredientsBox.clear();
     await _webImagesBox.clear();
 
     if (_queueBox.isEmpty) {
@@ -376,35 +374,6 @@ class HiveConnector {
     return null;
   }
 
-  Future<void> updateBookIngredients() async {
-    List<String> ingredients = [];
-
-    await _bookIngredientsBox.clear();
-
-    String? currentBookId = getCurrentBookId();
-    if (currentBookId != null) {
-      Book? book = getBook(currentBookId);
-      if (book != null) {
-        List<String> recipeIds = book.recipeIds;
-        for (String recipeId in recipeIds) {
-          Recipe? recipe = getRecipe(recipeId);
-          if (recipe != null) {
-            for (Ingredient ingredient in recipe.recipeIngredients) {
-              if (!ingredients.contains(ingredient.name.trim().toLowerCase())) {
-                ingredients.add(ingredient.name.trim().toLowerCase());
-              }
-              if (!_bookIngredientsBox.values.contains(ingredient.name.trim().toLowerCase())) {
-                _bookIngredientsBox.add(ingredient.name.trim().toLowerCase());
-              } 
-            }
-          }
-        }
-        await _contextBox.clear();
-        await _contextBox.put('ingredients', ingredients);
-      }
-    }
-  }
-
   List<Tag> getBookTags() {
     List<Tag> tags = [];
 
@@ -417,6 +386,20 @@ class HiveConnector {
     }
 
     return tags;
+  }
+
+  List<BookIngredient> getBookIngredients() {
+    List<BookIngredient> ingredients = [];
+
+    String? currentBookId = getCurrentBookId();
+    if (currentBookId != null) {
+      Book? book = getBook(currentBookId);
+      if (book != null) {
+        ingredients = book.bookIngredients;
+      }
+    }
+
+    return ingredients;
   }
 
   List<Tag> getRecipeTags(String recipeId) {
@@ -435,14 +418,6 @@ class HiveConnector {
     }
 
     return tags;
-  }
-
-  List<String> getBookIngredients() {
-    var ingredients = _contextBox.get('ingredients');
-    if (ingredients != null) {
-      return List<String>.from(ingredients);
-    }
-    return [];
   }
 
   Future<void> clearBooks() async {
@@ -548,6 +523,80 @@ class HiveConnector {
       print("book not found");
       return;
     }
+  }
+
+  Future<BookIngredient> addBookIngredient(String bookId, String name, String unit, double density) async {
+    try {
+      BookIngredient bookIngredient = BookIngredient(id: ObjectId().hexString, name: name, unit: unit, density: density);
+      await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: [...getBook(bookId)!.bookIngredients, bookIngredient]));
+      return bookIngredient;
+    } on Exception catch(e) {
+      throw Exception(e);
+    }
+  }
+
+  BookIngredient? getBookIngredient(String bookIngredientId) {
+    Book? book = getBook(getCurrentBookId()!);
+    if (book != null) {
+      try {
+        BookIngredient? bookIngredient = book.bookIngredients.firstWhere((ingredient) => ingredient.id == bookIngredientId);
+        return bookIngredient;
+      } on StateError {
+        print("book ingredient not found");
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<bool> deleteBookIngredient(String bookId, String bookIngredientId) async {
+    try {
+      Book? book = getBook(bookId);
+      BookIngredient? bookIngredient = getBookIngredient(bookIngredientId);
+      if (book != null && bookIngredient != null) {
+        if (getIngredientsRelatedToBookIngredient(bookIngredient).isNotEmpty) {
+          print("You can't delete this ingredient because it's used in a recipe");
+          return false;
+        }
+        List<BookIngredient> updatedIngredients = List.from(book.bookIngredients)..removeWhere((ingredient) => ingredient.id == bookIngredientId);
+        await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: updatedIngredients));
+        return true;
+      }
+    } on Exception catch(e) {
+      throw Exception(e);
+    }
+    return false;
+  }
+
+  Future<void> updateBookIngredient(String bookId, String bookIngredientId, {String? name, String? unit, double? density}) async {
+    try {
+      Book? book = getBook(bookId);
+      BookIngredient? bookIngredient = getBookIngredient(bookIngredientId);
+      if (book != null && bookIngredient != null) {
+        BookIngredient updatedBookIngredient = BookIngredient(
+          id: bookIngredient.id,
+          name: name ?? bookIngredient.name,
+          unit: unit ?? bookIngredient.unit,
+          density: density ?? bookIngredient.density
+        );
+        List<BookIngredient> updatedIngredients = List.from(book.bookIngredients)..removeWhere((ingredient) => ingredient.id == bookIngredientId)..add(updatedBookIngredient);
+        await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: updatedIngredients));
+      }
+    } on Exception catch(e) {
+      throw Exception(e);
+    }
+  }
+
+  List<Ingredient> getIngredientsRelatedToBookIngredient(BookIngredient bookIngredient) {
+    List<Ingredient> ingredients = [];
+    for (Recipe recipe in getAllRecipes()) {
+      for (Ingredient ingredient in recipe.recipeIngredients) {
+        if (ingredient.bookIngredientId == bookIngredient.id) {
+          ingredients.add(ingredient);
+        }
+      }
+    }
+    return ingredients;
   }
 
 

@@ -17,6 +17,7 @@ import '../../widgets/recipe_widgets/recipe_ingredients_widget.dart';
 import '../../widgets/recipe_widgets/recipe_steps_widget.dart';
 import '../../widgets/recipe_widgets/recipe_tags_widget.dart';
 import '../../widgets/recipe_widgets/recipe_time_widget.dart';
+import 'recipe_name_page.dart';
 
 class RecipePage extends StatefulWidget {
   static const route = "/home/recipe";
@@ -96,13 +97,13 @@ class _RecipePageState extends State<RecipePage> {
       shouldInit = false;
 
       // trigger Edit recipe name
-      WidgetsBinding.instance.addPostFrameCallback((_){
-        if (isNewRecipe) {
-          Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
-            "currentName": recipe.name
-          }).then((value) => updateAfterRename(value));
-        }
-      });
+      // WidgetsBinding.instance.addPostFrameCallback((_){
+      //   if (isNewRecipe) {
+      //     Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
+      //       "currentName": recipe.name
+      //     }).then((value) => updateAfterRename(value));
+      //   }
+      // });
     }
 
     // get is favorite recipe
@@ -126,9 +127,10 @@ class _RecipePageState extends State<RecipePage> {
                 child: IconButton(
                   icon: const FaIcon(FontAwesomeIcons.penToSquare),
                   onPressed: () {
-                    Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
-                      "currentName": recipe.name
-                    }).then((value) => updateAfterRename(value));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => RecipeNamePage(currentName: recipe.name))).then((value) => updateAfterRename(value));
+                    // Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
+                    //   "currentName": recipe.name
+                    // }).then((value) => updateAfterRename(value));
                   },
                 ),
               ) :

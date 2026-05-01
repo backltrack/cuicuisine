@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cuicuisine/database/synchronization.dart';
 import 'package:cuicuisine/pages/account/account_page.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:flutter/foundation.dart';
@@ -172,9 +171,9 @@ class _CuicuisineState extends State<Cuicuisine> {
                   return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
                 }
                 // navigate to recipe name edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
-                  return MaterialPageRoute(builder: (context) => const RecipeNamePage(), settings: settings);
-                }
+                // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
+                //   return MaterialPageRoute(builder: (context) => const RecipeNamePage(), settings: settings);
+                // }
                 // // navigate to recipe image edition page
                 else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'images') {
                   return MaterialPageRoute(builder: (context) => const RecipeImagesEditionPage(), settings: settings);

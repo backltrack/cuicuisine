@@ -59,7 +59,7 @@ class BookUpdate implements DatabaseObject {
   @HiveField(4)
   Map<String, AccessLevel>? access;
   @HiveField(5)
-  List<String>? bookIngredients;
+  List<BookIngredient>? bookIngredients;
   @HiveField(6)
   List<Tag>? tags;
   @HiveField(7)
@@ -101,6 +101,9 @@ class BookUpdate implements DatabaseObject {
     }
     if (tags != null) {
       json['tags'] = List<Map>.generate(tags!.length, (index) => tags![index].toJson());
+    }
+    if (bookIngredients != null) {
+      json['bookIngredients'] = List<Map>.generate(bookIngredients!.length, (index) => bookIngredients![index].toJson());
     }
 
     return json;

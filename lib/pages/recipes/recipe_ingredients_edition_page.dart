@@ -109,16 +109,16 @@ class _RecipeIngredientsEditionPageState extends State<RecipeIngredientsEditionP
                 setState(() {});
               },
               onEdit: (int index) async {
-                var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
+                Ingredient? result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
                   'isNew': false,
                   'locale': locale,
                   'ingredient': ingredients[index]
                 });
-                if (result != null && result is Ingredient) {
-                  ingredients[index].name = result.name;
-                  ingredients[index].unit = result.unit;
+                if (result != null) {
+                  ingredients[index].bookIngredientId = result.bookIngredientId;
+                  ingredients[index].unitOverride = result.unitOverride;
                   ingredients[index].quantity = result.quantity;
-                  ingredients[index].density = result.density;
+                  ingredients[index].densityOverride = result.densityOverride;
                   setState(() {});
                 }
               },

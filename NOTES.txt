@@ -1,5 +1,14 @@
-Question pour Claude:
-- Les books listent plusieurs fois les même recettes. Cela semble arriver particulièrement à la création de la première recette. J'ai souvent un popup de warning indiquant que la tache de création du book est re-queued alors que tout se passe bien côté server. Je pense que ce problème impacte la suite. Peux-tu m'aider à creuser cette piste avant de sécuriser le fait de ne pas pouvoir ajouter deux fois la même recette dans un book ?
+TODO:
+- bug ajout tag, pas selectionné
+- feed tags with defaults at account creation
+- edit my tags
+- categorize tags: pays, matériel, food tolerance
+- Api Version
+- model migration history
+- versioned db
+- deeplink
+- sort books per last access
+- research all book
 
 
 HIVE - REMOTE DB SYNC
