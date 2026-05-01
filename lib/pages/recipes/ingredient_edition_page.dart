@@ -114,9 +114,12 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
       if (!isNew) {
         selectedBookIngredient = DatabaseMgr().localMgr.getBookIngredient(ingredient.bookIngredientId);
       }
+      // suppress listener during init to avoid setState-inside-build
+      _selectingFromSuggestion = true;
       nameTextEditingController.text = ingredient.getName();
       quantityTextEditingController.text = (ingredient.quantity ?? 0).toString();
       densityTextEditingController.text = ingredient.getDensity().toString();
+      _selectingFromSuggestion = false;
       setState(() { unitMgr = Unit(locale); });
       shouldInit = false;
     }
@@ -180,11 +183,33 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
                     },
                   ),
                 ),
-                if (selectedBookIngredient != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12),
-                    child: FaIcon(FontAwesomeIcons.link, size: 16, color: ThemeMgr.getTheme(context)!.primaryColor),
+                if (selectedBookIngredient != null) ...[
+                  FaIcon(FontAwesomeIcons.link, size: 16, color: ThemeMgr.getTheme(context)!.primaryColor),
+                  IconButton(
+                    tooltip: S.of(context).ingredient_edit_book_ingredient,
+                    icon: const FaIcon(FontAwesomeIcons.pen, size: 14),
+                    onPressed: () async {
+                      final result = await Navigator.pushNamed(
+                        context,
+                        '${ModalRoute.of(context)!.settings.name!}/book_ingredient',
+                        arguments: {
+                          'bookIngredient': selectedBookIngredient!,
+                          'bookId': DatabaseMgr().localMgr.getCurrentBookId()!,
+                          'locale': locale,
+                        },
+                      );
+                      if (result != null && result is BookIngredient) {
+                        setState(() { selectedBookIngredient = result; });
+                        _selectingFromSuggestion = true;
+                        nameTextEditingController.text = result.name;
+                        _selectingFromSuggestion = false;
+                        if (ingredient.densityOverride == null) {
+                          densityTextEditingController.text = result.density.toString();
+                        }
+                      }
+                    },
                   ),
+                ],
               ],
             ),
 

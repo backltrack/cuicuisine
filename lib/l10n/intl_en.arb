@@ -191,6 +191,8 @@
   "ingredient_create_new_book_ingredient": "Create a new BookIngredient",
   "ingredient_reset_overrides": "Reset to default",
   "ingredient_select_or_create": "Select an existing ingredient or create a new one",
+  "book_ingredient_edition_title": "Edit master ingredient",
+  "ingredient_edit_book_ingredient": "Edit master ingredient",
 
   "steps_edition_title": "Steps",
   "step_edition_title": "RecipeStep",

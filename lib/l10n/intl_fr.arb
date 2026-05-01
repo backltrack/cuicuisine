@@ -191,6 +191,8 @@
   "ingredient_create_new_book_ingredient": "Créer un nouveau BookIngredient",
   "ingredient_reset_overrides": "Réinitialiser",
   "ingredient_select_or_create": "Sélectionne un ingrédient existant ou crée-en un nouveau",
+  "book_ingredient_edition_title": "Modifier l'ingrédient maître",
+  "ingredient_edit_book_ingredient": "Modifier l'ingrédient maître",
 
   "steps_edition_title": "Étapes",
   "step_edition_title": "Étape",

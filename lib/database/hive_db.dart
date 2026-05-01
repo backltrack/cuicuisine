@@ -26,7 +26,6 @@ class HiveConnector {
   late Box<Operation> _queueOperationBox;
   late Box<String> _changeBox;
   late Box<dynamic> _contextBox;
-  late Box<dynamic> _bookIngredientsBox;
   late Box<dynamic> _webImagesBox;
   FileStorage fileStorage = FileStorage();
 
@@ -47,6 +46,7 @@ class HiveConnector {
       ..registerAdapter(BookAdapter())
       ..registerAdapter(VariantAdapter())
       ..registerAdapter(IngredientAdapter())
+      ..registerAdapter(BookIngredientAdapter())
       ..registerAdapter(TagAdapter())
       ..registerAdapter(RecipeStepAdapter())
       ..registerAdapter(RecipeAdapter())

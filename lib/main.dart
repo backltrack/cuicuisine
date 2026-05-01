@@ -30,6 +30,7 @@ import 'pages/settings/general_settings_page.dart';
 import 'pages/home_page.dart';
 import 'pages/item_selector_page.dart';
 import 'pages/recipes/ingredient_edition_page.dart';
+import 'pages/recipes/book_ingredient_edition_page.dart';
 import 'pages/recipes/new_tag_page.dart';
 import 'pages/recipes/recipe_images_edition_page.dart';
 import 'pages/recipes/recipe_ingredients_edition_page.dart';
@@ -201,6 +202,13 @@ class _CuicuisineState extends State<Cuicuisine> {
                     && settings.name!.split('/')[5] == 'ingredients'
                     && settings.name!.split('/').last == 'edition') {
                   return MaterialPageRoute(builder: (context) => const IngredientEditionPage(), settings: settings);
+                }
+                // navigate to book ingredient edition page
+                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 8
+                    && settings.name!.split('/')[5] == 'ingredients'
+                    && settings.name!.split('/')[6] == 'edition'
+                    && settings.name!.split('/').last == 'book_ingredient') {
+                  return MaterialPageRoute(builder: (context) => const BookIngredientEditionPage(), settings: settings);
                 }
                 // navigate to recipe steps edition page
                 else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'steps') {

@@ -1,28 +1,62 @@
+import 'data_model.dart';
 
-Map<String,List<String>> defaultTags = {
+Map<String, List<Tag>> defaultTags = {
   'en': [
-    'winter', 'spring', 'summer', 'automne',
-    'vegetarian', 'vegan', 'meat', 'fish',
-    'oven', 'bbq', 'steam',
-    'hot', 'spicy',
-    'cold',
-    'salad', 'sandwich',
-    'breakfast', 'aperitif', 'lunch', 'dinner',
-    'drink', 'cocktail', 'beer',
-    'french', 'italian', 'american', 'asian'
+    Tag.newTag('winter', "season"),
+    Tag.newTag('spring', "season"),
+    Tag.newTag('summer', "season"),
+    Tag.newTag('autumn', "season"),
+    Tag.newTag('vegetarian', "diet"),
+    Tag.newTag('vegan', "diet"),
+    Tag.newTag('sans gluten', "diet"),
+    Tag.newTag('viande', "protein"),
+    Tag.newTag('poisson', "protein"),
+    Tag.newTag('four', "cooking"),
+    Tag.newTag('bbq', "cooking"),
+    Tag.newTag('vapeur', "cooking"),
+    Tag.newTag('piquant', "taste"),
+    Tag.newTag('froid', "temperature"),
+    Tag.newTag('salade', "dish"),
+    Tag.newTag('petit-déjeuner', "meal"),
+    Tag.newTag('apéro', "meal"),
+    Tag.newTag('déjeuner', "meal"),
+    Tag.newTag('dîner', "meal"),
+    Tag.newTag('boisson', "drink"),
+    Tag.newTag('cocktail', "drink"),
+    Tag.newTag('bière', "drink"),
+    Tag.newTag('français', "origin"),
+    Tag.newTag('italien', "origin"),
+    Tag.newTag('asiatique', "origin")
   ],
   'fr': [
-    'hiver', 'printemps', 'été', 'automne',
-    'végétarien', 'vegan', 'viande', 'poisson',
-    'four', 'bbq', 'vapeur',
-    'piquant', 'épicé',
-    'froid',
-    'salade', 'sandwich',
-    'petit-déjeuner', 'apéro', 'déjeuner', 'dîner',
-    'boisson', 'cocktail', 'bière',
-    'français', 'italien', 'américain', 'asiatique'
+    Tag.newTag('hiver', "saison"),
+    Tag.newTag('printemps', "saison"),
+    Tag.newTag('été', "saison"),
+    Tag.newTag('automne', "saison"),
+    Tag.newTag('végétarien', "régime"),
+    Tag.newTag('vegan', "régime"),
+    Tag.newTag('sans gluten', "régime"),
+    Tag.newTag('viande', "protéine"),
+    Tag.newTag('poisson', "protéine"),
+    Tag.newTag('four', "cuisson"),
+    Tag.newTag('bbq', "cuisson"),
+    Tag.newTag('vapeur', "cuisson"),
+    Tag.newTag('piquant', "goût"),
+    Tag.newTag('froid', "température"),
+    Tag.newTag('salade', "plat"),
+    Tag.newTag('petit-déjeuner', "repas"),
+    Tag.newTag('apéro', "repas"),
+    Tag.newTag('déjeuner', "repas"),
+    Tag.newTag('dîner', "repas"),
+    Tag.newTag('boisson', "boisson"),
+    Tag.newTag('cocktail', "boisson"),
+    Tag.newTag('bière', "boisson"),
+    Tag.newTag('français', "cuisine"),
+    Tag.newTag('italien', "cuisine"),
+    Tag.newTag('asiatique', "cuisine")
   ]
 };
+
 
 Map<String,List<String>> defaultIngredients = {
   'en': [

@@ -109,12 +109,12 @@ class _RecipeIngredientsEditionPageState extends State<RecipeIngredientsEditionP
                 setState(() {});
               },
               onEdit: (int index) async {
-                Ingredient? result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
+                final result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/edition', arguments: {
                   'isNew': false,
                   'locale': locale,
                   'ingredient': ingredients[index]
                 });
-                if (result != null) {
+                if (result != null && result is Ingredient) {
                   ingredients[index].bookIngredientId = result.bookIngredientId;
                   ingredients[index].unitOverride = result.unitOverride;
                   ingredients[index].quantity = result.quantity;

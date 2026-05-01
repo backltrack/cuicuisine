@@ -1630,6 +1630,26 @@ class S {
     );
   }
 
+  /// `Modifier le BookIngredient`
+  String get book_ingredient_edition_title {
+    return Intl.message(
+      'Modifier le BookIngredient',
+      name: 'book_ingredient_edition_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Modifier le BookIngredient`
+  String get ingredient_edit_book_ingredient {
+    return Intl.message(
+      'Modifier le BookIngredient',
+      name: 'ingredient_edit_book_ingredient',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Étapes`
   String get steps_edition_title {
     return Intl.message(
