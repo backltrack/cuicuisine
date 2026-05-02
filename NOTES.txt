@@ -1,8 +1,7 @@
 TODO:
-- bug ajout tag, pas selectionné
-- feed tags with defaults at account creation
-- edit my tags
-- categorize tags: pays, matériel, food tolerance
+- bug email recup password
+- nake notif smaller
+- pop up configuration a la création du compte
 - Api Version
 - model migration history
 - versioned db
