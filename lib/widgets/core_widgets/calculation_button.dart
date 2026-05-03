@@ -19,11 +19,8 @@ class _CalculationButtonWidgetState extends State<CalculationButtonWidget> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      _value = widget.value;
-      _isEnabled = _value != 1;
-    });
+    _value = widget.value;
+    _isEnabled = _value != 1;
   }
 
   @override
@@ -41,8 +38,6 @@ class _CalculationButtonWidgetState extends State<CalculationButtonWidget> {
               double? newValue = await showQuantityMultiplierDialog(context: Navigator.of(context).context, currentCoefficient: _value);
               if (newValue == null) return;
               if (newValue != _value && newValue > 0) {
-                print("JE SUIS EN TRAIN DE CHANGER LA VALEUR");
-                print(mounted);
                 setState(() {
                   _isEnabled = newValue != 1;
                   _value = newValue;

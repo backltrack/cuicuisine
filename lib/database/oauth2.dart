@@ -55,19 +55,13 @@ class OAuth2Connexion {
       return client;
 
     } on Exception catch(e) {
-      if (e.toString().contains("Incorrect email")) {
-
+      final msg = e.toString().toLowerCase();
+      if (msg.contains("incorrect email") || msg.contains("user not found")) {
         throw InvalidEmailException();
-      }
-      else if (e.toString().contains("Incorrect password")) {
+      } else {
         throw InvalidPasswordException();
       }
-      else {
-        print(e);
-      }
     }
-    
-    return null;
   }
 
   static Future<oauth2.Client?> createClientFromPassword({required String serverUri, required String email, required String password}) async {

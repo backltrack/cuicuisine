@@ -57,10 +57,10 @@ class _EmailConnexionState extends State<EmailConnexion> {
           setState(() {
             showForgottenButton = true;
           });
-          ToastNotifier().showInfo("Invalid email, do you want to register?");
+          ToastNotifier().showInfo(S.of(context).wrong_user);
         },
         onInvalidPassword: () {
-          ToastNotifier().showWarning("Invalid password, try again!");
+          ToastNotifier().showWarning(S.of(context).wrong_password);
         },
         onSuccess: (AppUser user) async {
           await DatabaseMgr().synchronization.sync();

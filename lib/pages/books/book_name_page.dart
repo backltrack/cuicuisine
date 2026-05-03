@@ -5,6 +5,7 @@ import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
+import '../../l10n/localeMgr.dart';
 import '../../models/data_model.dart';
 
 class BookNamePage extends StatefulWidget {
@@ -46,7 +47,7 @@ class _BookNamePageState extends State<BookNamePage> {
     void submit() async {
       if (_controller.text != "" && _controller.text != currentName) {
         if (isBookCreation) {
-          String? newBookId = await DatabaseMgr().localMgr.addNewBook(_controller.text);
+          String? newBookId = await DatabaseMgr().localMgr.addNewBook(_controller.text, LocaleMgr.getLocale(context));
           if (newBookId != null) {
             Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
             Navigator.pop(context, newBook);

@@ -19,7 +19,7 @@ class ToastNotifier {
     _toastification.show(
       title: Text(message),
       type: ToastificationType.success,
-      alignment: AlignmentDirectional.bottomCenter,
+      alignment: AlignmentDirectional.topCenter,
       style: ToastificationStyle.flat,
       backgroundColor: DarkColors.tileBackgroundColor,
       foregroundColor: DarkColors.writingColor,
@@ -32,7 +32,7 @@ class ToastNotifier {
     _toastification.show(
       title: Text(message),
       type: ToastificationType.info,
-      alignment: AlignmentDirectional.bottomCenter,
+      alignment: AlignmentDirectional.topCenter,
       style: ToastificationStyle.flat,
       backgroundColor: DarkColors.tileBackgroundColor,
       foregroundColor: DarkColors.writingColor,
@@ -45,7 +45,7 @@ class ToastNotifier {
     _toastification.show(
       title: Text(message),
       type: ToastificationType.warning,
-      alignment: AlignmentDirectional.bottomCenter,
+      alignment: AlignmentDirectional.topCenter,
       style: ToastificationStyle.flat,backgroundColor: DarkColors.tileBackgroundColor,
       foregroundColor: DarkColors.writingColor,
       borderSide: BorderSide(color: Colors.orange, width: 2),
@@ -57,7 +57,7 @@ class ToastNotifier {
     _toastification.show(
       title: Text(message),
       type: ToastificationType.error,
-      alignment: AlignmentDirectional.bottomCenter,
+      alignment: AlignmentDirectional.topCenter,
       style: ToastificationStyle.flat,backgroundColor: DarkColors.tileBackgroundColor,
       foregroundColor: DarkColors.writingColor,
       borderSide: BorderSide(color: Colors.red, width: 2),

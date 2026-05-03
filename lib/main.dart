@@ -26,6 +26,7 @@ import 'pages/books/book_join_page.dart';
 import 'pages/books/book_name_page.dart';
 import 'pages/books/book_settings_page.dart';
 import 'pages/books/book_share_page.dart';
+import 'pages/books/book_tags_edition_page.dart';
 import 'pages/settings/general_settings_page.dart';
 import 'pages/home_page.dart';
 import 'pages/item_selector_page.dart';
@@ -224,6 +225,11 @@ class _CuicuisineState extends State<Cuicuisine> {
                 // navigate to book settings page
                 else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
                   return MaterialPageRoute(builder: (context) => const BookSettingsPage(), settings: settings);
+                }
+
+                // navigate to book tags edition page
+                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 5 && settings.name!.split('/').last == 'tags') {
+                  return MaterialPageRoute(builder: (context) => const BookTagsEditionPage(), settings: settings);
                 }
 
                 // navigate to book share page

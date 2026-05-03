@@ -1,6 +1,6 @@
-import 'package:cuicuisine/database/database_mgr.dart';
-import 'package:cuicuisine/main.dart';
 import 'package:flutter/material.dart';
+import '../database/database_mgr.dart';
+import '../main.dart';
 
 class LocaleMgr {
   static final LocaleMgr _instance = LocaleMgr._();

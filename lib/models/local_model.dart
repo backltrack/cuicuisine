@@ -115,37 +115,37 @@ class Unit {
     quantities = SmallQuantityUnit(locale);
 
   List<String> getCompatibleUnits(Ingredient ingredient) {
-    final double density = ingredient.getDensity();
-    if (masses.unitList.contains(ingredient.getUnit()) && density == 0) return masses.unitList;
-    else if (masses.unitList.contains(ingredient.getUnit()) && density != 0) return masses.unitList + volumes.unitList;
-    else if (volumes.aliasesList.contains(ingredient.getUnit()) && density == 0) return volumes.unitList;
-    else if (volumes.aliasesList.contains(ingredient.getUnit()) && density != 0) return volumes.unitList + masses.unitList;
-    else return [ingredient.getUnit()];
+    return getCompatibleUnitsForUnit(ingredient.getUnit(), ingredient.getDensity());
+  }
+
+  List<String> getCompatibleUnitsForUnit(String unit, double density) {
+    if (masses.unitList.contains(unit) && density == 0) return masses.unitList;
+    else if (masses.unitList.contains(unit) && density != 0) return masses.unitList + volumes.unitList;
+    else if (volumes.aliasesList.contains(unit) && density == 0) return volumes.unitList;
+    else if (volumes.aliasesList.contains(unit) && density != 0) return volumes.unitList + masses.unitList;
+    else return [unit];
   }
 
   double getConversionFactor(Ingredient ingredient, String wantedUnit) {
-    if (masses.unitList.contains(ingredient.getUnit()) && masses.unitList.contains(wantedUnit)) {
-      // mass conversion
-      return masses.massConversionFactor(ingredient.getUnit(), wantedUnit)!;
+    return getConversionFactorForUnit(ingredient.getUnit(), wantedUnit, ingredient.getDensity());
+  }
+
+  double getConversionFactorForUnit(String fromUnit, String toUnit, double density) {
+    if (masses.unitList.contains(fromUnit) && masses.unitList.contains(toUnit)) {
+      return masses.massConversionFactor(fromUnit, toUnit)!;
     }
-    else if (volumes.aliasesList.contains(ingredient.getUnit()) && volumes.unitList.contains(wantedUnit)) {
-      // volume conversion
-      return volumes.volumeConversionFactor(ingredient.getUnit(), wantedUnit)!;
+    else if (volumes.aliasesList.contains(fromUnit) && volumes.unitList.contains(toUnit)) {
+      return volumes.volumeConversionFactor(fromUnit, toUnit)!;
     }
-    else if (ingredient.getDensity() != 0 && masses.unitList.contains(ingredient.getUnit()) && volumes.unitList.contains(wantedUnit)) {
-      // mass to volume conversion
-      // mass to g -> / density*10 (g/cL) -> cL -> wanted volume
-      return masses.massConversionFactor(ingredient.getUnit(), masses.defaultUnit)!
-          / (ingredient.getDensity() * 10) * volumes.volumeConversionFactor(volumes.defaultUnit, wantedUnit)!;
+    else if (density != 0 && masses.unitList.contains(fromUnit) && volumes.unitList.contains(toUnit)) {
+      return masses.massConversionFactor(fromUnit, masses.defaultUnit)!
+          / (density * 10) * volumes.volumeConversionFactor(volumes.defaultUnit, toUnit)!;
     }
-    else if (ingredient.getDensity() != 0 && volumes.unitList.contains(ingredient.getUnit()) && masses.unitList.contains(wantedUnit)) {
-      // volume to mass conversion
-      // volume to cL -> * density*10 (g/cL) -> g -> wanted mass
-      return volumes.volumeConversionFactor(ingredient.getUnit(), volumes.defaultUnit)!
-          * (ingredient.getDensity() * 10) * masses.massConversionFactor(masses.defaultUnit, wantedUnit)!;
+    else if (density != 0 && volumes.unitList.contains(fromUnit) && masses.unitList.contains(toUnit)) {
+      return volumes.volumeConversionFactor(fromUnit, volumes.defaultUnit)!
+          * (density * 10) * masses.massConversionFactor(masses.defaultUnit, toUnit)!;
     }
     else {
-      print("Impossible conversion");
       return 1;
     }
   }

@@ -155,6 +155,7 @@
 
   "book_settings_page_title": "Paramètres du livre",
   "book_settings_rename": "Renommer",
+  "book_settings_tags": "Tags",
   "book_settings_share": "Partager",
   "book_settings_share_link": "Partager avec lien",
   "book_settings_share_qr": "Partager avec code QR",
@@ -178,6 +179,7 @@
 
   "new_tag_title": "Nouveau tag",
   "new_tag_name": "Nom",
+  "new_tag_category": "Catégorie",
   "no_tag": "notag",
 
   "new_ingredient_title": "Nouvel ingrédient",
@@ -193,6 +195,9 @@
   "ingredient_select_or_create": "Sélectionne un ingrédient existant ou crée-en un nouveau",
   "book_ingredient_edition_title": "Modifier l'ingrédient maître",
   "ingredient_edit_book_ingredient": "Modifier l'ingrédient maître",
+  "tag_category_other": "Autres",
+  "tag_delete_used_warning": "Ce tag est utilisé dans {count} recette(s) (\"{name}\"). La suppression le retirera de toutes ces recettes.",
+  "tag_delete_used_confirm": "Veux-tu quand même le supprimer ?",
 
   "steps_edition_title": "Étapes",
   "step_edition_title": "Étape",

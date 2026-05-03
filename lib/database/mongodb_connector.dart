@@ -633,7 +633,12 @@ class MongoConnector {
   }
 
   Future<OperationResult> createBook(Book book) async {
-    final response = await _securePutRequest('/books/create', {'id': book.id, 'name': book.name});
+    final response = await _securePutRequest('/books/create', {
+      'id': book.id,
+      'name': book.name,
+      'tags': jsonEncode(List<Map>.generate(book.tags.length, (index) => book.tags[index].toJson())),
+      'bookIngredients': jsonEncode(List<Map>.generate(book.bookIngredients.length, (index) => book.bookIngredients[index].toJson())),
+    });
 
     if (response != null && response.statusCode == 201) {
       try {

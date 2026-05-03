@@ -106,7 +106,8 @@ class Book extends HiveObject implements DatabaseObject {
       'recipeIds': recipeIds.toString(),
       'access': Map<String, int>.fromEntries(access.entries.map((entry) => MapEntry(entry.key, entry.value.index))).toString(),
       'users': users.toString(),
-      'tags': List<Map>.generate(tags.length, (index) => tags[index].toJson()).toString()
+      'tags': List<Map>.generate(tags.length, (index) => tags[index].toJson()).toString(),
+      'bookIngredients': List<Map>.generate(bookIngredients.length, (index) => bookIngredients[index].toJson()).toString(),
     };
   }
 
@@ -119,9 +120,7 @@ class Book extends HiveObject implements DatabaseObject {
       recipeIds: List.generate(data['recipeIds'].length, (index) => data['recipeIds'][index] as String),
       lastUpdate: DateTime.parse(data['lastUpdate']),
       tags: List.generate(data['tags'].length, (index) => Tag.fromJson(data['tags'][index])),
-      bookIngredients: data['bookIngredients'] != null
-          ? List.generate(data['bookIngredients'].length, (index) => BookIngredient.fromJson(data['bookIngredients'][index]))
-          : [],
+      bookIngredients: List.generate(data['bookIngredients'].length, (index) => BookIngredient.fromJson(data['bookIngredients'][index]))
     );
   }
 
@@ -134,7 +133,7 @@ class Book extends HiveObject implements DatabaseObject {
       users: [...book.users],
       lastUpdate: book.lastUpdate,
       tags: List.generate(book.tags.length, (index) => book.tags[index].copy()),
-      bookIngredients: List.generate(book.bookIngredients.length, (index) => book.bookIngredients[index].copy()),
+      bookIngredients: List.generate(book.bookIngredients.length, (index) => book.bookIngredients[index].copy())
     );
   }
 
@@ -433,9 +432,13 @@ class BookIngredient extends HiveObject {
   BookIngredient({
     required this.id,
     required this.name,
-    required this.unit,
+    this.unit='',
     this.density=0.0
   });
+
+  factory BookIngredient.newBookIngredient({required String name, String? unit, double? density}) {
+    return BookIngredient(id: UuidV4().generate(), name: name, unit: unit ?? '', density: density ?? 0.0);
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,

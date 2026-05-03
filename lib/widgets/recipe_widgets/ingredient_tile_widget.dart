@@ -23,19 +23,16 @@ class IngredientTile extends StatefulWidget {
 class _IngredientTileState extends State<IngredientTile> {
   late Ingredient ingredient;
   late Unit unitMgr;
-
+  late String baseUnit;
   late String currentUnit;
-
 
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      ingredient = widget.ingredient;
-      currentUnit = ingredient.getUnit();
-      unitMgr = Unit(widget.locale);
-    });
+    ingredient = widget.ingredient;
+    baseUnit = ingredient.getUnit();
+    currentUnit = baseUnit;
+    unitMgr = Unit(widget.locale);
   }
 
   String parseQuantity(double quantity) {
@@ -56,12 +53,11 @@ class _IngredientTileState extends State<IngredientTile> {
   @override
   Widget build(BuildContext context) {
 
-    double unitFactor = unitMgr.getConversionFactor(ingredient, currentUnit);
-    double quantity = double.parse(ingredient.quantity.toString())
-        * widget.quantityRatio
-        * unitFactor;
+    final double density = ingredient.getDensity();
+    double unitFactor = unitMgr.getConversionFactorForUnit(baseUnit, currentUnit, density);
+    double quantity = (ingredient.quantity ?? 0.0) * widget.quantityRatio * unitFactor;
 
-    List<String> compatibleUnits = unitMgr.getCompatibleUnits(ingredient);
+    List<String> compatibleUnits = unitMgr.getCompatibleUnitsForUnit(baseUnit, density);
 
     return Container(
         decoration: BoxDecoration(
@@ -73,12 +69,12 @@ class _IngredientTileState extends State<IngredientTile> {
         height: 45,
         child: Row(
           children: [
-            Container(
+            SizedBox(
                 width: MediaQuery.of(context).size.width / 5,
                 child: parseQuantity(quantity) == '0' ? const SizedBox() :
                   Text([
                     parseQuantity(quantity),
-                    if (ingredient.getUnit() != "none" && ingredient.getUnit() != "quantity") currentUnit
+                    if (baseUnit != "none" && baseUnit != "quantity") currentUnit
                   ].join(" "), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge)
             ),
             Expanded(

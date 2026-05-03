@@ -27,10 +27,8 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
 
   getNames() async {
     if (_book != null) {
-      if (_book!.access[DatabaseMgr().localMgr.getUserId()]!.index == AccessLevel.own.index) {
-        if (await DatabaseMgr().remoteMgr.testConnexion()) {
-          userNames = await DatabaseMgr().remoteMgr.getBookUserNames(_book!.id);
-        }
+      if (await DatabaseMgr().remoteMgr.testConnexion()) {
+        userNames = await DatabaseMgr().remoteMgr.getBookUserNames(_book!.id);
       }
       // build is ready to render
       isReady = true;
@@ -100,6 +98,18 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                     }
                   }
                 });
+              },
+            ),
+          // tags edition
+          if (_book!.access[DatabaseMgr().localMgr.getUser()!.id]!.index >= AccessLevel.write.index)
+            ListTile(
+              title: Text(S.of(context).book_settings_tags),
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '${BookSettingsPage.route}/${_book!.id}/tags',
+                  arguments: {'bookId': _book!.id},
+                );
               },
             ),
           // share book

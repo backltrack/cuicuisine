@@ -65,6 +65,7 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
   void _linkBookIngredient(BookIngredient bi) {
     setState(() {
       selectedBookIngredient = bi;
+      ingredient.bookIngredientId = bi.id;
       ingredient.unitOverride = null;
       ingredient.densityOverride = null;
     });
@@ -169,6 +170,7 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
                     onSuggestionSelected: (String suggestion) {
                       if (suggestion == '__create__') {
                         _createAndLinkBookIngredient();
+                        setState(() {});
                         return;
                       }
                       _selectingFromSuggestion = true;
@@ -179,6 +181,7 @@ class _IngredientEditionPageState extends State<IngredientEditionPage> {
                           (bi) => removeDiacritics(bi.name).toLowerCase().trim() == suggestion,
                         );
                         _linkBookIngredient(bi);
+                        setState(() {});
                       } on StateError { /* no match */ }
                     },
                   ),

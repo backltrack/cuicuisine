@@ -11,6 +11,7 @@ import 'package:objectid/objectid.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 import '../models/data_model.dart';
+import '../models/default_data.dart';
 import '../models/update_model.dart';
 import '../models/sync_model.dart';
 import './database_mgr.dart';
@@ -327,14 +328,24 @@ class HiveConnector {
     }
   }
 
-  Future<String?> addNewBook(String name) async {
+  Future<String?> addNewBook(String name, String locale) async {
     AppUser? user = getUser();
-    if (user == null) {
-      return null;
-    }
-    Book book = Book(id: ObjectId().hexString, name: name, recipeIds: [], users: [user.id], access: {user.id: AccessLevel.own});
-    await addBook(book);
+    if (user == null) return null;
 
+    final effectiveLocale = defaultTags.containsKey(locale) ? locale : 'en';
+    final List<Tag> initialTags = List<Tag>.from(defaultTags[effectiveLocale]!);
+    final List<BookIngredient> initialBookIngredients = List<BookIngredient>.from(defaultIngredients[effectiveLocale]!);
+
+    Book book = Book(
+      id: ObjectId().hexString,
+      name: name,
+      recipeIds: [],
+      users: [user.id],
+      access: {user.id: AccessLevel.own},
+      tags: initialTags,
+      bookIngredients: initialBookIngredients,
+    );
+    await addBook(book);
     return book.id;
   }
 
@@ -536,14 +547,14 @@ class HiveConnector {
   }
 
   BookIngredient? getBookIngredient(String bookIngredientId) {
-    Book? book = getBook(getCurrentBookId()!);
-    if (book != null) {
+    if (bookIngredientId.isEmpty) return null;
+    for (final book in _bookBox.values) {
       try {
-        BookIngredient? bookIngredient = book.bookIngredients.firstWhere((ingredient) => ingredient.id == bookIngredientId);
-        return bookIngredient;
-      } on StateError {
-        print("book ingredient not found");
-        return null;
+        for (final bi in book.bookIngredients) {
+          if (bi.id == bookIngredientId) return bi;
+        }
+      } catch (_) {
+        continue;
       }
     }
     return null;
@@ -599,6 +610,33 @@ class HiveConnector {
     return ingredients;
   }
 
+
+  int countRecipesUsingTag(String tagId) {
+    return getAllRecipes().where((r) => r.tags.contains(tagId)).length;
+  }
+
+  Future<void> deleteBookTag(String bookId, String tagId) async {
+    Book? book = getBook(bookId);
+    if (book == null) return;
+    final updatedTags = List<Tag>.from(book.tags)..removeWhere((t) => t.id == tagId);
+    await updateBook(bookId, BookUpdate(id: bookId, tags: updatedTags));
+    for (final recipe in getAllRecipes()) {
+      if (recipe.tags.contains(tagId)) {
+        final updatedRecipeTags = List<String>.from(recipe.tags)..remove(tagId);
+        await updateRecipe(recipe.id, RecipeUpdate(id: recipe.id, tags: updatedRecipeTags));
+      }
+    }
+  }
+
+  Future<void> updateBookTag(String bookId, String tagId, {String? name, String? category}) async {
+    Book? book = getBook(bookId);
+    if (book == null) return;
+    final updatedTags = book.tags.map((t) {
+      if (t.id != tagId) return t;
+      return Tag(id: t.id, name: name ?? t.name, category: category ?? t.category);
+    }).toList();
+    await updateBook(bookId, BookUpdate(id: bookId, tags: updatedTags));
+  }
 
   // RECIPE //
   Recipe? getRecipe(String recipeId) {

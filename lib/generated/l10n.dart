@@ -1330,6 +1330,15 @@ class S {
     );
   }
 
+  String get book_settings_tags {
+    return Intl.message(
+      'Tags',
+      name: 'book_settings_tags',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Partager`
   String get book_settings_share {
     return Intl.message(
@@ -1510,6 +1519,15 @@ class S {
     );
   }
 
+  String get new_tag_category {
+    return Intl.message(
+      'Catégorie',
+      name: 'new_tag_category',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `notag`
   String get no_tag {
     return Intl.message(
@@ -1630,21 +1648,48 @@ class S {
     );
   }
 
-  /// `Modifier le BookIngredient`
+  /// `Modifier l'ingrédient maître`
   String get book_ingredient_edition_title {
     return Intl.message(
-      'Modifier le BookIngredient',
+      'Modifier l\'ingrédient maître',
       name: 'book_ingredient_edition_title',
       desc: '',
       args: [],
     );
   }
 
-  /// `Modifier le BookIngredient`
+  /// `Modifier l'ingrédient maître`
   String get ingredient_edit_book_ingredient {
     return Intl.message(
-      'Modifier le BookIngredient',
+      'Modifier l\'ingrédient maître',
       name: 'ingredient_edit_book_ingredient',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Autres`
+  String get tag_category_other {
+    return Intl.message(
+      'Autres',
+      name: 'tag_category_other',
+      desc: '',
+      args: [],
+    );
+  }
+
+  String tag_delete_used_warning(int count, String name) {
+    return Intl.message(
+      'Ce tag est utilisé dans $count recette(s) ("$name"). La suppression le retirera de toutes ces recettes.',
+      name: 'tag_delete_used_warning',
+      args: [count, name],
+    );
+  }
+
+  String get tag_delete_used_confirm {
+    return Intl.message(
+      'Veux-tu quand même le supprimer ?',
+      name: 'tag_delete_used_confirm',
       desc: '',
       args: [],
     );

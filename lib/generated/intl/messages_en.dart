@@ -60,6 +60,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "book_choice": MessageLookupByLibrary.simpleMessage("Pick a book!"),
         "book_creation_name": MessageLookupByLibrary.simpleMessage("Name"),
         "book_creation_title": MessageLookupByLibrary.simpleMessage("New book"),
+        "book_ingredient_edition_title":
+            MessageLookupByLibrary.simpleMessage("Edit master ingredient"),
         "book_join_scan": MessageLookupByLibrary.simpleMessage("Scan ID"),
         "book_join_title": MessageLookupByLibrary.simpleMessage("Join book"),
         "book_join_uid": MessageLookupByLibrary.simpleMessage("Book ID"),
@@ -137,9 +139,13 @@ class MessageLookup extends MessageLookupByLibrary {
         "info_share_book_title":
             MessageLookupByLibrary.simpleMessage("Share a book"),
         "ingredient_advanced": MessageLookupByLibrary.simpleMessage("Advanced"),
+        "ingredient_create_new_book_ingredient":
+            MessageLookupByLibrary.simpleMessage("Create a new BookIngredient"),
         "ingredient_density": MessageLookupByLibrary.simpleMessage("Density"),
         "ingredient_density_updated":
             MessageLookupByLibrary.simpleMessage("Ingredient density updated"),
+        "ingredient_edit_book_ingredient":
+            MessageLookupByLibrary.simpleMessage("Edit master ingredient"),
         "ingredient_edition_title":
             MessageLookupByLibrary.simpleMessage("Ingredient"),
         "ingredient_name": MessageLookupByLibrary.simpleMessage("Name"),
@@ -152,6 +158,10 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Type"),
         "ingredient_quantity_type_dialog_name":
             MessageLookupByLibrary.simpleMessage("Quantity type"),
+        "ingredient_reset_overrides":
+            MessageLookupByLibrary.simpleMessage("Reset to default"),
+        "ingredient_select_or_create": MessageLookupByLibrary.simpleMessage(
+            "Select an existing ingredient or create a new one"),
         "ingredient_unit": MessageLookupByLibrary.simpleMessage("Unity"),
         "ingredient_widget_quantity_type":
             MessageLookupByLibrary.simpleMessage("People"),
@@ -260,6 +270,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Synchronization status"),
         "synchronization_status_up_to_date":
             MessageLookupByLibrary.simpleMessage("Up to date"),
+        "tag_category_other": MessageLookupByLibrary.simpleMessage("Other"),
         "time_minutes_abr": MessageLookupByLibrary.simpleMessage("min"),
         "time_widget_cooking": MessageLookupByLibrary.simpleMessage("Cooking"),
         "time_widget_preparation":

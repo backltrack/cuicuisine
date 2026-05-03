@@ -68,8 +68,8 @@ class BookAdapter extends TypeAdapter<Book> {
       recipeIds: (fields[2] as List).cast<String>(),
       users: (fields[3] as List).cast<String>(),
       access: (fields[4] as Map).cast<String, AccessLevel>(),
-      tags: (fields[6] as List).cast<Tag>(),
-      bookIngredients: (fields[5] as List).cast<BookIngredient>(),
+      tags: (fields[6] as List?)?.cast<Tag>() ?? [],
+      bookIngredients: (fields[5] as List?)?.cast<BookIngredient>() ?? [],
       lastUpdate: fields[7] as DateTime?,
     );
   }

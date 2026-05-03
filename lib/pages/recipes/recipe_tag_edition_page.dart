@@ -5,13 +5,13 @@ import 'package:flutter/scheduler.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
-import '../../l10n/localeMgr.dart';
 import '../../models/data_model.dart';
 import '../../widgets/core_widgets/my_outlined_button.dart';
 import '../../widgets/recipe_widgets/recipe_tags_widget.dart';
 import '../../widgets/core_widgets/search_app_bar.dart';
 
-import '../../models/default_data.dart';
+import '../../themes/theme_mgr.dart';
+import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
 class RecipeTagEditionPage extends StatefulWidget {
@@ -26,8 +26,6 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
 
   List<Tag> _selectedTags = [];
 
-  String locale = 'en';
-
   String _search = "";
 
   List<Tag> tags = [];
@@ -36,70 +34,98 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
   void initState() {
     super.initState();
 
-    locale = LocaleMgr.getLocale(context);
-    tags = computetags();
+    tags = _computeTags();
     setState(() {});
   }
 
-  List<Tag> computetags() {
-    final List<Tag> tags = [];
-    for (Tag tag in DatabaseMgr().localMgr.getBookTags()) {
-      if (! defaultTags[locale]!.contains(tag.name.trim().toLowerCase())) {
-        tags.add(tag);
-      }
+  List<Tag> _computeTags() {
+    return DatabaseMgr().localMgr.getBookTags().toList();
+  }
+
+  /// Builds a flat list of items for the ListView: alternating String headers
+  /// and Tag items, followed by a null sentinel for the bottom spacer.
+  List<dynamic> _buildListItems(List<Tag> filtered) {
+    final Map<String, List<Tag>> byCategory = {};
+    for (final tag in filtered) {
+      (byCategory[tag.category] ??= []).add(tag);
     }
-    tags.sort();
-    return tags;
+
+    // Sort categories: non-empty alphabetically first, empty category last
+    final sortedCats = byCategory.keys.toList()
+      ..sort((a, b) {
+        if (a.isEmpty) return 1;
+        if (b.isEmpty) return -1;
+        return removeDiacritics(a.toLowerCase()).compareTo(removeDiacritics(b.toLowerCase()));
+      });
+
+    final List<dynamic> items = [];
+    for (final cat in sortedCats) {
+      items.add(cat); // category header (String)
+      final catTags = byCategory[cat]!
+        ..sort((a, b) => removeDiacritics(a.name).compareTo(removeDiacritics(b.name)));
+      items.addAll(catTags);
+    }
+    items.add(null); // bottom spacer sentinel
+    return items;
+  }
+
+  Widget _categoryHeader(String category) {
+    final label = category.isEmpty
+        ? S.of(context).tag_category_other
+        : beautifyName(category);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Row(
+        children: [
+          Text(label, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+          const SizedBox(width: 8),
+          const Expanded(child: Divider()),
+        ],
+      ),
+    );
+  }
+
+  Widget _tagTile(Tag tag) {
+    final bool selected = _selectedTags.contains(tag);
+    return ListTile(
+      title: Text(tag.name),
+      trailing: IconButton(
+        onPressed: () {
+          setState(() {
+            selected ? _selectedTags.remove(tag) : _selectedTags.add(tag);
+          });
+        },
+        icon: selected
+            ? const FaIcon(FontAwesomeIcons.solidCircleCheck)
+            : const FaIcon(FontAwesomeIcons.circlePlus),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // load params
     final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final List<Tag> currentTags = routeArgs['currentTags']!;
     final String recipeId = routeArgs['id']!;
 
-    tags.sort((a, b) => removeDiacritics(a.name).compareTo(removeDiacritics(b.name)));
-
     if (shouldInitialize) {
       _selectedTags.clear();
       _selectedTags.addAll(currentTags);
-
       shouldInitialize = false;
     }
 
-    ScrollController _scrollController = ScrollController();
+    final List<Tag> filtered = _search.isEmpty
+        ? tags
+        : tags.where((t) => removeDiacritics(t.name.toLowerCase())
+            .contains(removeDiacritics(_search.toLowerCase()))).toList();
 
-    Widget listTile(Tag tag) {
-      return ListTile(
-        title: Text(tag.name),
-        trailing: IconButton(
-            onPressed: () {
-              if (_selectedTags.contains(tag)) {
-                setState(() {
-                  _selectedTags.remove(tag);
-                });
-              } else {
-                setState(() {
-                  _selectedTags.add(tag);
-                });
-              }
-            },
-            icon: _selectedTags.contains(tag) ? const FaIcon(
-                FontAwesomeIcons.solidCircleCheck) : const FaIcon(
-                FontAwesomeIcons.circlePlus)
-        ),
-      );
-    }
+    final List<dynamic> listItems = _buildListItems(filtered);
 
     return Scaffold(
       appBar: SearchAppBar(
         myTitle: S.of(context).recipe_edition_tags_title,
         onSearchChanged: (String val) {
-          setState(() {
-            _search = val;
-          });
+          setState(() { _search = val; });
         },
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -112,21 +138,19 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
+                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold)),
                   Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
+                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center),
                 ],
               ),
             ).then((value) {
-              if (value != null && value) {
-                returnValue = true;
-              }
+              if (value != null && value) returnValue = true;
             });
 
             SchedulerBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pop(returnValue);
             });
-          }
+          },
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -137,10 +161,9 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             recipeId,
             RecipeUpdate(
               id: recipeId,
-              tags: List.generate(_selectedTags.length, (index) => _selectedTags[index].id)
-            )
+              tags: List.generate(_selectedTags.length, (i) => _selectedTags[i].id),
+            ),
           );
-
           Navigator.pop(context, 'update');
         },
       ),
@@ -150,59 +173,55 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             tags: _selectedTags,
             isEditable: true,
             onRemove: (Tag val) {
-              setState(() {
-                _selectedTags.remove(val);
-              });
+              setState(() { _selectedTags.remove(val); });
             },
           ),
 
-          const SizedBox(
-            height: 12,
-          ),
+          const SizedBox(height: 12),
+
           MyOutlinedButton(
             text: S.of(context).add_button,
             icon: FontAwesomeIcons.plus,
             onPressed: () async {
-              var result = await Navigator.pushNamed(context, '${ModalRoute.of(context)!.settings.name!}/new');
-              if (result != null) {
-                if (!List.generate(tags.length, (index) => tags[index].name).contains(result.toString())) {
-                  String? currentBookId = DatabaseMgr().localMgr.getCurrentBookId();
+              final result = await Navigator.pushNamed(
+                context,
+                '${ModalRoute.of(context)!.settings.name!}/new',
+              );
+              if (result != null && result is Map) {
+                final String name = result['name'] as String;
+                final String category = result['category'] as String? ?? '';
+                if (!tags.any((t) => t.name == name)) {
+                  final String? currentBookId = DatabaseMgr().localMgr.getCurrentBookId();
                   if (currentBookId != null) {
                     setState(() {
-                      Tag newTag = Tag.newTag(result.toString(), '');
+                      final Tag newTag = Tag.newTag(name, category);
+                      final selectedIds = _selectedTags.map((t) => t.id).toSet()..add(newTag.id);
                       tags.add(newTag);
-
-                      DatabaseMgr().localMgr.updateBook(currentBookId, 
-                        BookUpdate(id: currentBookId, tags: tags)
+                      DatabaseMgr().localMgr.updateBook(
+                        currentBookId,
+                        BookUpdate(id: currentBookId, tags: tags),
                       );
-                      tags = computetags();
-                      
-                      _selectedTags.add(newTag);
+                      tags = _computeTags();
+                      _selectedTags = tags.where((t) => selectedIds.contains(t.id)).toList();
                     });
                   }
                 }
               }
             },
           ),
-          const SizedBox(
-            height: 12,
-          ),
+
+          const SizedBox(height: 12),
 
           Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: tags.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == tags.length) {
-                    // space for floating button
-                    return const SizedBox(height: 80);
-                  }
-                  else {
-                    return _search != "" && removeDiacritics(tags[index].name.toLowerCase()).contains(removeDiacritics(_search.toLowerCase())) || _search == "" ?
-                    listTile(tags[index]) : const SizedBox();
-                  }
-                },
-              )
+            child: ListView.builder(
+              itemCount: listItems.length,
+              itemBuilder: (context, index) {
+                final item = listItems[index];
+                if (item == null) return const SizedBox(height: 80);
+                if (item is String) return _categoryHeader(item);
+                return _tagTile(item as Tag);
+              },
+            ),
           ),
         ],
       ),
