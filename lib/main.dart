@@ -20,6 +20,7 @@ import 'pages/authentication/authentication_page.dart';
 import 'pages/authentication/email_check_page.dart';
 import 'pages/authentication/email_connexion.dart';
 import 'pages/authentication/email_registration.dart';
+import 'pages/authentication/onboarding_page.dart';
 import 'pages/account/remove_account.dart';
 import 'pages/authentication/forgotten_password.dart';
 import 'pages/books/book_join_page.dart';
@@ -156,6 +157,7 @@ class _CuicuisineState extends State<Cuicuisine> {
                 EmailCheck.route: (ctx) => const EmailCheck(),
                 EmailConnexion.route: (ctx) => const EmailConnexion(),
                 EmailRegistration.route: (ctx) => EmailRegistration(),
+                OnboardingPage.route: (ctx) => const OnboardingPage(),
                 ForgottenPasswordPage.route: (ctx) => const ForgottenPasswordPage(),
                 HomePage.route: (ctx) => HomePage(),
                 GeneralSettingsPage.route: (ctx) => const GeneralSettingsPage(),

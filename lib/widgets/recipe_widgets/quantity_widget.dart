@@ -29,12 +29,9 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      _quantity = widget.quantity;
-      _quantityType = widget.quantityType;
-      _multiplier = widget.multiplier;
-    });
+    _quantity = widget.quantity;
+    _quantityType = widget.quantityType;
+    _multiplier = widget.multiplier;
   }
 
   @override

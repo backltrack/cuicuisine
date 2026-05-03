@@ -1,6 +1,4 @@
 TODO:
-- bug email recup password
-- nake notif smaller
 - pop up configuration a la création du compte
 - Api Version
 - model migration history

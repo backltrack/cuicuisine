@@ -308,7 +308,6 @@ class _RecipePageState extends State<RecipePage> {
                 ),
                 WidgetSelectionOverlay(
                   widget: RecipeIngredientsWidget(
-                    key: UniqueKey(),
                     ingredients: recipe.recipeIngredients,
                     defaultQuantity: recipe.quantity,
                     quantityType: recipe.quantityType,

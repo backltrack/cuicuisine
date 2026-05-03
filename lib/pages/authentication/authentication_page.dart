@@ -11,6 +11,7 @@ import '../../widgets/core_widgets/animated_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
 import '../home_page.dart';
 import './email_check_page.dart';
+import './onboarding_page.dart';
 
 class LogInPage extends StatefulWidget {
   static const String route = '/';
@@ -74,7 +75,10 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         // synchronize
         await DatabaseMgr().synchronization.sync();
         // goto home page
-        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+        final dest = DatabaseMgr().localMgr.isOnboardingDone()
+            ? HomePage.route
+            : OnboardingPage.route;
+        if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(dest, (Route<dynamic> route) => false);
       }
       else {
         print('need to register');

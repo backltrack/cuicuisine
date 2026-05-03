@@ -222,5 +222,17 @@
   "weak_password": "Password too weak",
   "lost_password": "I lost my password",
 
-  "page_not_found": "Page not found"
+  "page_not_found": "Page not found",
+
+  "onboarding_books_title": "Books",
+  "onboarding_books_desc": "Organize your recipes into books. Create several for different occasions: everyday, holidays, travels...",
+  "onboarding_recipes_title": "Recipes",
+  "onboarding_recipes_desc": "Add your recipes with ingredients, preparation steps, photos and custom variants.",
+  "onboarding_sharing_title": "Sharing",
+  "onboarding_sharing_desc": "Share your books with your loved ones. Choose each collaborator's rights: read, write or admin.",
+  "onboarding_ready_title": "Let's go!",
+  "onboarding_ready_desc": "Choose your language and start cooking!",
+  "onboarding_next": "Next",
+  "onboarding_skip": "Skip",
+  "onboarding_start": "Get started"
 }

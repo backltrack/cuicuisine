@@ -11,7 +11,7 @@ import '../../widgets/core_widgets/social_button.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
 import '../404.dart';
-import '../home_page.dart';
+import 'onboarding_page.dart';
 
 
 class EmailRegistration extends StatefulWidget {
@@ -140,7 +140,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
               onPressed: areAllFieldsValid() ? () async {
                 await DatabaseMgr().remoteMgr.registerWithEmail(emailEditingController.text, passwordEditingController.text, "${nameEditingController.text} ${lastnameEditingController.text}",
                   onSuccess: (AppUser user) async {
-                    if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+                    if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(OnboardingPage.route, (Route<dynamic> route) => false);
                   },
                   onFailure: (String reason) {
                     if (reason == "Email already exists") {

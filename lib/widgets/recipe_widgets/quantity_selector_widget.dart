@@ -23,11 +23,8 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
   @override
   void initState() {
     super.initState();
-
-    setState(() {
-      _quantity = widget.quantity;
-      _quantityType = widget.quantityType;
-    });
+    _quantity = widget.quantity;
+    _quantityType = widget.quantityType;
   }
 
   @override

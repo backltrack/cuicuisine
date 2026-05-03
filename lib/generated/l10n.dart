@@ -1874,6 +1874,58 @@ class S {
       args: [],
     );
   }
+
+  String get onboarding_books_title {
+    return Intl.message('Les Livres', name: 'onboarding_books_title', desc: '', args: []);
+  }
+
+  String get onboarding_books_desc {
+    return Intl.message(
+      'Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages...',
+      name: 'onboarding_books_desc', desc: '', args: []);
+  }
+
+  String get onboarding_recipes_title {
+    return Intl.message('Les Recettes', name: 'onboarding_recipes_title', desc: '', args: []);
+  }
+
+  String get onboarding_recipes_desc {
+    return Intl.message(
+      'Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.',
+      name: 'onboarding_recipes_desc', desc: '', args: []);
+  }
+
+  String get onboarding_sharing_title {
+    return Intl.message('Le Partage', name: 'onboarding_sharing_title', desc: '', args: []);
+  }
+
+  String get onboarding_sharing_desc {
+    return Intl.message(
+      'Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration.',
+      name: 'onboarding_sharing_desc', desc: '', args: []);
+  }
+
+  String get onboarding_ready_title {
+    return Intl.message('C\'est parti !', name: 'onboarding_ready_title', desc: '', args: []);
+  }
+
+  String get onboarding_ready_desc {
+    return Intl.message(
+      'Choisissez votre langue et commencez à cuisiner !',
+      name: 'onboarding_ready_desc', desc: '', args: []);
+  }
+
+  String get onboarding_next {
+    return Intl.message('Suivant', name: 'onboarding_next', desc: '', args: []);
+  }
+
+  String get onboarding_skip {
+    return Intl.message('Passer', name: 'onboarding_skip', desc: '', args: []);
+  }
+
+  String get onboarding_start {
+    return Intl.message('Commencer', name: 'onboarding_start', desc: '', args: []);
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

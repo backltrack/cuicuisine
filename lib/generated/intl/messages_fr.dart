@@ -323,6 +323,25 @@ class MessageLookup extends MessageLookupByLibrary {
         "wrong_password":
             MessageLookupByLibrary.simpleMessage("Mauvais mot de passe"),
         "wrong_user":
-            MessageLookupByLibrary.simpleMessage("Utilisateur non reconnu")
+            MessageLookupByLibrary.simpleMessage("Utilisateur non reconnu"),
+        "onboarding_books_title":
+            MessageLookupByLibrary.simpleMessage("Les Livres"),
+        "onboarding_books_desc": MessageLookupByLibrary.simpleMessage(
+            "Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages..."),
+        "onboarding_recipes_title":
+            MessageLookupByLibrary.simpleMessage("Les Recettes"),
+        "onboarding_recipes_desc": MessageLookupByLibrary.simpleMessage(
+            "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées."),
+        "onboarding_sharing_title":
+            MessageLookupByLibrary.simpleMessage("Le Partage"),
+        "onboarding_sharing_desc": MessageLookupByLibrary.simpleMessage(
+            "Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration."),
+        "onboarding_ready_title":
+            MessageLookupByLibrary.simpleMessage("C\'est parti !"),
+        "onboarding_ready_desc": MessageLookupByLibrary.simpleMessage(
+            "Choisissez votre langue et commencez à cuisiner !"),
+        "onboarding_next": MessageLookupByLibrary.simpleMessage("Suivant"),
+        "onboarding_skip": MessageLookupByLibrary.simpleMessage("Passer"),
+        "onboarding_start": MessageLookupByLibrary.simpleMessage("Commencer")
       };
 }

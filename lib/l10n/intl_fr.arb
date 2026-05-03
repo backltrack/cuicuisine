@@ -222,5 +222,17 @@
   "weak_password": "Mot de passe trop simple",
   "lost_password": "J'ai perdu mon mot de passe",
 
-  "page_not_found": "Page introuvable"
+  "page_not_found": "Page introuvable",
+
+  "onboarding_books_title": "Les Livres",
+  "onboarding_books_desc": "Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages...",
+  "onboarding_recipes_title": "Les Recettes",
+  "onboarding_recipes_desc": "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.",
+  "onboarding_sharing_title": "Le Partage",
+  "onboarding_sharing_desc": "Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration.",
+  "onboarding_ready_title": "C'est parti !",
+  "onboarding_ready_desc": "Choisissez votre langue et commencez à cuisiner !",
+  "onboarding_next": "Suivant",
+  "onboarding_skip": "Passer",
+  "onboarding_start": "Commencer"
 }

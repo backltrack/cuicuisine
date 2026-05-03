@@ -59,9 +59,11 @@ class _IngredientTileState extends State<IngredientTile> {
 
     List<String> compatibleUnits = unitMgr.getCompatibleUnitsForUnit(baseUnit, density);
 
+    final theme = ThemeMgr.getTheme(context)!;
+
     return Container(
         decoration: BoxDecoration(
-            color: ThemeMgr.getTheme(context)!.colorScheme.surface,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(4)
         ),
         margin: const EdgeInsets.symmetric(vertical: 4),
@@ -75,19 +77,19 @@ class _IngredientTileState extends State<IngredientTile> {
                   Text([
                     parseQuantity(quantity),
                     if (baseUnit != "none" && baseUnit != "quantity") currentUnit
-                  ].join(" "), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge)
+                  ].join(" "), style: theme.textTheme.bodyLarge)
             ),
             Expanded(
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: Text(ingredient.getName(), style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                child: Text(ingredient.getName(), style: theme.textTheme.bodyLarge),
               )
             ),
             if (compatibleUnits.length > 1)
               PopupMenuButton(
                 icon: const FaIcon(FontAwesomeIcons.scaleBalanced, size: 20),
-                itemBuilder: (context) => List<PopupMenuItem>.generate(compatibleUnits.length, (unitIndex) => PopupMenuItem(
-                  child: Text(compatibleUnits[unitIndex], style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                itemBuilder: (ctx) => List<PopupMenuItem>.generate(compatibleUnits.length, (unitIndex) => PopupMenuItem(
+                  child: Text(compatibleUnits[unitIndex], style: theme.textTheme.bodyLarge),
                   onTap: () {
                     setState(() {
                       currentUnit = compatibleUnits[unitIndex];

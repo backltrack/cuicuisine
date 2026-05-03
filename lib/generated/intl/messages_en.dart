@@ -309,6 +309,25 @@ class MessageLookup extends MessageLookupByLibrary {
         "wrong_password":
             MessageLookupByLibrary.simpleMessage("Wrong password"),
         "wrong_user":
-            MessageLookupByLibrary.simpleMessage("User not recognized")
+            MessageLookupByLibrary.simpleMessage("User not recognized"),
+        "onboarding_books_title":
+            MessageLookupByLibrary.simpleMessage("Books"),
+        "onboarding_books_desc": MessageLookupByLibrary.simpleMessage(
+            "Organize your recipes into books. Create several for different occasions: everyday, holidays, travels..."),
+        "onboarding_recipes_title":
+            MessageLookupByLibrary.simpleMessage("Recipes"),
+        "onboarding_recipes_desc": MessageLookupByLibrary.simpleMessage(
+            "Add your recipes with ingredients, preparation steps, photos and custom variants."),
+        "onboarding_sharing_title":
+            MessageLookupByLibrary.simpleMessage("Sharing"),
+        "onboarding_sharing_desc": MessageLookupByLibrary.simpleMessage(
+            "Share your books with your loved ones. Choose each collaborator's rights: read, write or admin."),
+        "onboarding_ready_title":
+            MessageLookupByLibrary.simpleMessage("Let's go!"),
+        "onboarding_ready_desc": MessageLookupByLibrary.simpleMessage(
+            "Choose your language and start cooking!"),
+        "onboarding_next": MessageLookupByLibrary.simpleMessage("Next"),
+        "onboarding_skip": MessageLookupByLibrary.simpleMessage("Skip"),
+        "onboarding_start": MessageLookupByLibrary.simpleMessage("Get started")
       };
 }

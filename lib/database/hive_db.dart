@@ -107,6 +107,14 @@ class HiveConnector {
     return null;
   }
 
+  bool isOnboardingDone() {
+    return _settingBox.get('onboardingDone') == true;
+  }
+
+  Future<void> saveOnboardingDone() async {
+    await _settingBox.put('onboardingDone', true);
+  }
+
   Future<void> saveLocale(String locale) async {
     await _settingBox.put('locale', locale);
   }
