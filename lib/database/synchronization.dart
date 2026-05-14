@@ -124,9 +124,8 @@ class Synchronization {
   }
 
   Future<bool> sync() async {
-    // send all local document type, id, last update
-    // server sends back all new or updated documents
-    // refresh UI
+    if (!DatabaseMgr().isCompatible) return false;
+
     bool isOnline = await DatabaseMgr().remoteMgr.testConnexion();
     if (!isOnline) {
       return false;

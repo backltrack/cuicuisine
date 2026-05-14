@@ -16,6 +16,7 @@ import '../models/update_model.dart';
 import '../models/sync_model.dart';
 import './database_mgr.dart';
 import 'file_storage.dart';
+import 'hive_migration.dart';
 
 class HiveConnector {
   late Box<dynamic> _settingBox;
@@ -74,6 +75,7 @@ class HiveConnector {
     if (_queueBox.isEmpty) {
       await _queueBox.add(OperationQueue());
     }
+    await HiveMigration.run(this);
     if (kDebugMode) print('Hive initialized');
   }
 
@@ -153,6 +155,9 @@ class HiveConnector {
 
     return null;
   }
+
+  int loadSchemaVersion() => _settingBox.get('schemaVersion', defaultValue: 0) as int;
+  Future<void> saveSchemaVersion(int v) => _settingBox.put('schemaVersion', v);
 
   Future<void> saveBookSharingAgreement(bool isValid) async {
     await _settingBox.put('bookSharing', isValid);

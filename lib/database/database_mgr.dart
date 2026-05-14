@@ -11,11 +11,18 @@ class DatabaseMgr with ChangeNotifier {
   late final Synchronization synchronization;
 
   bool _isOnline = false;
+  bool _isCompatible = true; // optimistic: stays true until server says otherwise
 
   bool get isOnline => _isOnline;
+  bool get isCompatible => _isCompatible;
 
   set isOnline(bool value) {
     _isOnline = value;
+    notifyListeners();
+  }
+
+  set isCompatible(bool value) {
+    _isCompatible = value;
     notifyListeners();
   }
 

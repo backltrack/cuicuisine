@@ -210,6 +210,12 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Sharing"),
         "onboarding_skip": MessageLookupByLibrary.simpleMessage("Skip"),
         "onboarding_start": MessageLookupByLibrary.simpleMessage("Get started"),
+        "outdated_version_banner": MessageLookupByLibrary.simpleMessage(
+            "Your app version is outdated. Update to continue using all features."),
+        "outdated_version_download":
+            MessageLookupByLibrary.simpleMessage("Download update"),
+        "outdated_version_login_blocked": MessageLookupByLibrary.simpleMessage(
+            "Please update the app to log in."),
         "page_not_found":
             MessageLookupByLibrary.simpleMessage("Page not found"),
         "popup_delete_description_as_collaborator":
@@ -306,17 +312,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "time_widget_text": MessageLookupByLibrary.simpleMessage("Time"),
         "time_widget_waiting": MessageLookupByLibrary.simpleMessage("Waiting"),
         "title": MessageLookupByLibrary.simpleMessage("Cookcorico"),
-        "tutorial_recipe_name":
-            MessageLookupByLibrary.simpleMessage("Poule au pot"),
-        "tutorial_recipe_step1": MessageLookupByLibrary.simpleMessage(
-            "<div>Éplucher et découper en gros morceaux les carottes, les navets et les poireaux. Piquer les clous de girofle sur l\'oignon.</div>"),
-        "tutorial_recipe_step2": MessageLookupByLibrary.simpleMessage(
-            "<div>Remplir une cocotte d\'eau sur environ 10 cm. Plonger le bouquet garni et l\'oignon. Saler et poivrer. Placer la poule dans la cocotte. Faire cuire à couvert durant 2 heures. 20 minutes avant la fin de la cuisson, ajouter les légumes.</div>"),
-        "tutorial_recipe_step3": MessageLookupByLibrary.simpleMessage(
-            "<div>Hacher le persil. Découper la poule au pot. Placer les morceaux de poule, les légumes et le jus dans un grand plat. Parsemer de persil. Servir chaud.</div>"),
-        "tutorial_recipe_tag1": MessageLookupByLibrary.simpleMessage("winter"),
-        "tutorial_recipe_tag2": MessageLookupByLibrary.simpleMessage("meat"),
-        "tutorial_recipe_tag3": MessageLookupByLibrary.simpleMessage("french"),
         "understood": MessageLookupByLibrary.simpleMessage("Understood"),
         "unit_cap": MessageLookupByLibrary.simpleMessage("cap"),
         "unit_cup": MessageLookupByLibrary.simpleMessage("cup"),

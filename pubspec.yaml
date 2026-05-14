@@ -52,6 +52,7 @@ dependencies:
   flutter_quill: ^11.5.0
   flutter_quill_delta_from_html: ^1.5.3
   toastification: ^3.0.3
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:

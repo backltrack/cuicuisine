@@ -450,76 +450,6 @@ class S {
     );
   }
 
-  /// `Poule au pot`
-  String get tutorial_recipe_name {
-    return Intl.message(
-      'Poule au pot',
-      name: 'tutorial_recipe_name',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `<div>Éplucher et découper en gros morceaux les carottes, les navets et les poireaux. Piquer les clous de girofle sur l'oignon.</div>`
-  String get tutorial_recipe_step1 {
-    return Intl.message(
-      '<div>Éplucher et découper en gros morceaux les carottes, les navets et les poireaux. Piquer les clous de girofle sur l\'oignon.</div>',
-      name: 'tutorial_recipe_step1',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `<div>Remplir une cocotte d'eau sur environ 10 cm. Plonger le bouquet garni et l'oignon. Saler et poivrer. Placer la poule dans la cocotte. Faire cuire à couvert durant 2 heures. 20 minutes avant la fin de la cuisson, ajouter les légumes.</div>`
-  String get tutorial_recipe_step2 {
-    return Intl.message(
-      '<div>Remplir une cocotte d\'eau sur environ 10 cm. Plonger le bouquet garni et l\'oignon. Saler et poivrer. Placer la poule dans la cocotte. Faire cuire à couvert durant 2 heures. 20 minutes avant la fin de la cuisson, ajouter les légumes.</div>',
-      name: 'tutorial_recipe_step2',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `<div>Hacher le persil. Découper la poule au pot. Placer les morceaux de poule, les légumes et le jus dans un grand plat. Parsemer de persil. Servir chaud.</div>`
-  String get tutorial_recipe_step3 {
-    return Intl.message(
-      '<div>Hacher le persil. Découper la poule au pot. Placer les morceaux de poule, les légumes et le jus dans un grand plat. Parsemer de persil. Servir chaud.</div>',
-      name: 'tutorial_recipe_step3',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `hiver`
-  String get tutorial_recipe_tag1 {
-    return Intl.message(
-      'hiver',
-      name: 'tutorial_recipe_tag1',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `viande`
-  String get tutorial_recipe_tag2 {
-    return Intl.message(
-      'viande',
-      name: 'tutorial_recipe_tag2',
-      desc: '',
-      args: [],
-    );
-  }
-
-  /// `français`
-  String get tutorial_recipe_tag3 {
-    return Intl.message(
-      'français',
-      name: 'tutorial_recipe_tag3',
-      desc: '',
-      args: [],
-    );
-  }
-
   /// `Étapes`
   String get steps_widget_title {
     return Intl.message(
@@ -725,6 +655,36 @@ class S {
     return Intl.message(
       'État: ',
       name: 'synchronization_status',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ta version de l'application est obsolète. Mets-la à jour pour continuer à utiliser toutes les fonctionnalités.`
+  String get outdated_version_banner {
+    return Intl.message(
+      'Ta version de l\'application est obsolète. Mets-la à jour pour continuer à utiliser toutes les fonctionnalités.',
+      name: 'outdated_version_banner',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Télécharger la mise à jour`
+  String get outdated_version_download {
+    return Intl.message(
+      'Télécharger la mise à jour',
+      name: 'outdated_version_download',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mets l'application à jour pour te connecter.`
+  String get outdated_version_login_blocked {
+    return Intl.message(
+      'Mets l\'application à jour pour te connecter.',
+      name: 'outdated_version_login_blocked',
       desc: '',
       args: [],
     );

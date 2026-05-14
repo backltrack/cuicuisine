@@ -79,6 +79,9 @@
   "synchronization_status_failure": "Unknown status",
   "synchronizing": "Synchronizing...",
   "synchronization_status": "Status: ",
+  "outdated_version_banner": "Your app version is outdated. Update to continue using all features.",
+  "outdated_version_download": "Download update",
+  "outdated_version_login_blocked": "Please update the app to log in.",
 
   "remove_account": "Remove my account",
   "remove_button": "Remove",

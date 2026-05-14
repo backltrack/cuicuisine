@@ -221,6 +221,12 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Le Partage"),
         "onboarding_skip": MessageLookupByLibrary.simpleMessage("Passer"),
         "onboarding_start": MessageLookupByLibrary.simpleMessage("Commencer"),
+        "outdated_version_banner": MessageLookupByLibrary.simpleMessage(
+            "Ta version de l\'application est obsolète. Mets-la à jour pour continuer à utiliser toutes les fonctionnalités."),
+        "outdated_version_download":
+            MessageLookupByLibrary.simpleMessage("Télécharger la mise à jour"),
+        "outdated_version_login_blocked": MessageLookupByLibrary.simpleMessage(
+            "Mets l\'application à jour pour te connecter."),
         "page_not_found":
             MessageLookupByLibrary.simpleMessage("Page introuvable"),
         "popup_delete_description_as_collaborator":
@@ -320,18 +326,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "time_widget_text": MessageLookupByLibrary.simpleMessage("Temps"),
         "time_widget_waiting": MessageLookupByLibrary.simpleMessage("Attente"),
         "title": MessageLookupByLibrary.simpleMessage("Cuicuisine"),
-        "tutorial_recipe_name":
-            MessageLookupByLibrary.simpleMessage("Poule au pot"),
-        "tutorial_recipe_step1": MessageLookupByLibrary.simpleMessage(
-            "<div>Éplucher et découper en gros morceaux les carottes, les navets et les poireaux. Piquer les clous de girofle sur l\'oignon.</div>"),
-        "tutorial_recipe_step2": MessageLookupByLibrary.simpleMessage(
-            "<div>Remplir une cocotte d\'eau sur environ 10 cm. Plonger le bouquet garni et l\'oignon. Saler et poivrer. Placer la poule dans la cocotte. Faire cuire à couvert durant 2 heures. 20 minutes avant la fin de la cuisson, ajouter les légumes.</div>"),
-        "tutorial_recipe_step3": MessageLookupByLibrary.simpleMessage(
-            "<div>Hacher le persil. Découper la poule au pot. Placer les morceaux de poule, les légumes et le jus dans un grand plat. Parsemer de persil. Servir chaud.</div>"),
-        "tutorial_recipe_tag1": MessageLookupByLibrary.simpleMessage("hiver"),
-        "tutorial_recipe_tag2": MessageLookupByLibrary.simpleMessage("viande"),
-        "tutorial_recipe_tag3":
-            MessageLookupByLibrary.simpleMessage("français"),
         "understood": MessageLookupByLibrary.simpleMessage("J\'ai compris"),
         "unit_cap": MessageLookupByLibrary.simpleMessage("bouchon"),
         "unit_cup": MessageLookupByLibrary.simpleMessage("tasse"),

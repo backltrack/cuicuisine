@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:oauth2/oauth2.dart' as oauth2;
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'oauth2.dart';
 import '../models/data_model.dart';
@@ -223,6 +224,7 @@ class MongoConnector {
         DatabaseMgr().isOnline = result;
         ToastNotifier().showInfo(result ? "Back online" : "You are offline");
       }
+      if (result) await checkMinimumVersion();
       return result;
     } catch (e) {
       print(e);
@@ -230,6 +232,40 @@ class MongoConnector {
       ToastNotifier().showError("You are offline");
       return false;
     }
+  }
+
+  Future<void> checkMinimumVersion() async {
+    try {
+      final response = await http.get(
+        Uri.parse("$server/version"),
+        headers: {'accept': 'application/json'},
+      ).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode != 200) return;
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final String minimum = data['minimum_app_version'] as String;
+
+      final info = await PackageInfo.fromPlatform();
+      final bool compatible = _semverGte(info.version, minimum);
+      DatabaseMgr().isCompatible = compatible;
+    } catch (_) {
+      // Don't change compatibility state on network error — keep last known value.
+    }
+  }
+
+  /// Returns true if [version] >= [minimum] using simple semver comparison.
+  bool _semverGte(String version, String minimum) {
+    List<int> parse(String v) =>
+        v.split('.').map((s) => int.tryParse(s) ?? 0).toList();
+    final a = parse(version);
+    final b = parse(minimum);
+    for (int i = 0; i < 3; i++) {
+      final av = i < a.length ? a[i] : 0;
+      final bv = i < b.length ? b[i] : 0;
+      if (av != bv) return av > bv;
+    }
+    return true;
   }
 
   Future<AppUser?> refreshToken() async {

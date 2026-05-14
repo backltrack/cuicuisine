@@ -70,7 +70,18 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    DatabaseMgr().addListener(_onDatabaseMgrChanged);
     init();
+  }
+
+  @override
+  void dispose() {
+    DatabaseMgr().removeListener(_onDatabaseMgrChanged);
+    super.dispose();
+  }
+
+  void _onDatabaseMgrChanged() {
+    if (mounted) setState(() {});
   }
 
   void init() async {
@@ -324,12 +335,30 @@ class _HomePageState extends State<HomePage> {
               setState(() {});
             }
           },
-        body:
-          selectedBook == null ?
-          ListTile(
-            title: Text(S.of(context).book_choice),
-          ):
-          RefreshIndicator(
+        body: Column(
+          children: [
+            if (!DatabaseMgr().isCompatible)
+              MaterialBanner(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                content: Text(S.of(context).outdated_version_banner),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      String? apkPath = await DatabaseMgr().remoteMgr.getLatestApk();
+                      if (apkPath != null && mounted) {
+                        downloadFile("${DatabaseMgr().localMgr.getServerUri()!}$apkPath");
+                      }
+                    },
+                    child: Text(S.of(context).outdated_version_download),
+                  ),
+                ],
+              ),
+            Expanded(
+              child: selectedBook == null ?
+              ListTile(
+                title: Text(S.of(context).book_choice),
+              ):
+              RefreshIndicator(
             onRefresh: refreshData,
             child: Builder(
               builder: (context) {
@@ -438,9 +467,12 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             )
-          ),
+          ),    // closes RefreshIndicator
+            ),  // closes Expanded
+          ],    // closes Column.children
+        ),      // closes Column (body)
 
-        floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read) ? null : FloatingActionButton(
+        floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read || !DatabaseMgr().isCompatible) ? null : FloatingActionButton(
           onPressed: () async {
             await Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => RecipeNamePage(currentName: "")

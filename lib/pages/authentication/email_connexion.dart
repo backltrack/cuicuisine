@@ -53,6 +53,10 @@ class _EmailConnexionState extends State<EmailConnexion> {
     }
 
     void _submitPassword() async {
+      if (!DatabaseMgr().isCompatible) {
+        ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+        return;
+      }
       setState(() => _isSyncing = true);
       await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password,
         onInvalidEmail: () {
@@ -74,6 +78,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
     }
 
     final bool canSubmit = !_isSyncing &&
+        DatabaseMgr().isCompatible &&
         EmailPasswordValidator.isEmailValid(emailEditingController.text) &&
         EmailPasswordValidator.isPasswordValid(_password);
 
