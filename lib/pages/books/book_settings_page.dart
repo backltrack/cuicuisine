@@ -7,6 +7,7 @@ import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
 import '../../pages/books/book_name_page.dart';
+import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import 'book_share_page.dart';
 
@@ -79,6 +80,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
             ListTile(
               title: Text(S.of(context).book_settings_rename),
               onTap: () {
+                if (!DatabaseMgr().isCompatible) {
+                  ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                  return;
+                }
                 Navigator.of(context).pushNamed(BookNamePage.route,
                     arguments: {
                       'bookId': _book!.id,
@@ -105,6 +110,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
             ListTile(
               title: Text(S.of(context).book_settings_tags),
               onTap: () {
+                if (!DatabaseMgr().isCompatible) {
+                  ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                  return;
+                }
                 Navigator.pushNamed(
                   context,
                   '${BookSettingsPage.route}/${_book!.id}/tags',
@@ -127,6 +136,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
               ListTile(
                 title: Text(S.of(context).book_settings_remove),
                 onTap: () {
+                  if (!DatabaseMgr().isCompatible) {
+                    ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                    return;
+                  }
                   showAlertDialog(
                       context: context,
                       title: S.of(context).popup_delete_title,
@@ -152,6 +165,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
             ListTile(
               title: Text(S.of(context).book_settings_quit),
               onTap: () {
+                if (!DatabaseMgr().isCompatible) {
+                  ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                  return;
+                }
                 showAlertDialog(
                     context: context,
                     title: S.of(context).popup_quit_title,
@@ -227,6 +244,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                                   padding: const EdgeInsets.all(8)
                               ),
                               onPressed: () async {
+                                if (!DatabaseMgr().isCompatible) {
+                                  ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                                  return;
+                                }
                                 showAlertDialog(
                                     context: context,
                                     title: S.of(context).popup_remove_user_title,
@@ -264,6 +285,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                                 padding: const EdgeInsets.all(8)
                             ),
                             onPressed: () async {
+                              if (!DatabaseMgr().isCompatible) {
+                                ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                                return;
+                              }
                               // update access
                               if (_book!.access[_book!.users[index]]!.index == AccessLevel.write.index) {
                                 DatabaseMgr().localMgr.updateUserAccess(_book!, _book!.users[index], AccessLevel.read);

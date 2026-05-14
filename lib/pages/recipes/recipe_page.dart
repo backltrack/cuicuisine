@@ -120,7 +120,7 @@ class _RecipePageState extends State<RecipePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(recipe.name),
-          actions: [
+          actions: DatabaseMgr().isCompatible ? [
             isEditMode ?
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 4),
@@ -182,11 +182,11 @@ class _RecipePageState extends State<RecipePage> {
                       throw UnimplementedError();
                   }
                 },
-                itemBuilder: (context) => makeRecipePopupMenu(context, userAccess)
+                itemBuilder: (context) => makeRecipePopupMenu(context, DatabaseMgr().isCompatible ? userAccess : AccessLevel.read)
             )
-          ],
+          ] : null,
         ),
-        floatingActionButton: userAccess.index > AccessLevel.read.index ?
+        floatingActionButton: userAccess.index > AccessLevel.read.index && DatabaseMgr().isCompatible ?
           FloatingActionButton(
             child: Icon(isEditMode ? Icons.check : Icons.edit),
             onPressed: ()  {

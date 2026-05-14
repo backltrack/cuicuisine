@@ -2,6 +2,7 @@ import 'package:cuicuisine/pages/recipes/recipe_name_page.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:flutter_vibrate/flutter_vibrate.dart';
@@ -10,6 +11,7 @@ import 'package:diacritic/diacritic.dart';
 import '../models/data_model.dart';
 import '../database/database_mgr.dart';
 import '../utilities/string_functions.dart';
+import '../utilities/toast_notifier.dart';
 import '../fonts/custom_icons.dart';
 import '../generated/l10n.dart';
 
@@ -235,6 +237,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> addNewBook() async {
+    if (!DatabaseMgr().isCompatible) {
+      ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+      return;
+    }
     await showAddBookDialog(context: context).then((value) {
       if (value is String && value == "new") {
         Navigator.of(context).pushNamed(BookNamePage.route, arguments: {
@@ -340,16 +346,30 @@ class _HomePageState extends State<HomePage> {
             if (!DatabaseMgr().isCompatible)
               MaterialBanner(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                content: Text(S.of(context).outdated_version_banner),
+                backgroundColor: const Color(0xFFE6A817),
+                leading: const FaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
+                content: Text(
+                  S.of(context).outdated_version_banner,
+                  style: const TextStyle(color: Colors.white),
+                ),
                 actions: [
-                  TextButton(
+                  IconButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: const Color(0xFFE6A817),
+                    ),
                     onPressed: () async {
-                      String? apkPath = await DatabaseMgr().remoteMgr.getLatestApk();
-                      if (apkPath != null && mounted) {
-                        downloadFile("${DatabaseMgr().localMgr.getServerUri()!}$apkPath");
+                      final serverUri = DatabaseMgr().localMgr.getServerUri();
+                      if (serverUri == null) return;
+                      final url = "$serverUri/apk/download";
+                      if (kIsWeb) {
+                        downloadFile(url);
+                      } else {
+                        launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
                       }
                     },
-                    child: Text(S.of(context).outdated_version_download),
+                    icon: const FaIcon(FontAwesomeIcons.download, size: 14),
+                    // label: Text(S.of(context).outdated_version_download),
                   ),
                 ],
               ),
@@ -435,12 +455,12 @@ class _HomePageState extends State<HomePage> {
                                     key: UniqueKey(),
                                     recipe: sortedData[index],
                                     onTap: onTap,
-                                    onLongPress: () async {
+                                    onLongPress: DatabaseMgr().isCompatible ? () async {
                                       // if (canVibrate) {
                                       //   Vibrate.feedback(FeedbackType.medium);
                                       // }
                                       _showCustomMenu(sortedData[index]);
-                                    },
+                                    } : null,
                                     onTapDown: _storePosition,
                                   );
                                 } else {

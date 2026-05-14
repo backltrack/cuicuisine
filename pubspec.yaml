@@ -37,7 +37,7 @@ dependencies:
   path_provider: ^2.1.2
   http: ^1.2.0
   oauth2: ^2.0.2
-  wakelock_plus: ^1.1.6
+  wakelock_plus: ^1.4.0
   google_fonts: ^7.0.2
   uuid: ^4.3.3
   url_launcher: ^6.3.0
@@ -52,7 +52,7 @@ dependencies:
   flutter_quill: ^11.5.0
   flutter_quill_delta_from_html: ^1.5.3
   toastification: ^3.0.3
-  package_info_plus: ^8.0.0
+  package_info_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:

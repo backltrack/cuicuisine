@@ -62,10 +62,10 @@ class _AccountPageState extends State<AccountPage> {
               ListTile(
                 title: Text("************", style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
                 trailing: IconButton(
-                  onPressed: DatabaseMgr().isOnline ? () {
+                  onPressed: DatabaseMgr().isOnline && DatabaseMgr().isCompatible ? () {
                     Navigator.pushNamed(context, UpdatePassword.route);
                   } : () {
-                    ToastNotifier().showWarning(S.of(context).connexion_needed2);
+                    ToastNotifier().showWarning(DatabaseMgr().isCompatible ? S.of(context).connexion_needed2 : S.of(context).outdated_version_login_blocked);
                   },
                   icon: const FaIcon(FontAwesomeIcons.pen)
                 )
@@ -80,10 +80,10 @@ class _AccountPageState extends State<AccountPage> {
           ListTile(
               title: Text(S.of(context).remove_account),
               leading: const FaIcon(FontAwesomeIcons.userSlash),
-              onTap: DatabaseMgr().isOnline ? () {
+              onTap: DatabaseMgr().isOnline && DatabaseMgr().isCompatible ? () {
                 Navigator.pushNamed(context, RemoveAccountPage.route);
               } : () {
-                ToastNotifier().showWarning(S.of(context).connexion_needed2);
+                ToastNotifier().showWarning(DatabaseMgr().isCompatible ? S.of(context).connexion_needed2 : S.of(context).outdated_version_login_blocked);
               }
           )
         ]

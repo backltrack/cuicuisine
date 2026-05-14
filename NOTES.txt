@@ -1,9 +1,6 @@
 TODO:
 - pull to refresh download tout si aucun change créé
 
-- Api Version
-- model migration history
-- versioned db
 - deeplink
 - sort books per last access
 - research all book
