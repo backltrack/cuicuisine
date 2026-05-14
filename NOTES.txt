@@ -1,7 +1,6 @@
 TODO:
 - pull to refresh download tout si aucun change créé
 
-- deeplink
 - research all book
 
 

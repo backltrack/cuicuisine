@@ -120,7 +120,7 @@ class _RecipePageState extends State<RecipePage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(recipe.name),
+          title: Text(recipe.name, maxLines: 2, overflow: TextOverflow.ellipsis),
           actions: [
             IconButton(
               icon: const FaIcon(FontAwesomeIcons.shareNodes),

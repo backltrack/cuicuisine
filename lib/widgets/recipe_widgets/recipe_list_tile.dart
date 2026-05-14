@@ -62,9 +62,9 @@ class _RecipeListTileState extends State<RecipeListTile> {
                             Container(
                               height: cardHeight * 0.55,
                               alignment: Alignment.centerLeft,
-                                child: SingleChildScrollView(
-                                    child: Text(widget.recipe.name, style: ThemeMgr.getTheme(context)!.textTheme.displaySmall)
-                                ),
+                              child: SingleChildScrollView(
+                                child: Text(widget.recipe.name, style: ThemeMgr.getTheme(context)!.textTheme.displaySmall),
+                              ),
                             ),
                             Row(
                               children: [

@@ -57,7 +57,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
       appBar: AppBar(
         title: Text(S.of(context).book_settings_page_title),
       ),
-      body: isReady ? Column(
+      body: isReady ? SingleChildScrollView(child: Column(
         children: [
           // Header
           Center(
@@ -198,9 +198,9 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
           Text(S.of(context).book_settings_users, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
           const SizedBox(height: 12),
 
-          DatabaseMgr().isOnline ? Expanded(
-            child:ListView.builder(
+          DatabaseMgr().isOnline ? ListView.builder(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: _book!.users.length,
             itemBuilder: (context, int index) {
@@ -318,11 +318,11 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
               );
             }
           )
-          ) : ListTile(
+          : ListTile(
             title: Text(S.of(context).book_settings_need_online),
           )
         ],
-      ) :
+      )) :
       const Center(
         child: CircularProgressIndicator()
       )

@@ -38,7 +38,6 @@ import 'pages/recipes/book_ingredient_edition_page.dart';
 import 'pages/recipes/new_tag_page.dart';
 import 'pages/recipes/recipe_images_edition_page.dart';
 import 'pages/recipes/recipe_ingredients_edition_page.dart';
-import 'pages/recipes/recipe_name_page.dart';
 import 'pages/recipes/recipe_page.dart';
 import 'pages/recipes/recipe_step_edition_page.dart';
 import 'pages/recipes/recipe_steps_edition_page.dart';
