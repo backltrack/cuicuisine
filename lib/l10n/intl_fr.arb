@@ -231,5 +231,7 @@
   "onboarding_ready_desc": "Choisissez votre langue et commencez à cuisiner !",
   "onboarding_next": "Suivant",
   "onboarding_skip": "Passer",
-  "onboarding_start": "Commencer"
+  "onboarding_start": "Commencer",
+
+  "deeplink_recipe_not_found": "Recette introuvable. Vérifie que tu as bien accès à ce livre."
 }

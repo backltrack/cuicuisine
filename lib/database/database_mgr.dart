@@ -13,6 +13,8 @@ class DatabaseMgr with ChangeNotifier {
   bool _isOnline = false;
   bool _isCompatible = true; // optimistic: stays true until server says otherwise
 
+  String? pendingDeepLinkRecipeId;
+
   bool get isOnline => _isOnline;
   bool get isCompatible => _isCompatible;
 

@@ -147,6 +147,18 @@ class HiveConnector {
     await _settingBox.put('currentBook', id);
   }
 
+  Map<String, int> getBookLastOpened() {
+    final raw = _settingBox.get('bookLastOpened');
+    if (raw is Map) return Map<String, int>.from(raw);
+    return {};
+  }
+
+  Future<void> touchBookLastOpened(String id) async {
+    final map = getBookLastOpened();
+    map[id] = DateTime.now().millisecondsSinceEpoch;
+    await _settingBox.put('bookLastOpened', map);
+  }
+
   String? getCurrentBookId() {
     var currentBook = _settingBox.get('currentBook');
     if (currentBook is String) {
@@ -303,6 +315,18 @@ class HiveConnector {
   }
 
   // BOOK //
+  Book? findBookForRecipe(String recipeId) {
+    final String? userId = getUserId();
+    if (userId == null) return null;
+    try {
+      return _bookBox.values.firstWhere(
+        (book) => book.users.contains(userId) && book.recipeIds.contains(recipeId),
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
   Book? getBook(String bookId) {
     try {
       Book? book = _bookBox.values.firstWhere((book) => book.id == bookId);

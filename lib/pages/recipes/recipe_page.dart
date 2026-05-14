@@ -2,6 +2,7 @@ import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
@@ -120,71 +121,74 @@ class _RecipePageState extends State<RecipePage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(recipe.name),
-          actions: DatabaseMgr().isCompatible ? [
-            isEditMode ?
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                child: IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.penToSquare),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => RecipeNamePage(currentName: recipe.name))).then((value) => updateAfterRename(value));
-                    // Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
-                    //   "currentName": recipe.name
-                    // }).then((value) => updateAfterRename(value));
+          actions: [
+            IconButton(
+              icon: const FaIcon(FontAwesomeIcons.shareNodes),
+              onPressed: () => Share.share(
+                'cuicuisine://recipe/${recipe.id}',
+                subject: recipe.name,
+              ),
+            ),
+            if (DatabaseMgr().isCompatible)
+              isEditMode ?
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: IconButton(
+                    icon: const FaIcon(FontAwesomeIcons.penToSquare),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RecipeNamePage(currentName: recipe.name))).then((value) => updateAfterRename(value));
+                    },
+                  ),
+                ) :
+              PopupMenuButton(
+                  icon: const Icon(Icons.more_vert),
+                  onSelected: (item) async {
+                    switch (item) {
+                      case "copy_into":
+                        return showBookPickerDialog(
+                            context: context,
+                            books: DatabaseMgr().localMgr.getUserBooks(getWritableOnly: true)
+                        ).then((bookId) async {
+                          if (bookId != null) {
+                            DatabaseMgr().localMgr.duplicateRecipe(recipe, bookId);
+                            if (mounted) Navigator.pop(context, "reloadBooks");
+                          }
+                        });
+                      case "remove":
+                        return showAlertDialog(
+                            context: context,
+                            title: S.of(context).popup_delete_title,
+                            description: userAccess.index <= AccessLevel.write.index ?
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(S.of(context).popup_delete_ownership_warning, textAlign: TextAlign.center),
+                                  Text(S.of(context).popup_delete_description_as_collaborator, textAlign: TextAlign.center),
+                                  Text(recipe.name, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                  Text(S.of(context).popup_delete_description_user_warning, textAlign: TextAlign.center)
+                                ],
+                              ) :
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(S.of(context).popup_delete_description_as_owner, textAlign: TextAlign.center),
+                                  Text(recipe.name, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                                  Text(S.of(context).popup_delete_description_user_warning, textAlign: TextAlign.center)
+                                ],
+                              )
+                        ).then((value) {
+                          if (value != null && value) {
+                            DatabaseMgr().localMgr.deleteRecipe(recipe.id);
+                            if (mounted) Navigator.pop(context, "reloadRecipes");
+                          }
+                        });
+                      default:
+                        throw UnimplementedError();
+                    }
                   },
-                ),
-              ) :
-            PopupMenuButton(
-                icon: const Icon(Icons.more_vert),
-                onSelected: (item) async {
-                  switch (item) {
-                    case "copy_into":
-                      return showBookPickerDialog(
-                          context: context,
-                          books: DatabaseMgr().localMgr.getUserBooks(getWritableOnly: true)
-                      ).then((bookId) async {
-                        if (bookId != null) {
-                          print("add ${recipe.name} to $bookId");
-                          DatabaseMgr().localMgr.duplicateRecipe(recipe, bookId);
-                          if (mounted) Navigator.pop(context, "reloadBooks");
-                        }
-                      });
-                    case "remove":
-                      return showAlertDialog(
-                          context: context,
-                          title: S.of(context).popup_delete_title,
-                          description: userAccess.index <= AccessLevel.write.index ?
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(S.of(context).popup_delete_ownership_warning, textAlign: TextAlign.center),
-                                Text(S.of(context).popup_delete_description_as_collaborator, textAlign: TextAlign.center),
-                                Text(recipe.name, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                Text(S.of(context).popup_delete_description_user_warning, textAlign: TextAlign.center)
-                              ],
-                            )
-                                :
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(S.of(context).popup_delete_description_as_owner, textAlign: TextAlign.center),
-                                Text(recipe.name, style: const TextStyle(fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                                Text(S.of(context).popup_delete_description_user_warning, textAlign: TextAlign.center)
-                              ],
-                            )
-                      ).then((value) {
-                        if (value != null && value) {
-                          DatabaseMgr().localMgr.deleteRecipe(recipe.id);
-                          if (mounted) Navigator.pop(context, "reloadRecipes");
-                        }
-                      });
-                    default:
-                      throw UnimplementedError();
-                  }
-                },
-                itemBuilder: (context) => makeRecipePopupMenu(context, DatabaseMgr().isCompatible ? userAccess : AccessLevel.read)
-            )
-          ] : null,
+                  itemBuilder: (context) => makeRecipePopupMenu(context, userAccess)
+              ),
+          ],
         ),
         floatingActionButton: userAccess.index > AccessLevel.read.index && DatabaseMgr().isCompatible ?
           FloatingActionButton(

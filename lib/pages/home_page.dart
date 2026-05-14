@@ -74,6 +74,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     DatabaseMgr().addListener(_onDatabaseMgrChanged);
     init();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkPendingDeepLink());
   }
 
   @override
@@ -228,6 +229,7 @@ class _HomePageState extends State<HomePage> {
     selectedBook = book;
     // store new default book
     DatabaseMgr().localMgr.saveCurrentBookId(book.id);
+    DatabaseMgr().localMgr.touchBookLastOpened(book.id);
     //get recipes and set tags and ingredients names to book
     recipes = DatabaseMgr().localMgr.getRecipesFromBook(book.id);
     // get user access
@@ -272,6 +274,27 @@ class _HomePageState extends State<HomePage> {
       }
     }
     );
+  }
+
+  void _checkPendingDeepLink() {
+    final recipeId = DatabaseMgr().pendingDeepLinkRecipeId;
+    if (recipeId == null) return;
+    DatabaseMgr().pendingDeepLinkRecipeId = null;
+    _openRecipeFromDeepLink(recipeId);
+  }
+
+  void _openRecipeFromDeepLink(String recipeId) {
+    final book = DatabaseMgr().localMgr.findBookForRecipe(recipeId);
+    if (book == null) {
+      ToastNotifier().showWarning(S.of(context).deeplink_recipe_not_found);
+      return;
+    }
+    setBookAsDefaultAndRefresh(book).then((_) {
+      final recipe = DatabaseMgr().localMgr.getRecipe(recipeId);
+      if (recipe != null && mounted) {
+        Navigator.of(context).pushNamed("${RecipePage.route}/$recipeId", arguments: {'recipe': recipe});
+      }
+    });
   }
 
   Future<void> refreshData() async {
@@ -610,55 +633,53 @@ class _HomePageState extends State<HomePage> {
 
           if (books != null && books!.isNotEmpty)
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                scrollDirection: Axis.vertical,
-                itemCount: books!.length + 1,
-                itemBuilder: (context, int index) {
-                  return index < books!.length  ?
-                    ListTile(
-                      key: UniqueKey(),
-                      leading: FaIcon(books![index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own ? FontAwesomeIcons.book :
-                                        books![index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.write ? CustomIcons.book_write :
-                                          CustomIcons.book_read),
-                      title: Text(books![index].name),
-                      textColor: selectedBook != null && selectedBook!.id == books![index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
-                      iconColor: selectedBook != null && selectedBook!.id == books![index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
-                      trailing: selectedBook != null && selectedBook!.id == books![index].id ? CircularIconButton(
-                        icon: FaIcon(FontAwesomeIcons.gear, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
-                        color: ThemeMgr.getTheme(context)!.cardColor,
-                        onPressed: () {
-                          Navigator.of(context).pushNamed("${BookSettingsPage.route}/${books![index].id}", arguments: {
-                            'book': books![index]
-                          }).then((value) async {
-                            books = DatabaseMgr().localMgr.getUserBooks();
-
-                            if (books != null) {
-                              selectedBook = findBookFromId(selectedBook!.id);
-                              if(selectedBook == null) {
-                                // current book has been deleted
-                                if (books!.isNotEmpty) {
-                                  print('set first as default');
-                                  selectedBook = books![0];
+              child: Builder(builder: (context) {
+                final lastOpened = DatabaseMgr().localMgr.getBookLastOpened();
+                final sortedBooks = List<Book>.from(books!)
+                  ..sort((a, b) => (lastOpened[b.id] ?? 0).compareTo(lastOpened[a.id] ?? 0));
+                return ListView.builder(
+                  padding: EdgeInsets.zero,
+                  scrollDirection: Axis.vertical,
+                  itemCount: sortedBooks.length + 1,
+                  itemBuilder: (context, int index) {
+                    return index < sortedBooks.length ?
+                      ListTile(
+                        key: UniqueKey(),
+                        leading: FaIcon(sortedBooks[index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own ? FontAwesomeIcons.book :
+                                          sortedBooks[index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.write ? CustomIcons.book_write :
+                                            CustomIcons.book_read),
+                        title: Text(sortedBooks[index].name),
+                        textColor: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
+                        iconColor: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
+                        trailing: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? CircularIconButton(
+                          icon: FaIcon(FontAwesomeIcons.gear, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
+                          color: ThemeMgr.getTheme(context)!.cardColor,
+                          onPressed: () {
+                            Navigator.of(context).pushNamed("${BookSettingsPage.route}/${sortedBooks[index].id}", arguments: {
+                              'book': sortedBooks[index]
+                            }).then((value) async {
+                              books = DatabaseMgr().localMgr.getUserBooks();
+                              if (books != null) {
+                                selectedBook = findBookFromId(selectedBook!.id);
+                                if (selectedBook == null) {
+                                  if (books!.isNotEmpty) {
+                                    selectedBook = books![0];
+                                  }
                                 }
-                                else {
-                                  print('no more book');
-                                }
+                                setState(() {});
                               }
-                              setState(() {});
-                            }
-                          });
+                            });
+                          },
+                        ) : null,
+                        onTap: () async {
+                          setBookAsDefaultAndRefresh(sortedBooks[index]);
+                          Navigator.pop(context);
                         },
-                      ) : null,
-                      onTap: () async {
-                        setBookAsDefaultAndRefresh(books![index]);
-                        // pop
-                        Navigator.pop(context);
-                      },
-                    ) :
+                      ) :
                       addButton;
-                }
-              ),
+                  },
+                );
+              }),
             )
           else if (books != null && books!.isEmpty)
             ...[

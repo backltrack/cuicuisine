@@ -1959,6 +1959,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Recette introuvable. Vérifie que tu as bien accès à ce livre.`
+  String get deeplink_recipe_not_found {
+    return Intl.message(
+      'Recette introuvable. Vérifie que tu as bien accès à ce livre.',
+      name: 'deeplink_recipe_not_found',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

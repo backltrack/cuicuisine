@@ -102,6 +102,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "You need to be online to log in."),
         "connexion_needed2": MessageLookupByLibrary.simpleMessage(
             "This action requires to be online"),
+        "deeplink_recipe_not_found": MessageLookupByLibrary.simpleMessage(
+            "Recipe not found. Make sure you have access to this book."),
         "disable": MessageLookupByLibrary.simpleMessage("Disable"),
         "error_name_empty":
             MessageLookupByLibrary.simpleMessage("The name is empty"),

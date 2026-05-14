@@ -2,7 +2,6 @@ TODO:
 - pull to refresh download tout si aucun change créé
 
 - deeplink
-- sort books per last access
 - research all book
 
 

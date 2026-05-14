@@ -108,6 +108,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Attends d\'être en ligne pour pouvoir te connecter."),
         "connexion_needed2": MessageLookupByLibrary.simpleMessage(
             "Cette action nécessite une connexion."),
+        "deeplink_recipe_not_found": MessageLookupByLibrary.simpleMessage(
+            "Recette introuvable. Vérifie que tu as bien accès à ce livre."),
         "disable": MessageLookupByLibrary.simpleMessage("Désactiver"),
         "error_name_empty":
             MessageLookupByLibrary.simpleMessage("Le nom est vide"),

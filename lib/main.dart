@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:app_links/app_links.dart';
 import 'package:cuicuisine/pages/account/account_page.dart';
 import 'package:cuicuisine/pages/account/update_password.dart';
 import 'package:flutter/foundation.dart';
@@ -67,6 +69,8 @@ void main() async {
   runApp(const Cuicuisine());
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class Cuicuisine extends StatefulWidget {
   const Cuicuisine({super.key});
 
@@ -79,6 +83,7 @@ class Cuicuisine extends StatefulWidget {
 class _CuicuisineState extends State<Cuicuisine> {
   // Handle locale switch
   Locale? _locale;
+  StreamSubscription<Uri>? _deepLinkSub;
 
   void changeLocale(String localeCode) {
     setState(() {
@@ -111,11 +116,32 @@ class _CuicuisineState extends State<Cuicuisine> {
         DatabaseMgr().localMgr.saveWakelock(false);
       }
     }
+
+    _initDeepLinks();
   }
 
+  void _initDeepLinks() async {
+    final appLinks = AppLinks();
+    // Cold start: link that launched the app
+    final initial = await appLinks.getInitialLink();
+    if (initial != null) _handleDeepLink(initial);
+    // Hot start: link received while app is running
+    _deepLinkSub = appLinks.uriLinkStream.listen(_handleDeepLink);
+  }
+
+  void _handleDeepLink(Uri uri) {
+    if (uri.scheme != 'cuicuisine' || uri.host != 'recipe') return;
+    final recipeId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
+    if (recipeId == null || recipeId.isEmpty) return;
+    DatabaseMgr().pendingDeepLinkRecipeId = recipeId;
+    if (DatabaseMgr().localMgr.getUser() != null) {
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(HomePage.route, (r) => false);
+    }
+  }
 
   @override
   void dispose() {
+    _deepLinkSub?.cancel();
     if (kIsWeb) {
       WakelockPlus.disable();
     }
@@ -131,6 +157,7 @@ class _CuicuisineState extends State<Cuicuisine> {
         builder: (context, theme) {
           return ToastificationWrapper(
             child: MaterialApp(
+              navigatorKey: navigatorKey,
               theme: theme,
               debugShowCheckedModeBanner: false,
               localizationsDelegates: const [
