@@ -141,7 +141,7 @@ class _EmailRegistrationState extends State<EmailRegistration> {
               // email sign in button
               onPressed: areAllFieldsValid() ? () async {
                 await DatabaseMgr().remoteMgr.registerWithEmail(emailEditingController.text, passwordEditingController.text, "${nameEditingController.text} ${lastnameEditingController.text}",
-                  onSuccess: (AppUser user) async {
+                  onSuccess: (AppUser user) {
                     if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(OnboardingPage.route, (Route<dynamic> route) => false);
                   },
                   onFailure: (String reason) {
