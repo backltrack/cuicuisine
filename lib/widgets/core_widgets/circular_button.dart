@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CircularIconButton extends StatefulWidget {
-  const CircularIconButton({Key? key, required this.icon, this.color, this.onPressed}) : super(key: key);
+  const CircularIconButton({super.key, required this.icon, this.color, this.onPressed});
 
   final Widget icon;
   final Color? color;
@@ -15,12 +15,12 @@ class _CircularIconButtonState extends State<CircularIconButton> {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: widget.icon,
       style: ElevatedButton.styleFrom(
           shape: const CircleBorder(),
           backgroundColor: widget.color
       ),
-      onPressed: widget.onPressed
+      onPressed: widget.onPressed,
+      child: widget.icon
     );
   }
 }

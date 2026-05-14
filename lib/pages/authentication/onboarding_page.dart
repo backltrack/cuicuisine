@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../../database/database_mgr.dart';
 import '../../generated/l10n.dart';
-import '../../l10n/localeMgr.dart';
+import '../../l10n/locale_mgr.dart';
 import '../../themes/theme_mgr.dart';
 import '../home_page.dart';
 

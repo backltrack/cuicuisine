@@ -1,23 +1,22 @@
-import 'package:cuicuisine/database/synchronization.dart';
-import 'package:cuicuisine/pages/account/account_page.dart';
-
-import '../../database/database_mgr.dart';
-import '../../l10n/localeMgr.dart';
-import '../../themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../../database/database_mgr.dart';
+import '../../l10n/locale_mgr.dart';
+import '../../themes/theme_mgr.dart';
 import '../../generated/l10n.dart';
-import '../authentication/authentication_page.dart';
 import '../../themes/themes.dart';
 import '../../utilities/import_export.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
+import '../account/account_page.dart';
+import '../authentication/authentication_page.dart';
 import 'synchronization_status_page.dart';
 
 class GeneralSettingsPage extends StatefulWidget {
   static const String route = "/settings";
 
-  const GeneralSettingsPage({Key? key}) : super(key: key);
+  const GeneralSettingsPage({super.key});
 
   @override
   _GeneralSettingsPageState createState() => _GeneralSettingsPageState();

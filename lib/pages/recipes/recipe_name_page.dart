@@ -6,7 +6,7 @@ import '../../widgets/core_widgets/my_text_field.dart';
 
 class RecipeNamePage extends StatefulWidget {
   final String currentName;
-  const RecipeNamePage({Key? key, required this.currentName}) : super(key: key);
+  const RecipeNamePage({super.key, required this.currentName});
 
   @override
   _RecipeNamePageState createState() => _RecipeNamePageState();

@@ -10,15 +10,15 @@ class BadgedIconButton extends StatefulWidget {
   final Color? textColor;
   final bool hideBadgeOnNull;
 
-  BadgedIconButton({
-    Key? key,
+  const BadgedIconButton({
+    super.key,
     required this.icon,
     this.number = 0,
     this.onPressed,
     this.badgeColor = Colors.red,
     this.textColor = Colors.white,
     this.hideBadgeOnNull = true
-  }) : super(key: key);
+  });
 
   @override
   _BadgedIconButtonState createState() => _BadgedIconButtonState(this.number);

@@ -20,7 +20,7 @@ class BottomActionBar extends StatefulWidget {
   final VoidCallback? onChangeDisplay;
   final Book? currentBook;
 
-  BottomActionBar({Key? key, this.onCloseFilters, this.onResetFilters, this.onSortingMethodChanged, this.onChangeDisplay, this.currentBook}) : super(key: key);
+  const BottomActionBar({super.key, this.onCloseFilters, this.onResetFilters, this.onSortingMethodChanged, this.onChangeDisplay, this.currentBook});
 
   @override
   _BottomActionBarState createState() => _BottomActionBarState();

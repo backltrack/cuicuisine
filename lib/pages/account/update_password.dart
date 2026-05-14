@@ -13,7 +13,7 @@ import '../../widgets/core_widgets/social_button.dart';
 class UpdatePassword extends StatefulWidget {
   static const String route = '/account/change-password';
 
-  const UpdatePassword({ Key? key }) : super(key: key);
+  const UpdatePassword({ super.key });
 
   @override
   _UpdatePasswordState createState() => _UpdatePasswordState();

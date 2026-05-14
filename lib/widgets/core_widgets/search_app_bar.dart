@@ -14,7 +14,7 @@ class SearchAppBar extends AppBar {
   final IconButton? extraWebButton;
   final Widget? leading;
 
-  SearchAppBar({Key? key, this.myTitle, required this.onSearchChanged, this.leading, this.extraWebButton}) : super(key: key);
+  SearchAppBar({super.key, this.myTitle, required this.onSearchChanged, this.leading, this.extraWebButton});
 
   @override
   _SearchAppBarState createState() => _SearchAppBarState();

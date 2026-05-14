@@ -10,7 +10,7 @@ class RecipeListTile extends StatefulWidget {
   final Function()? onTap;
   final Function()? onLongPress;
   final Function(TapDownDetails)? onTapDown;
-  RecipeListTile({Key? key, required this.recipe, this.onTap, this.onLongPress, this.onTapDown}) : super(key: key);
+  const RecipeListTile({super.key, required this.recipe, this.onTap, this.onLongPress, this.onTapDown});
 
   @override
   _RecipeListTileState createState() => _RecipeListTileState();

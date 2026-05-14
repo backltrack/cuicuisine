@@ -9,7 +9,7 @@ class VariantWidget extends StatefulWidget {
   final Variant variant;
   final Function()? onRemove;
 
-  VariantWidget({Key? key, required this.variant, this.onRemove}) : super(key: key);
+  const VariantWidget({super.key, required this.variant, this.onRemove});
 
   @override
   State<VariantWidget> createState() => _VariantWidgetState();

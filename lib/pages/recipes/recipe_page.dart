@@ -23,7 +23,7 @@ import 'recipe_name_page.dart';
 class RecipePage extends StatefulWidget {
   static const route = "/home/recipe";
 
-  RecipePage({Key? key}) : super(key: key);
+  const RecipePage({super.key});
 
   @override
   _RecipePageState createState() => _RecipePageState();

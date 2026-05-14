@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../database/database_mgr.dart';
 import '../../models/data_model.dart';
 import '../../models/local_model.dart';
 import '../../themes/theme_mgr.dart';
@@ -12,12 +11,12 @@ class IngredientEditionTile extends StatefulWidget {
   final Function()? onRemove;
 
   const IngredientEditionTile({
-    Key? key,
+    super.key,
     required this.ingredient,
     required this.locale,
     this.onEdit,
     this.onRemove
-  }) : super(key: key);
+  });
 
   @override
   _IngredientEditionTileState createState() => _IngredientEditionTileState();

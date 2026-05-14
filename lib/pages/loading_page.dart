@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class Loading extends StatefulWidget {
+  const Loading({super.key});
+
   _LoadingState createState() => _LoadingState();
 }
 

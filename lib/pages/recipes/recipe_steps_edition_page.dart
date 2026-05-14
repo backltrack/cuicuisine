@@ -11,7 +11,7 @@ import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/recipe_widgets/recipe_steps_edition_widget.dart';
 
 class RecipeStepsEditionPage extends StatefulWidget {
-  const RecipeStepsEditionPage({Key? key}) : super(key: key);
+  const RecipeStepsEditionPage({super.key});
 
   @override
   _RecipeStepsEditionPageState createState() => _RecipeStepsEditionPageState();

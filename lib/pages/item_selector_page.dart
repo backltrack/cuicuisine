@@ -10,7 +10,7 @@ import '../../widgets/core_widgets/search_app_bar.dart';
 class ItemSelector extends StatefulWidget {
   static const String route = "/home/ingredient_selection";
 
-  const ItemSelector();
+  const ItemSelector({super.key});
 
   @override
   _ItemSelectorState createState() => _ItemSelectorState();

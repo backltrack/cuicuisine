@@ -12,7 +12,7 @@ class RecipeTagsWidget extends StatefulWidget {
   final List<Tag> tags;
   final bool isEditable;
   final Function(Tag)? onRemove;
-  const RecipeTagsWidget({Key? key, required this.tags, this.isEditable=false, this.onRemove}) : super(key: key);
+  const RecipeTagsWidget({super.key, required this.tags, this.isEditable=false, this.onRemove});
 
   @override
   State<RecipeTagsWidget> createState() => _RecipeTagsWidgetState();

@@ -1,4 +1,4 @@
-import 'package:cuicuisine/l10n/localeMgr.dart';
+import 'package:cuicuisine/l10n/locale_mgr.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

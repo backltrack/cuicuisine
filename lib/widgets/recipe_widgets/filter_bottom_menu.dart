@@ -20,7 +20,7 @@ class FilterBottomMenu extends StatefulWidget {
 
   final VoidCallback? onReset;
 
-  FilterBottomMenu({this.onReset});
+  const FilterBottomMenu({super.key, this.onReset});
 
   @override
   _FilterBottomMenuState createState() => _FilterBottomMenuState();

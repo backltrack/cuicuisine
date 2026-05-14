@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
-import '../../l10n/localeMgr.dart';
+import '../../l10n/locale_mgr.dart';
 import '../../models/data_model.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
@@ -11,7 +11,7 @@ import '../../widgets/recipe_widgets/recipe_ingredients_edition_widget.dart';
 
 class RecipeIngredientsEditionPage extends StatefulWidget {
 
-  const RecipeIngredientsEditionPage({Key? key}) : super(key: key);
+  const RecipeIngredientsEditionPage({super.key});
 
   @override
   _RecipeIngredientsEditionPageState createState() => _RecipeIngredientsEditionPageState();

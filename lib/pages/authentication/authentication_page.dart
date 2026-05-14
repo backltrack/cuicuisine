@@ -16,6 +16,8 @@ import './onboarding_page.dart';
 class LogInPage extends StatefulWidget {
   static const String route = '/';
 
+  const LogInPage({super.key});
+
   @override
   _LogInPageState createState() => _LogInPageState();
 }

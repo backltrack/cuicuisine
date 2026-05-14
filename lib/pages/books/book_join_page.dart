@@ -15,7 +15,7 @@ import '../../models/data_model.dart';
 
 class BookJoinPage extends StatefulWidget {
   static const String route = '/home/join_book';
-  const BookJoinPage({Key? key}) : super(key: key);
+  const BookJoinPage({super.key});
 
   @override
   _BookJoinPageState createState() => _BookJoinPageState();

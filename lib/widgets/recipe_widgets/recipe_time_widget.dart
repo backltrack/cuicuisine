@@ -8,11 +8,11 @@ class RecipeTimeWidget extends StatelessWidget {
   final int waitingTime;
   final int cookingTime;
 
-  const RecipeTimeWidget({Key? key, required this.preparationTime, required this.waitingTime, required this.cookingTime}) : super(key: key);
+  const RecipeTimeWidget({super.key, required this.preparationTime, required this.waitingTime, required this.cookingTime});
 
   @override
   Widget build(BuildContext context) {
-    final int _totalTime = preparationTime + waitingTime + cookingTime;
+    final int totalTime = preparationTime + waitingTime + cookingTime;
 
     return Container(
       decoration: BoxDecoration(
@@ -33,7 +33,7 @@ class RecipeTimeWidget extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                    minutesToTime(_totalTime),
+                    minutesToTime(totalTime),
                     style: ThemeMgr.getTheme(context)!.textTheme.displayLarge
                 )
               ],

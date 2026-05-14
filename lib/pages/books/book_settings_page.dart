@@ -14,7 +14,7 @@ import 'book_share_page.dart';
 class BookSettingsPage extends StatefulWidget {
   static const route = "/home/book_settings";
 
-  const BookSettingsPage({Key? key}) : super(key: key);
+  const BookSettingsPage({super.key});
 
   @override
   _BookSettingsPageState createState() => _BookSettingsPageState();

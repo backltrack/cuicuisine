@@ -15,7 +15,7 @@ import '../../utilities/string_functions.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
 class RecipeTagEditionPage extends StatefulWidget {
-  const RecipeTagEditionPage();
+  const RecipeTagEditionPage({super.key});
 
   @override
   _RecipeTagEditionPageState createState() => _RecipeTagEditionPageState();

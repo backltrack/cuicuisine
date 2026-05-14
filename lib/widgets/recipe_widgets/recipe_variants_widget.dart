@@ -14,7 +14,7 @@ class RecipeVariantsWidget extends StatefulWidget {
   final List<Variant> variants;
   final AccessLevel userAccess;
   final Function()? onUpdate;
-  RecipeVariantsWidget({Key? key, required this.recipeId, required this.variants, required this.userAccess, this.onUpdate}) : super(key: key);
+  const RecipeVariantsWidget({super.key, required this.recipeId, required this.variants, required this.userAccess, this.onUpdate});
 
   @override
   _RecipeVariantsWidgetState createState() => _RecipeVariantsWidgetState();

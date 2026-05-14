@@ -17,6 +17,8 @@ import 'onboarding_page.dart';
 class EmailRegistration extends StatefulWidget {
   static const String route = '/registration';
 
+  const EmailRegistration({super.key});
+
   @override
   _EmailRegistrationState createState() => _EmailRegistrationState();
 }

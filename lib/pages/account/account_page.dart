@@ -13,7 +13,7 @@ import 'remove_account.dart';
 class AccountPage extends StatefulWidget {
   static const String route = '/account';
 
-  const AccountPage({ Key? key }) : super(key: key);
+  const AccountPage({ super.key });
 
   @override
   _AccountPageState createState() => _AccountPageState();

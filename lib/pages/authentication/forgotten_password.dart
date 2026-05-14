@@ -14,7 +14,7 @@ import '../../widgets/core_widgets/my_text_field.dart';
 class ForgottenPasswordPage extends StatefulWidget {
   static const String route = '/forgotten-password';
 
-  const ForgottenPasswordPage({Key? key}) : super(key: key);
+  const ForgottenPasswordPage({super.key});
 
   @override
   State<ForgottenPasswordPage> createState() => _ForgottenPasswordPageState();

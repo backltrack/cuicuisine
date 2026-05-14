@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:cuicuisine/l10n/localeMgr.dart';
+import 'package:cuicuisine/l10n/locale_mgr.dart';
 import 'package:flutter/material.dart';
 import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
@@ -14,7 +14,7 @@ class RecipeIngredientsWidget extends StatefulWidget {
   final int defaultQuantity;
   final String quantityType;
 
-  RecipeIngredientsWidget({Key? key, required this.ingredients, required this.quantityType, required this.defaultQuantity}) : super(key: key);
+  const RecipeIngredientsWidget({super.key, required this.ingredients, required this.quantityType, required this.defaultQuantity});
 
   @override
   _RecipeIngredientsWidgetState createState() => _RecipeIngredientsWidgetState();

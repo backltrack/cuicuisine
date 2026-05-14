@@ -11,7 +11,7 @@ import '../../models/data_model.dart';
 
 class RecipeStepsWidget extends StatefulWidget {
   final List<RecipeStep> steps;
-  RecipeStepsWidget({Key? key, required this.steps}) : super(key: key);
+  const RecipeStepsWidget({super.key, required this.steps});
 
   @override
   _RecipeStepsWidgetState createState() => _RecipeStepsWidgetState();

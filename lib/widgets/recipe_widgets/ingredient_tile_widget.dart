@@ -10,11 +10,11 @@ class IngredientTile extends StatefulWidget {
   final double quantityRatio;
 
   const IngredientTile({
-    Key? key,
+    super.key,
     required this.ingredient,
     required this.locale,
     this.quantityRatio=1.0
-  }) : super(key: key);
+  });
 
   @override
   _IngredientTileState createState() => _IngredientTileState();

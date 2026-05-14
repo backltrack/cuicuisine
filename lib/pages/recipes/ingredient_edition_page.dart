@@ -14,7 +14,7 @@ import '../../widgets/core_widgets/my_type_ahead_text_field.dart';
 
 class IngredientEditionPage extends StatefulWidget {
 
-  const IngredientEditionPage({Key? key}) : super(key: key);
+  const IngredientEditionPage({super.key});
 
   @override
   _IngredientEditionPageState createState() => _IngredientEditionPageState();

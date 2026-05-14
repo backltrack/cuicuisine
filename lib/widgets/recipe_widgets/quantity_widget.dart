@@ -15,7 +15,7 @@ class QuantityEditorWidget extends StatefulWidget {
   final bool isEdition;
   final bool showQuantityMultiplier;
 
-  const QuantityEditorWidget({Key? key, required this.quantity, required this.quantityType, this.multiplier=1, this.onQuantityChanged, this.onTypeChanged, this.onMultiplierChanged, this.location=SimpleAlignment.left, this.isEdition=false, this.showQuantityMultiplier=true}) : super(key: key);
+  const QuantityEditorWidget({super.key, required this.quantity, required this.quantityType, this.multiplier=1, this.onQuantityChanged, this.onTypeChanged, this.onMultiplierChanged, this.location=SimpleAlignment.left, this.isEdition=false, this.showQuantityMultiplier=true});
 
   @override
   _QuantityEditorWidgetState createState() => _QuantityEditorWidgetState();

@@ -12,7 +12,7 @@ import '../../widgets/core_widgets/info_dialog.dart';
 
 class BookSharePage extends StatefulWidget {
   static const String route = '/home/share_book';
-  const BookSharePage({Key? key}) : super(key: key);
+  const BookSharePage({super.key});
 
   @override
   _BookSharePageState createState() => _BookSharePageState();

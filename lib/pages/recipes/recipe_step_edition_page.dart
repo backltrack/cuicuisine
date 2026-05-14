@@ -6,7 +6,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import '../../generated/l10n.dart';
 
 class StepEditionPage extends StatefulWidget {
-  const StepEditionPage({Key? key}) : super(key: key);
+  const StepEditionPage({super.key});
 
   @override
   _StepEditionPageState createState() => _StepEditionPageState();

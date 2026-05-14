@@ -5,13 +5,13 @@ import '../../generated/l10n.dart';
 import '../../database/database_mgr.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
-import '../../l10n/localeMgr.dart';
+import '../../l10n/locale_mgr.dart';
 import '../../models/data_model.dart';
 
 class BookNamePage extends StatefulWidget {
   static const route = "/home/rename_book";
 
-  const BookNamePage({Key? key}) : super(key: key);
+  const BookNamePage({super.key});
 
   @override
   _BookNamePageState createState() => _BookNamePageState();

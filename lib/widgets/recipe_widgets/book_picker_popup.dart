@@ -11,7 +11,7 @@ Future<String?> showBookPickerDialog({required context, required List<Book> book
 
 class BookPickerDialog extends StatefulWidget {
   final List<Book> books;
-  const BookPickerDialog({Key? key, required this.books}) : super(key: key);
+  const BookPickerDialog({super.key, required this.books});
 
   @override
   _BookPickerDialogState createState() => _BookPickerDialogState();

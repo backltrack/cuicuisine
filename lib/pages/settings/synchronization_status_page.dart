@@ -7,7 +7,7 @@ import '../../generated/l10n.dart';
 class SynchronizationStatusPage extends StatefulWidget {
   static const String route = '/synchronization_status';
 
-  const SynchronizationStatusPage({Key? key}) : super(key: key);
+  const SynchronizationStatusPage({super.key});
 
   @override
   State<SynchronizationStatusPage> createState() =>

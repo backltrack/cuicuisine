@@ -5,7 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../themes/theme_mgr.dart';
 
 class PictureListTile extends StatefulWidget {
-  const PictureListTile({Key? key, required this.recipeId, required this.imageId, this.height=80, this.onRemove}) : super(key: key);
+  const PictureListTile({super.key, required this.recipeId, required this.imageId, this.height=80, this.onRemove});
 
   final String recipeId;
   final String imageId;

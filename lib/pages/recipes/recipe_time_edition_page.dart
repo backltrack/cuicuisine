@@ -10,7 +10,7 @@ import '../../widgets/core_widgets/alert_dialog.dart';
 
 class RecipeTimeEditionPage extends StatefulWidget {
 
-  const RecipeTimeEditionPage({Key? key}) : super(key: key);
+  const RecipeTimeEditionPage({super.key});
 
   @override
   _RecipeTimeEditionPageState createState() => _RecipeTimeEditionPageState();

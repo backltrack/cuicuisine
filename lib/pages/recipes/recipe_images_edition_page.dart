@@ -14,7 +14,7 @@ import '../../widgets/recipe_widgets/picture_list_tile_widget.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
 class RecipeImagesEditionPage extends StatefulWidget {
-  const RecipeImagesEditionPage({Key? key}) : super(key: key);
+  const RecipeImagesEditionPage({super.key});
 
   @override
   State<RecipeImagesEditionPage> createState() => _RecipeImagesEditionPageState();

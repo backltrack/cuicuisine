@@ -4,7 +4,7 @@ import '../../themes/theme_mgr.dart';
 
 class RecipeCardTile extends StatefulWidget {
   final Recipe recipe;
-  RecipeCardTile({Key? key, required this.recipe}) : super(key: key);
+  const RecipeCardTile({super.key, required this.recipe});
 
   @override
   _RecipeCardTileState createState() => _RecipeCardTileState();

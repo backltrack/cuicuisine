@@ -20,7 +20,7 @@ class RecipeStepsEditionWidget extends StatefulWidget {
   final Function(RecipeStep)? onAddStep;
   final Function(int)? onRemoveStep;
   final Function(int, int)? onReorderSteps;
-  RecipeStepsEditionWidget({Key? key, required this.steps, this.onStepChanged, this.onAddStep, this.onRemoveStep, this.onReorderSteps}) : super(key: key);
+  const RecipeStepsEditionWidget({super.key, required this.steps, this.onStepChanged, this.onAddStep, this.onRemoveStep, this.onReorderSteps});
 
   @override
   _RecipeStepsEditionWidgetState createState() => _RecipeStepsEditionWidgetState();

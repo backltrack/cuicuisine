@@ -10,7 +10,7 @@ import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
 class BookIngredientEditionPage extends StatefulWidget {
-  const BookIngredientEditionPage({Key? key}) : super(key: key);
+  const BookIngredientEditionPage({super.key});
 
   @override
   _BookIngredientEditionPageState createState() => _BookIngredientEditionPageState();

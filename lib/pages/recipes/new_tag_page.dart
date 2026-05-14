@@ -4,7 +4,7 @@ import '../../generated/l10n.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
 class NewTagPage extends StatefulWidget {
-  const NewTagPage({Key? key}) : super(key: key);
+  const NewTagPage({super.key});
 
   @override
   _NewTagPageState createState() => _NewTagPageState();
