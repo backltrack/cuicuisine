@@ -20,6 +20,9 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'fr';
 
+  static String m0(count, name) =>
+      "Ce tag est utilisé dans ${count} recette(s) (\"${name}\"). La suppression le retirera de toutes ces recettes.";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
         "account": MessageLookupByLibrary.simpleMessage("Compte"),
@@ -88,6 +91,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Partager avec lien"),
         "book_settings_share_qr":
             MessageLookupByLibrary.simpleMessage("Partager avec code QR"),
+        "book_settings_tags": MessageLookupByLibrary.simpleMessage("Tags"),
         "book_settings_users":
             MessageLookupByLibrary.simpleMessage("Utilisateurs"),
         "bottom_bar_sort_alpha":
@@ -185,6 +189,7 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Nouvelle recette"),
         "new_recipe_step":
             MessageLookupByLibrary.simpleMessage("Nouvelle étape"),
+        "new_tag_category": MessageLookupByLibrary.simpleMessage("Catégorie"),
         "new_tag_name": MessageLookupByLibrary.simpleMessage("Nom"),
         "new_tag_title": MessageLookupByLibrary.simpleMessage("Nouveau tag"),
         "no_recipe":
@@ -197,6 +202,25 @@ class MessageLookup extends MessageLookupByLibrary {
         "offline_refused_toast": MessageLookupByLibrary.simpleMessage(
             "Attends le retour du réseau ou tente de te connecter à un autre serveur."),
         "ok": MessageLookupByLibrary.simpleMessage("OK"),
+        "onboarding_books_desc": MessageLookupByLibrary.simpleMessage(
+            "Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages..."),
+        "onboarding_books_title":
+            MessageLookupByLibrary.simpleMessage("Les Livres"),
+        "onboarding_next": MessageLookupByLibrary.simpleMessage("Suivant"),
+        "onboarding_ready_desc": MessageLookupByLibrary.simpleMessage(
+            "Choisissez votre langue et commencez à cuisiner !"),
+        "onboarding_ready_title":
+            MessageLookupByLibrary.simpleMessage("C\'est parti !"),
+        "onboarding_recipes_desc": MessageLookupByLibrary.simpleMessage(
+            "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées."),
+        "onboarding_recipes_title":
+            MessageLookupByLibrary.simpleMessage("Les Recettes"),
+        "onboarding_sharing_desc": MessageLookupByLibrary.simpleMessage(
+            "Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration."),
+        "onboarding_sharing_title":
+            MessageLookupByLibrary.simpleMessage("Le Partage"),
+        "onboarding_skip": MessageLookupByLibrary.simpleMessage("Passer"),
+        "onboarding_start": MessageLookupByLibrary.simpleMessage("Commencer"),
         "page_not_found":
             MessageLookupByLibrary.simpleMessage("Page introuvable"),
         "popup_delete_description_as_collaborator":
@@ -283,7 +307,12 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("État de la synchronisation"),
         "synchronization_status_up_to_date":
             MessageLookupByLibrary.simpleMessage("À jour"),
+        "synchronizing":
+            MessageLookupByLibrary.simpleMessage("Synchronisation en cours..."),
         "tag_category_other": MessageLookupByLibrary.simpleMessage("Autres"),
+        "tag_delete_used_confirm": MessageLookupByLibrary.simpleMessage(
+            "Veux-tu quand même le supprimer ?"),
+        "tag_delete_used_warning": m0,
         "time_minutes_abr": MessageLookupByLibrary.simpleMessage("min"),
         "time_widget_cooking": MessageLookupByLibrary.simpleMessage("Cuisson"),
         "time_widget_preparation":
@@ -323,25 +352,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "wrong_password":
             MessageLookupByLibrary.simpleMessage("Mauvais mot de passe"),
         "wrong_user":
-            MessageLookupByLibrary.simpleMessage("Utilisateur non reconnu"),
-        "onboarding_books_title":
-            MessageLookupByLibrary.simpleMessage("Les Livres"),
-        "onboarding_books_desc": MessageLookupByLibrary.simpleMessage(
-            "Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages..."),
-        "onboarding_recipes_title":
-            MessageLookupByLibrary.simpleMessage("Les Recettes"),
-        "onboarding_recipes_desc": MessageLookupByLibrary.simpleMessage(
-            "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées."),
-        "onboarding_sharing_title":
-            MessageLookupByLibrary.simpleMessage("Le Partage"),
-        "onboarding_sharing_desc": MessageLookupByLibrary.simpleMessage(
-            "Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration."),
-        "onboarding_ready_title":
-            MessageLookupByLibrary.simpleMessage("C\'est parti !"),
-        "onboarding_ready_desc": MessageLookupByLibrary.simpleMessage(
-            "Choisissez votre langue et commencez à cuisiner !"),
-        "onboarding_next": MessageLookupByLibrary.simpleMessage("Suivant"),
-        "onboarding_skip": MessageLookupByLibrary.simpleMessage("Passer"),
-        "onboarding_start": MessageLookupByLibrary.simpleMessage("Commencer")
+            MessageLookupByLibrary.simpleMessage("Utilisateur non reconnu")
       };
 }

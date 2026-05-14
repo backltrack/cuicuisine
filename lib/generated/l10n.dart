@@ -710,6 +710,16 @@ class S {
     );
   }
 
+  /// `Synchronisation en cours...`
+  String get synchronizing {
+    return Intl.message(
+      'Synchronisation en cours...',
+      name: 'synchronizing',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `État: `
   String get synchronization_status {
     return Intl.message(
@@ -1330,6 +1340,7 @@ class S {
     );
   }
 
+  /// `Tags`
   String get book_settings_tags {
     return Intl.message(
       'Tags',
@@ -1519,6 +1530,7 @@ class S {
     );
   }
 
+  /// `Catégorie`
   String get new_tag_category {
     return Intl.message(
       'Catégorie',
@@ -1678,14 +1690,17 @@ class S {
     );
   }
 
-  String tag_delete_used_warning(int count, String name) {
+  /// `Ce tag est utilisé dans {count} recette(s) ("{name}"). La suppression le retirera de toutes ces recettes.`
+  String tag_delete_used_warning(Object count, Object name) {
     return Intl.message(
       'Ce tag est utilisé dans $count recette(s) ("$name"). La suppression le retirera de toutes ces recettes.',
       name: 'tag_delete_used_warning',
+      desc: '',
       args: [count, name],
     );
   }
 
+  /// `Veux-tu quand même le supprimer ?`
   String get tag_delete_used_confirm {
     return Intl.message(
       'Veux-tu quand même le supprimer ?',
@@ -1875,56 +1890,114 @@ class S {
     );
   }
 
+  /// `Les Livres`
   String get onboarding_books_title {
-    return Intl.message('Les Livres', name: 'onboarding_books_title', desc: '', args: []);
+    return Intl.message(
+      'Les Livres',
+      name: 'onboarding_books_title',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages...`
   String get onboarding_books_desc {
     return Intl.message(
       'Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages...',
-      name: 'onboarding_books_desc', desc: '', args: []);
+      name: 'onboarding_books_desc',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Les Recettes`
   String get onboarding_recipes_title {
-    return Intl.message('Les Recettes', name: 'onboarding_recipes_title', desc: '', args: []);
+    return Intl.message(
+      'Les Recettes',
+      name: 'onboarding_recipes_title',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.`
   String get onboarding_recipes_desc {
     return Intl.message(
       'Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.',
-      name: 'onboarding_recipes_desc', desc: '', args: []);
+      name: 'onboarding_recipes_desc',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Le Partage`
   String get onboarding_sharing_title {
-    return Intl.message('Le Partage', name: 'onboarding_sharing_title', desc: '', args: []);
+    return Intl.message(
+      'Le Partage',
+      name: 'onboarding_sharing_title',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration.`
   String get onboarding_sharing_desc {
     return Intl.message(
       'Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration.',
-      name: 'onboarding_sharing_desc', desc: '', args: []);
+      name: 'onboarding_sharing_desc',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `C'est parti !`
   String get onboarding_ready_title {
-    return Intl.message('C\'est parti !', name: 'onboarding_ready_title', desc: '', args: []);
+    return Intl.message(
+      'C\'est parti !',
+      name: 'onboarding_ready_title',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Choisissez votre langue et commencez à cuisiner !`
   String get onboarding_ready_desc {
     return Intl.message(
       'Choisissez votre langue et commencez à cuisiner !',
-      name: 'onboarding_ready_desc', desc: '', args: []);
+      name: 'onboarding_ready_desc',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Suivant`
   String get onboarding_next {
-    return Intl.message('Suivant', name: 'onboarding_next', desc: '', args: []);
+    return Intl.message(
+      'Suivant',
+      name: 'onboarding_next',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Passer`
   String get onboarding_skip {
-    return Intl.message('Passer', name: 'onboarding_skip', desc: '', args: []);
+    return Intl.message(
+      'Passer',
+      name: 'onboarding_skip',
+      desc: '',
+      args: [],
+    );
   }
 
+  /// `Commencer`
   String get onboarding_start {
-    return Intl.message('Commencer', name: 'onboarding_start', desc: '', args: []);
+    return Intl.message(
+      'Commencer',
+      name: 'onboarding_start',
+      desc: '',
+      args: [],
+    );
   }
 }
 

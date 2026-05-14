@@ -207,7 +207,7 @@ class _FilterBottomMenuState extends State<FilterBottomMenu> {
                         onPressed: () {
                           // add ingredient
                           Navigator.of(context).pushNamed(ItemSelector.route, arguments: {
-                            'items': DatabaseMgr().localMgr.getBookIngredients(),
+                            'items': DatabaseMgr().localMgr.getBookIngredients().map((bi) => bi.name).toList(),
                             'itemType': "ingredients"
                           }).whenComplete(() {
                             refreshFilterItems();

@@ -52,13 +52,6 @@
   "recipe_menu_remove": "Remove",
   "new_recipe_name": "New recipe",
   "new_recipe_step": "New step",
-  "tutorial_recipe_name": "Poule au pot",
-  "tutorial_recipe_step1": "<div>Éplucher et découper en gros morceaux les carottes, les navets et les poireaux. Piquer les clous de girofle sur l'oignon.</div>",
-  "tutorial_recipe_step2": "<div>Remplir une cocotte d'eau sur environ 10 cm. Plonger le bouquet garni et l'oignon. Saler et poivrer. Placer la poule dans la cocotte. Faire cuire à couvert durant 2 heures. 20 minutes avant la fin de la cuisson, ajouter les légumes.</div>",
-  "tutorial_recipe_step3": "<div>Hacher le persil. Découper la poule au pot. Placer les morceaux de poule, les légumes et le jus dans un grand plat. Parsemer de persil. Servir chaud.</div>",
-  "tutorial_recipe_tag1": "winter",
-  "tutorial_recipe_tag2": "meat",
-  "tutorial_recipe_tag3": "french",
 
   "steps_widget_title": "Steps",
   "steps_widget_step": "Step",
@@ -84,6 +77,7 @@
   "synchronization_status_need_sync": "Need synchronization",
   "synchronization_queue": "Queue: ",
   "synchronization_status_failure": "Unknown status",
+  "synchronizing": "Synchronizing...",
   "synchronization_status": "Status: ",
 
   "remove_account": "Remove my account",

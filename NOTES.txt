@@ -1,5 +1,6 @@
 TODO:
-- pop up configuration a la création du compte
+- pull to refresh download tout si aucun change créé
+
 - Api Version
 - model migration history
 - versioned db

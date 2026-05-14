@@ -30,6 +30,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
   String _password = "";
 
   bool showForgottenButton = false;
+  bool _isSyncing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,77 +53,101 @@ class _EmailConnexionState extends State<EmailConnexion> {
     }
 
     void _submitPassword() async {
-      await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password, 
+      setState(() => _isSyncing = true);
+      await DatabaseMgr().remoteMgr.connectWithEmail(emailEditingController.text, _password,
         onInvalidEmail: () {
           setState(() {
             showForgottenButton = true;
+            _isSyncing = false;
           });
           ToastNotifier().showInfo(S.of(context).wrong_user);
         },
         onInvalidPassword: () {
+          setState(() => _isSyncing = false);
           ToastNotifier().showWarning(S.of(context).wrong_password);
         },
         onSuccess: (AppUser user) async {
           await DatabaseMgr().synchronization.sync();
           if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
-
         }
       );
     }
 
+    final bool canSubmit = !_isSyncing &&
+        EmailPasswordValidator.isEmailValid(emailEditingController.text) &&
+        EmailPasswordValidator.isPasswordValid(_password);
+
     return Scaffold(
       appBar: AppBar(title: Text(S.of(context).auth_connexion)),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(children: <Widget>[
-            // EMAIL method
-            MyTextField(
-              autofocus: false,
-              textEditingController: emailEditingController,
-              label: S.of(context).auth_email_label,
-              keyboardType: TextInputType.emailAddress,
-              suffixIcon: EmailPasswordValidator.isEmailValid(emailEditingController.text) ? FontAwesomeIcons.circleCheck : null,
-              icon: FontAwesomeIcons.at
-            ),
-            MyTextField(
-              autofocus: true,
-              label: S.of(context).auth_password_label,
-              keyboardType: TextInputType.text,
-              isPassword: true,
-              icon: FontAwesomeIcons.key,
-              onChanged: (val) {
-                setState(() {
-                  _password = val;
-                });
-              },
-              onSubmit: (String val) {
-                if (EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password)) {
-                  _submitPassword();
-                }
-              },
-            ),
+      body: Stack(
+        children: [
+          AbsorbPointer(
+            absorbing: _isSyncing,
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                child: Column(children: <Widget>[
+                  MyTextField(
+                    autofocus: false,
+                    textEditingController: emailEditingController,
+                    label: S.of(context).auth_email_label,
+                    keyboardType: TextInputType.emailAddress,
+                    suffixIcon: EmailPasswordValidator.isEmailValid(emailEditingController.text) ? FontAwesomeIcons.circleCheck : null,
+                    icon: FontAwesomeIcons.at
+                  ),
+                  MyTextField(
+                    autofocus: true,
+                    label: S.of(context).auth_password_label,
+                    keyboardType: TextInputType.text,
+                    isPassword: true,
+                    icon: FontAwesomeIcons.key,
+                    onChanged: (val) {
+                      setState(() {
+                        _password = val;
+                      });
+                    },
+                    onSubmit: (String val) {
+                      if (canSubmit) _submitPassword();
+                    },
+                  ),
 
-            PasswordCheckInfo(password: _password),
+                  PasswordCheckInfo(password: _password),
 
-            const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-            SocialButton(
-              // email sign in button
-              onPressed: EmailPasswordValidator.isEmailValid(emailEditingController.text) && EmailPasswordValidator.isPasswordValid(_password) ? _submitPassword : null,
-              // email sign in button
-              child: Text(S.of(context).auth_connexion),
+                  SocialButton(
+                    onPressed: canSubmit ? _submitPassword : null,
+                    child: Text(S.of(context).auth_connexion),
+                  ),
+
+                  TextButton(
+                    onPressed: () async {
+                      Navigator.pushNamed(context, ForgottenPasswordPage.route);
+                    },
+                    child: Text(S.of(context).auth_forgotten_password)
+                  ),
+                ]),
+              )
             ),
-
-            // forgotten password
-            TextButton(
-              onPressed: () async {
-                Navigator.pushNamed(context, ForgottenPasswordPage.route);
-              },
-              child: Text(S.of(context).auth_forgotten_password)
+          ),
+          if (_isSyncing)
+            Container(
+              color: Colors.black45,
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      S.of(context).synchronizing,
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ]),
-        )
+        ],
       )
     );
   }

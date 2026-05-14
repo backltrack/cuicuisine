@@ -60,7 +60,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 onPressed: _finish,
                 child: Text(S.of(context).onboarding_skip,
                     style: theme.textTheme.bodyLarge!
-                        .copyWith(color: theme.hintColor)),
+                        .copyWith(color: theme.textTheme.bodyMedium!.color)),
               ),
             ),
 
@@ -107,7 +107,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   decoration: BoxDecoration(
                     color: i == _currentPage
                         ? theme.primaryColor
-                        : theme.hintColor,
+                        : theme.textTheme.bodyMedium!.color,
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -172,7 +172,7 @@ class _OnboardingSlide extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             description,
-            style: theme.textTheme.bodyLarge!.copyWith(color: theme.hintColor),
+            style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
           if (extra != null) ...[
@@ -228,11 +228,11 @@ class _LangButton extends StatelessWidget {
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         side: BorderSide(
-          color: selected ? theme.primaryColor : theme.hintColor,
+          color: selected ? theme.primaryColor : theme.textTheme.bodyMedium!.color!,
           width: selected ? 2 : 1,
         ),
         foregroundColor:
-            selected ? theme.primaryColor : theme.hintColor,
+            selected ? theme.primaryColor : theme.textTheme.bodyMedium!.color,
       ),
       child: Text(label),
     );
