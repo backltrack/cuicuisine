@@ -9,6 +9,7 @@ import '../../widgets/core_widgets/social_button.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
 import '../../models/data_model.dart';
+import '../account/update_password.dart';
 import '../home_page.dart';
 import '../404.dart';
 import 'forgotten_password.dart';
@@ -72,7 +73,15 @@ class _EmailConnexionState extends State<EmailConnexion> {
         },
         onSuccess: (AppUser user) async {
           await DatabaseMgr().synchronization.sync();
-          if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(HomePage.route, (Route<dynamic> route) => false);
+          if (!context.mounted) return;
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              HomePage.route, (Route<dynamic> route) => false);
+          if (_password == 'ToChange01') {
+            Navigator.of(context).pushNamed(
+              UpdatePassword.route,
+              arguments: {'forceChange': true, 'oldPassword': _password},
+            );
+          }
         }
       );
     }

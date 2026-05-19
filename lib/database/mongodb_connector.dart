@@ -336,7 +336,7 @@ class MongoConnector {
     try {
       oauth2.Client? client = await OAuth2Connexion.connectFromPassword(serverUri: server, email: encEmail, password: encPwd);
       if (client != null) {
-        client = client;
+        this.client = client;
 
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
