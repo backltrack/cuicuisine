@@ -583,6 +583,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Drawer homepageDrawer(AppUser? appUser) {
+    if (appUser == null) return const Drawer();
 
     Widget addButton = MyOutlinedButton(
         text: S.of(context).add_button,
@@ -598,7 +599,7 @@ class _HomePageState extends State<HomePage> {
             fit: StackFit.loose,
             children: [
               UserAccountsDrawerHeader(
-                accountName: Text(appUser!.name),
+                accountName: Text(appUser.name),
                 accountEmail: Text(appUser.email),
                 currentAccountPicture: Stack(
                   fit: StackFit.expand,
