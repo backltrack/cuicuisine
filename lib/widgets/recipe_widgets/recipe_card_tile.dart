@@ -23,7 +23,7 @@ class _RecipeCardTileState extends State<RecipeCardTile> {
     
     return GestureDetector(
       child: Card(
-        child: Container(
+        child: SizedBox(
           width: cardWidth,
           child: Column(
             children: [

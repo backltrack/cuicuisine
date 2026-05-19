@@ -217,10 +217,10 @@ class _RecipePageState extends State<RecipePage> {
                           "recipe": recipe
                         }).then((value) async {
                           // reload local recipe
-                          Recipe? _tmp = DatabaseMgr().localMgr.getRecipe(recipe.id);
-                          if (_tmp != null) {
+                          Recipe? tmp = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                          if (tmp != null) {
                             setState(() {
-                              recipe = _tmp;
+                              recipe = tmp;
                             });
                           }
                         });

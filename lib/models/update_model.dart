@@ -90,11 +90,11 @@ class BookUpdate implements DatabaseObject {
       json['recipeIds'] = recipeIds!;
     }
     if (access != null) {
-      Map<String, int> _access = {};
+      Map<String, int> jsonAccess = {};
       for (String userId in access!.keys.toList()) {
-        _access[userId] = access![userId]!.index;
+        jsonAccess[userId] = access![userId]!.index;
       }
-      json['access'] = _access;
+      json['access'] = jsonAccess;
     }
     if (users != null) {
       json['users'] = users!;

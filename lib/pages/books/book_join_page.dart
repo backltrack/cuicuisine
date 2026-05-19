@@ -165,11 +165,11 @@ class _BookJoinPageState extends State<BookJoinPage> {
             // is book already accessed by user
             bool canAlreadyAccess = false;
             List<Book> books = DatabaseMgr().localMgr.getUserBooks();
-            books.forEach((Book book) {
+            for (var book in books) {
               print(book.id);
               canAlreadyAccess = canAlreadyAccess || book.id == _controller.text;
               print(canAlreadyAccess);
-            });
+            }
             // add user to book
             if (!canAlreadyAccess) {
               //await addUserToBook(_controller.text);

@@ -509,11 +509,11 @@ class HiveConnector {
       book.users = List<String>.from(data['users']);
     }
     if (data.keys.contains('access')) {
-      Map<String, AccessLevel> _access = {};
+      Map<String, AccessLevel> access = {};
       for (String userId in data['access'].keys.toList()) {
-        _access[userId] = AccessLevel.values[data['access'][userId]];
+        access[userId] = AccessLevel.values[data['access'][userId]];
       }
-      book.access = _access;
+      book.access = access;
     }
     if (data.keys.contains('lastUpdate')) {
       book.lastUpdate = DateTime.parse(data['lastUpdate']);
@@ -540,14 +540,14 @@ class HiveConnector {
 
   Future<bool> updateUserAccess(Book book, String userId, AccessLevel value) async {
     if (book.access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own) {
-      Map<String, AccessLevel> _newAccess = Map.from(book.access);
-      _newAccess[userId] = value;
+      Map<String, AccessLevel> newAccess = Map.from(book.access);
+      newAccess[userId] = value;
 
       await DatabaseMgr().localMgr.updateBook(
         book.id,
         BookUpdate(
           id: book.id,
-          access: _newAccess
+          access: newAccess
         )
       );
       return true;

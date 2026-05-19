@@ -52,7 +52,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
       shouldInit = false;
     }
 
-    void _submitPassword() async {
+    void submitPassword() async {
       if (!DatabaseMgr().isCompatible) {
         ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
         return;
@@ -112,7 +112,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
                       });
                     },
                     onSubmit: (String val) {
-                      if (canSubmit) _submitPassword();
+                      if (canSubmit) submitPassword();
                     },
                   ),
 
@@ -121,7 +121,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
                   const SizedBox(height: 24),
 
                   SocialButton(
-                    onPressed: canSubmit ? _submitPassword : null,
+                    onPressed: canSubmit ? submitPassword : null,
                     child: Text(S.of(context).auth_connexion),
                   ),
 

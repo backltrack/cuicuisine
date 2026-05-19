@@ -469,8 +469,8 @@ class _HomePageState extends State<HomePage> {
 
                       if (_mandatoryTags.isNotEmpty && tagCondition || _mandatoryTags.isEmpty) {
                         if (_mandatoryIngredients.isNotEmpty && ingredientCondition || _mandatoryIngredients.isEmpty) {
-                          AppUser? _appUser = DatabaseMgr().localMgr.getUser();
-                          if (_displayFavorites && _appUser!.favoriteRecipes.contains(sortedData[index].id) || !_displayFavorites) {
+                          AppUser? appUser = DatabaseMgr().localMgr.getUser();
+                          if (_displayFavorites && appUser!.favoriteRecipes.contains(sortedData[index].id) || !_displayFavorites) {
                             if (_time > 0 && _isTimeMax && sortedData[index].getTotalTime() < _time ||
                                 _time > 0 && !_isTimeMax && sortedData[index].getTotalTime() > _time ||
                                 _time == 0) {

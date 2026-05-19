@@ -21,7 +21,7 @@ class RecipeIngredientsEditionWidget extends StatefulWidget {
   final Function(int) onNumberChanged;
   final Function(String) onQuantityTypeChanged;
 
-  RecipeIngredientsEditionWidget({
+  const RecipeIngredientsEditionWidget({
     super.key,
     required this.ingredients,
     required this.defaultQuantity,

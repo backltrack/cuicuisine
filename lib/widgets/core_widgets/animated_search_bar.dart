@@ -263,8 +263,9 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                             toggle = 1;
                             setState(() {
                               ///if the autoFocus is true, the keyboard will pop open, automatically
-                              if (widget.autoFocus)
+                              if (widget.autoFocus) {
                                 FocusScope.of(context).requestFocus(focusNode);
+                              }
                             });
 
                             ///forward == expand

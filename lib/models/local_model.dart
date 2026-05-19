@@ -119,8 +119,9 @@ class Unit {
   }
 
   List<String> getCompatibleUnitsForUnit(String unit, double density) {
-    if (masses.unitList.contains(unit) && density == 0) return masses.unitList;
-    else if (masses.unitList.contains(unit) && density != 0) return masses.unitList + volumes.unitList;
+    if (masses.unitList.contains(unit) && density == 0) {
+      return masses.unitList;
+    } else if (masses.unitList.contains(unit) && density != 0) return masses.unitList + volumes.unitList;
     else if (volumes.aliasesList.contains(unit) && density == 0) return volumes.unitList;
     else if (volumes.aliasesList.contains(unit) && density != 0) return volumes.unitList + masses.unitList;
     else return [unit];
@@ -187,9 +188,9 @@ class DensityTable {
   Map<String, double> constructMap() {
     Map<String, double> map = {};
     for (int i=0; i<_translationTable.keys.length; i++) {
-      _translationTable.values.toList()[i].forEach((String ingredient) {
+      for (var ingredient in _translationTable.values.toList()[i]) {
         map[ingredient] = _densityTable[_translationTable.keys.toList()[i]] ?? 0;
-      });
+      }
     }
     return map;
   }

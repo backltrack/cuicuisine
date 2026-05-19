@@ -39,6 +39,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
     _quantity = widget.defaultQuantity;
     locale = LocaleMgr.getLocale(context);
   }
+  @override
   void dispose() {
     super.dispose();
     // Dispose of any resources if needed

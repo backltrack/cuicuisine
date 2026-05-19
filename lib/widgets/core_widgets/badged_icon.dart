@@ -21,12 +21,12 @@ class BadgedIconButton extends StatefulWidget {
   });
 
   @override
-  _BadgedIconButtonState createState() => _BadgedIconButtonState(this.number);
+  _BadgedIconButtonState createState() => _BadgedIconButtonState(number);
 }
 
 class _BadgedIconButtonState extends State<BadgedIconButton> {
 
-  int _badgeNumber;
+  final int _badgeNumber;
 
   _BadgedIconButtonState(this._badgeNumber);
 

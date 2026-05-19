@@ -18,7 +18,7 @@ class ItemSelector extends StatefulWidget {
 
 class _ItemSelectorState extends State<ItemSelector> {
 
-  List<int> _selectedIndices = [];
+  final List<int> _selectedIndices = [];
 
   String _search = "";
 
@@ -48,16 +48,16 @@ class _ItemSelectorState extends State<ItemSelector> {
     }
 
     // set title
-    String _title = "";
+    String title = "";
     if (itemType == "ingredients") {
-      _title = S.of(context).filter_ingredients;
+      title = S.of(context).filter_ingredients;
     } else if (itemType == "tags") {
-      _title = S.of(context).filter_tags;
+      title = S.of(context).filter_tags;
     }
 
     return Scaffold(
       appBar: SearchAppBar(
-        myTitle: _title,
+        myTitle: title,
         onSearchChanged: (String val) {
           setState(() {
             _search = val;

@@ -13,7 +13,7 @@ class RecipeNamePage extends StatefulWidget {
 }
 
 class _RecipeNamePageState extends State<RecipeNamePage> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   bool argsLoaded = false;
 
   @override

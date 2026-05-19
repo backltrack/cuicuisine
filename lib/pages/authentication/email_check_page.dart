@@ -26,7 +26,7 @@ class _EmailCheckState extends State<EmailCheck> {
 
   @override
   Widget build(BuildContext context) {
-    void _submitEmail() async {
+    void submitEmail() async {
       if (await DatabaseMgr().remoteMgr.emailExists(_email)) {
         Navigator.pushNamed(context,  EmailConnexion.route, arguments: {
           'email': _email
@@ -59,7 +59,7 @@ class _EmailCheckState extends State<EmailCheck> {
               autofocus: true,
               onSubmit: (String val) {
                 if (EmailPasswordValidator.isEmailValid(_email)) {
-                  _submitEmail();
+                  submitEmail();
                 }
               },
             ),
@@ -68,7 +68,7 @@ class _EmailCheckState extends State<EmailCheck> {
 
             SocialButton(
               // email sign in button
-              onPressed: EmailPasswordValidator.isEmailValid(_email) ? _submitEmail : null,
+              onPressed: EmailPasswordValidator.isEmailValid(_email) ? submitEmail : null,
               // email sign in button
               child: Text(S.of(context).auth_next),
             )

@@ -36,7 +36,7 @@ List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAc
     // Send to other book
     PopupMenuItem(
         value: "copy_into",
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width / 2,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,7 +51,7 @@ List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAc
     if (userAccess.index > AccessLevel.read.index)
       PopupMenuItem(
         value: "remove",
-        child: Container(
+        child: SizedBox(
           width: MediaQuery.of(context).size.width / 2,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

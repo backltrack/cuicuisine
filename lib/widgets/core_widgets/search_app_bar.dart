@@ -12,6 +12,7 @@ class SearchAppBar extends AppBar {
   final String? myTitle;
   final Function(String) onSearchChanged;
   final IconButton? extraWebButton;
+  @override
   final Widget? leading;
 
   SearchAppBar({super.key, this.myTitle, required this.onSearchChanged, this.leading, this.extraWebButton});
@@ -22,7 +23,7 @@ class SearchAppBar extends AppBar {
 
 class _SearchAppBarState extends State<SearchAppBar> {
 
-  TextEditingController _searchTextController = TextEditingController();
+  final TextEditingController _searchTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

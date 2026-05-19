@@ -92,10 +92,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                     }
                 ).then((mustUpdate) async {
                   if (mustUpdate != null && mustUpdate == "update") {
-                    var _tmp = DatabaseMgr().localMgr.getBook(_book!.id);
-                    if (_tmp != null) {
+                    var tmp = DatabaseMgr().localMgr.getBook(_book!.id);
+                    if (tmp != null) {
                       setState(() {
-                        _book = _tmp;
+                        _book = tmp;
                       });
                       setState(() {
 
@@ -204,7 +204,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 12),
             itemCount: _book!.users.length,
             itemBuilder: (context, int index) {
-              final String _name = userNames[_book!.users[index]] ?? "";
+              final String name = userNames[_book!.users[index]] ?? "";
 
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 4),
@@ -214,10 +214,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                     Row(
                       children: [
                         CircleAvatar(
-                          child: Text(getInitials(_name)),
+                          child: Text(getInitials(name)),
                         ),
                         const SizedBox(width: 16),
-                        Text(_name)
+                        Text(name)
                       ],
                     ),
                     if (_book!.access[_book!.users[index]]!.index == AccessLevel.own.index) // this book user is owner
@@ -251,16 +251,16 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                                 showAlertDialog(
                                     context: context,
                                     title: S.of(context).popup_remove_user_title,
-                                    description: Text('${S.of(context).popup_remove_user_description}$_name?')
+                                    description: Text('${S.of(context).popup_remove_user_description}$name?')
                                 ).then((value) async {
                                   if (value != null && value) {
                                     // remove access to book
                                     DatabaseMgr().localMgr.removeOtherUserFromBook(_book!.users[index], _book!);
                                     // get the book back from db
-                                    var _tmpBook = DatabaseMgr().localMgr.getBook(_book!.id);
-                                    if (_tmpBook != null) {
+                                    var tmpBook = DatabaseMgr().localMgr.getBook(_book!.id);
+                                    if (tmpBook != null) {
                                       setState(() {
-                                        _book = _tmpBook;
+                                        _book = tmpBook;
                                       });
                                     }
                                   }
@@ -298,10 +298,10 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
 
                               }
                               // get the book back from db
-                              var _tmpBook = DatabaseMgr().localMgr.getBook(_book!.id);
-                              if (_tmpBook != null) {
+                              var tmpBook = DatabaseMgr().localMgr.getBook(_book!.id);
+                              if (tmpBook != null) {
                                 setState(() {
-                                  _book = _tmpBook;
+                                  _book = tmpBook;
                                 });
                               }
                             },

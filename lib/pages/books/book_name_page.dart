@@ -18,7 +18,7 @@ class BookNamePage extends StatefulWidget {
 }
 
 class _BookNamePageState extends State<BookNamePage> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   bool argsLoaded = false;
 
   @override

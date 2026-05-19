@@ -51,7 +51,7 @@ class _RecipeTagsWidgetState extends State<RecipeTagsWidget> {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: 12),
       margin: EdgeInsets.only(left: 8, top: 8, right: 8),
-      child: widget.isEditable && _currentTags.length > 0 ?
+      child: widget.isEditable && _currentTags.isNotEmpty ?
         ReorderableRow(
           children: tagWidgetsList,
           onReorder: (int oldIndex, int newIndex) {
@@ -63,7 +63,7 @@ class _RecipeTagsWidgetState extends State<RecipeTagsWidget> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: _currentTags.length > 0 ? tagWidgetsList
+            children: _currentTags.isNotEmpty ? tagWidgetsList
                 : [
               TagItem(
                   title: "#${S.of(context).no_tag}"

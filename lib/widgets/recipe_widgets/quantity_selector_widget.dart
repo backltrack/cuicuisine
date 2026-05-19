@@ -64,14 +64,14 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
               },
               child: Text(
                   widget.quantityType != "" ?
-                  _quantity.toString() + "  " + _quantityType
-                      : _quantity.toString() + "  " + S.of(context).ingredient_widget_quantity_type,
+                  "$_quantity  $_quantityType"
+                      : "$_quantity  ${S.of(context).ingredient_widget_quantity_type}",
                   style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.surface)),
             )
                 : Text(
                 widget.quantityType != "" ?
-                _quantity.toString() + "  " + _quantityType
-                    : _quantity.toString() + "  " + S.of(context).ingredient_widget_quantity_type,
+                "$_quantity  $_quantityType"
+                    : "$_quantity  ${S.of(context).ingredient_widget_quantity_type}",
                 style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.colorScheme.surface)
             ),
             IconButton(

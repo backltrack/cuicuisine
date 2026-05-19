@@ -4,8 +4,9 @@ class AnimatedIconButton extends StatefulWidget {
   final Function()? onPressed;
   final Widget icon;
 
-  AnimatedIconButton({super.key, this.onPressed, required this.icon});
+  const AnimatedIconButton({super.key, this.onPressed, required this.icon});
 
+  @override
   _AnimatedIconButtonState createState() => _AnimatedIconButtonState();
 }
 

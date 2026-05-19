@@ -9,7 +9,7 @@ Future<void> exportAllAsJson() async {
   String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
 
   if (selectedDirectory != null) {
-    File saveFile = File(selectedDirectory + '/export.txt');
+    File saveFile = File('$selectedDirectory/export.txt');
     // await saveFile.writeAsString(data);
   }
 }

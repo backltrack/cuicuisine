@@ -33,10 +33,10 @@ class _SynchronizationStatusPageState extends State<SynchronizationStatusPage> {
     if (isOnline) {
       String? lastChange = DatabaseMgr().localMgr.getLastChange();
       if (lastChange != null) {
-        int? _count = await DatabaseMgr().remoteMgr.getNewerChangesCount(lastChange);
-        isCountValid = _count != null;
+        int? count = await DatabaseMgr().remoteMgr.getNewerChangesCount(lastChange);
+        isCountValid = count != null;
         if (isCountValid) {
-          getNewerChangesCount = _count!;
+          getNewerChangesCount = count!;
         }
       }
     }
