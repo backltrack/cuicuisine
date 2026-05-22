@@ -6,6 +6,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'database_mgr.dart';
+import '../utilities/logger.dart';
+
+final _log = Logger('FileStorage');
 
 class FileStorage {
   static final FileStorage _instance = FileStorage._();
@@ -83,7 +86,7 @@ class FileStorage {
       await image.saveTo(imagePath);
       return imagePath;
     } catch (e) {
-      print(e);
+      _log.warning('error', e);
     }
 
     return null;
@@ -109,7 +112,7 @@ class FileStorage {
       await file.writeAsBytes(bytes);
       return imagePath;
     } catch (e) {
-      print(e);
+      _log.warning('error', e);
     }
 
     return null;

@@ -12,6 +12,9 @@ import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 
 import '../../models/data_model.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('BookJoinPage');
 
 class BookJoinPage extends StatefulWidget {
   static const String route = '/home/join_book';
@@ -166,9 +169,9 @@ class _BookJoinPageState extends State<BookJoinPage> {
             bool canAlreadyAccess = false;
             List<Book> books = DatabaseMgr().localMgr.getUserBooks();
             for (var book in books) {
-              print(book.id);
+              _log.fine("joined book: ${book.id}");
               canAlreadyAccess = canAlreadyAccess || book.id == _controller.text;
-              print(canAlreadyAccess);
+              _log.fine("canAlreadyAccess: $canAlreadyAccess");
             }
             // add user to book
             if (!canAlreadyAccess) {

@@ -1,4 +1,7 @@
 import 'data_model.dart';
+import '../utilities/logger.dart';
+
+final _log = Logger('LocalModel');
 
 // Units and measures
 class MassUnit {
@@ -24,7 +27,7 @@ class MassUnit {
     if (unitList.contains(currentUnit) && unitList.contains(wantedUnit)) {
       return conversionMap[currentUnit]! / conversionMap[wantedUnit]!;
     } else {
-      print('Unit error');
+      _log.warning('unit error');
       return(0);
     }
   }
@@ -72,7 +75,7 @@ class VolumeUnit {
     if (unitList.contains(currentUnit) && unitList.contains(wantedUnit)) {
       return conversionMap[currentUnit]! / conversionMap[wantedUnit]!;
     } else {
-      print('Unit error');
+      _log.warning('unit error');
       return(0);
     }
   }

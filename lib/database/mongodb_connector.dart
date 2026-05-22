@@ -13,8 +13,11 @@ import 'dart:convert';
 import 'package:oauth2/oauth2.dart' as oauth2;
 import 'package:package_info_plus/package_info_plus.dart';
 
+import '../utilities/logger.dart';
 import 'oauth2.dart';
 import '../models/data_model.dart';
+
+final _log = Logger('MongoConnector');
 
 class MongoConnector {
   String server = '';
@@ -40,14 +43,14 @@ class MongoConnector {
 
   // helper
   Future<dynamic> retryFuture(Function future, int delay) async {
-    print("retrying in $delay ms");
+    _log.fine("retrying in $delay ms");
     await Future.delayed(Duration(milliseconds: delay));
     return await future();
   }
 
   Future<Response?> _secureGetRequest(String endpoint, {int trials=3}) async {
     if (client == null) { return null; }
-    print("GET $endpoint");
+    _log.fine("GET $endpoint");
 
     Uri serverUri = Uri.parse(server);
 
@@ -71,14 +74,14 @@ class MongoConnector {
         DatabaseMgr().isOnline = false;
         return null;
       }
-      print("try again : $trials");
+      _log.warning("retry ($trials left)");
       return await retryFuture(() => _secureGetRequest(endpoint, trials: trials - 1), 1000);
     }
   }
 
   Future<Response?> _secureDeleteRequest(String endpoint, Object data, {int trials=3}) async {
     if (client == null) { return null; }
-    print("DELETE $endpoint");
+    _log.fine("DELETE $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -104,14 +107,14 @@ class MongoConnector {
         DatabaseMgr().isOnline = false;
         return null;
       }
-      print("try again : $trials");
+      _log.warning("retry ($trials left)");
       return await retryFuture(() => _secureDeleteRequest(endpoint, data, trials: trials - 1), 1000);
     }
   }
 
   Future<Response?> _securePostJsonRequest(String endpoint, Map<String, dynamic> data, {int trials=3}) async {
     if (client == null) { return null; }
-    print("POST Json $endpoint");
+    _log.fine("POST Json $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -137,14 +140,14 @@ class MongoConnector {
         DatabaseMgr().isOnline = false;
         return null;
       }
-      print("try again : $trials");
+      _log.warning("retry ($trials left)");
       return await retryFuture(() => _securePostJsonRequest(endpoint, data, trials: trials - 1), 1000);
     }
   }
 
   Future<StreamedResponse?> _securePostMultipartRequest(String endpoint, File file, List<MapEntry<String, String>> form, {int trials=3}) async {
     if (client == null) { return null; }
-    print("POST Multipart $endpoint");
+    _log.fine("POST Multipart $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -172,14 +175,14 @@ class MongoConnector {
         DatabaseMgr().isOnline = false;
         return null;
       }
-      print("try again : $trials");
+      _log.warning("retry ($trials left)");
       return await retryFuture(() => _securePostMultipartRequest(endpoint, file, form, trials: trials - 1), 1000);
     }
   }
 
   Future<dynamic> _securePutRequest(String endpoint, Object data, {int trials=3}) async {
     if (client == null) { return; }
-    print("PUT $endpoint");
+    _log.fine("PUT $endpoint");
     
     Uri serverUri = Uri.parse(server);
 
@@ -204,8 +207,8 @@ class MongoConnector {
         DatabaseMgr().isOnline = false;
         return null;
       }
-      print(e);
-      print("try again : $trials");
+      _log.warning('error', e);
+      _log.warning("retry ($trials left)");
       return await retryFuture(() => _securePutRequest(endpoint, data, trials: trials - 1), 1000);
     }
   }
@@ -227,7 +230,7 @@ class MongoConnector {
       if (result) await checkMinimumVersion();
       return result;
     } catch (e) {
-      print(e);
+      _log.warning('error', e);
       DatabaseMgr().isOnline = false;
       ToastNotifier().showError("You are offline");
       return false;
@@ -269,7 +272,7 @@ class MongoConnector {
   }
 
   Future<AppUser?> refreshToken() async {
-    print('refreshing token...');
+    _log.fine('refreshing token');
     try {
       oauth2.Client? newClient = await OAuth2Connexion.refreshToken(serverUri: server, client: client!);
       if (newClient != null) {
@@ -282,7 +285,7 @@ class MongoConnector {
       }
     }
     catch (e) {
-      print(e);
+      _log.warning('error', e);
     }
     return null;
   }
@@ -299,8 +302,7 @@ class MongoConnector {
           return user;
         }
         catch (e) {
-          print('token expired');
-          print(e);
+          _log.warning('token expired', e);
         }
         
       }
@@ -349,13 +351,13 @@ class MongoConnector {
       }
     }
     on InvalidEmailException catch (e) {
-      print(e);
+      _log.warning('error', e);
       if (onInvalidEmail != null) {
         onInvalidEmail();
       }
     }
     on InvalidPasswordException catch (e) {
-      print(e);
+      _log.warning('error', e);
       if (onInvalidPassword != null) {
         onInvalidPassword();
       }
@@ -385,15 +387,15 @@ class MongoConnector {
       }
     }
     on IncorrectPasswordException catch(e) {
-      print(e);
+      _log.warning('error', e);
       onFailure??("Incorrect password");
     }
     on EmailAlreadyExistsException catch(e) {
-      print(e);
+      _log.warning('error', e);
       onFailure??("Email already exists");
     }
     catch (e) {
-      print(e);
+      _log.warning('error', e);
     }
     
     return null;
@@ -470,7 +472,7 @@ class MongoConnector {
 
   Future<int?> getNewerChangesCount(String lastChange) async {
     final response = await _secureGetRequest('/change/newer_count/$lastChange');
-    print(response!=null ? response.statusCode : "no response");
+    _log.fine("getNewerChangesCount status: ${response?.statusCode ?? 'no response'}");
     if (response != null && response.statusCode == 200) {
       int? count = int.tryParse(utf8.decode(response.bodyBytes));
       if (count != null) {
@@ -482,17 +484,16 @@ class MongoConnector {
 
   Future<bool> getLatestChanges(String lastChange) async {
     final response = await _secureGetRequest('/change/get/$lastChange');
-    print("Get latest changes response:");
-    print(response!=null ? response.statusCode : "no response");
+    _log.fine("getLatestChanges status: ${response?.statusCode ?? 'no response'}");
     if (response != null && response.statusCode == 200) {
       Map<String, dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
-      print(data);
+      _log.fine("changes data: $data");
 
       if (data['success']) {
         List<dynamic> tmp = data['changes'];
-        print(tmp);
+        _log.fine("changes: $tmp");
         if (tmp.isEmpty) {
-          print("no new changes");
+          _log.fine("no new changes");
           return true;
         }
         List<MongoChange> changes = [];
@@ -532,7 +533,7 @@ class MongoConnector {
             else {
               Recipe? recipe = await fetchRecipe(change.objectId);
               if (recipe == null) {
-                print("Failed to fetch recipe with id ${change.objectId}");
+                _log.warning("failed to fetch recipe ${change.objectId}");
                 return false;
               }
               Recipe? localRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
@@ -555,7 +556,7 @@ class MongoConnector {
         }
         return true;
       }
-      print("Change not found");
+      _log.warning("change not found");
     }
     return false;
   }
@@ -586,12 +587,12 @@ class MongoConnector {
             await downloadMissingImages(recipe);
           }
           else {
-            print("Failed to fetch recipe with id $recipeId");
+            _log.warning("failed to fetch recipe $recipeId");
           }
         }
 
         String? lastChange = data['lastChange'];
-        print(lastChange);
+        _log.fine("lastChange: $lastChange");
         if (lastChange != null) {
           DatabaseMgr().localMgr.addChange(lastChange);
         }
@@ -640,7 +641,7 @@ class MongoConnector {
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
@@ -693,7 +694,7 @@ class MongoConnector {
           DatabaseMgr().localMgr.addChange(change);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       // Server confirmed creation (201): always delete from queue regardless of change registration
       return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
@@ -726,7 +727,7 @@ class MongoConnector {
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
@@ -756,7 +757,7 @@ class MongoConnector {
           return true;
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
     }
     return false;
@@ -778,7 +779,7 @@ class MongoConnector {
         return null;
       }
       catch (e) {
-        print(e);
+        _log.warning('error', e);
         return null;
       }
     }
@@ -803,7 +804,7 @@ class MongoConnector {
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
@@ -816,8 +817,7 @@ class MongoConnector {
 
   Future<Map<String, String>> getBookUserNames(String bookId) async {
     final response = await _secureGetRequest('/books/get_users/$bookId');
-    print("Get book user names response:");
-    print(response!=null ? response.statusCode : "no response");
+    _log.fine("getBookUserNames status: ${response?.statusCode ?? 'no response'}");
     if (response != null && response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
@@ -840,11 +840,11 @@ class MongoConnector {
         return Recipe.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
       }
       catch (e) {
-        print(e);
+        _log.warning('error', e);
         return null;
       }
     } else {
-      print("Failed to fetch recipe with status code ${response?.statusCode}");
+      _log.warning("failed to fetch recipe, status: ${response?.statusCode}");
       return null;
     } 
   }
@@ -893,7 +893,7 @@ class MongoConnector {
           DatabaseMgr().localMgr.addChange(changeBook);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       // Server confirmed creation (201): always delete from queue regardless of change registration
       return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
@@ -926,7 +926,7 @@ class MongoConnector {
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
@@ -954,7 +954,7 @@ class MongoConnector {
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
-        print(e);
+        _log.warning('error', e);
       }
       return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
     }
@@ -987,7 +987,7 @@ class MongoConnector {
       await DatabaseMgr().localMgr.fileStorage.writeImagefromBytes(bytes: response.bodyBytes, recipeId: recipeId, imageId: imageId);
     }
     else {
-      print("WRONG RESPONSE STATUS");
+      _log.warning("unexpected status downloading image $recipeId/$imageId: ${response?.statusCode}");
     }
 
     return null;

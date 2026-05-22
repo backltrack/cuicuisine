@@ -1,11 +1,13 @@
+import '../utilities/logger.dart';
 import '../utilities/toast_notifier.dart';
 import './database_mgr.dart';
 import '../models/data_model.dart';
 import '../models/update_model.dart';
 import '../models/sync_model.dart';
-
 import './hive_db.dart';
 import './mongodb_connector.dart';
+
+final _log = Logger('Synchronization');
 
 
 class Synchronization {
@@ -25,7 +27,7 @@ class Synchronization {
       // server document more recent -> conflict
     
     Operation? ope = await _localMgr.getFirstOperation();
-    print("operation queue length: ${_localMgr.getQueueLength()}");
+    _log.fine("operation queue length: ${_localMgr.getQueueLength()}");
     List<Operation> failedOperations = [];
 
     int successCount = 0;
@@ -44,7 +46,7 @@ class Synchronization {
         case OperationType.delete:
           operationResult = await deleteObject(ope.object);
       }
-      print("${ope.id}: ${operationResult.action} ${operationResult.status}");
+      _log.fine("${ope.id}: ${operationResult.action} ${operationResult.status}");
       if (operationResult.action == OperationResultAction.requeue) {
         failedOperations.add(ope);
       }
@@ -85,18 +87,15 @@ class Synchronization {
     else {
       for (Operation ope in failedOperations) {
 
-        print("re-adding failed operation to queue: ${ope.type} ${ope.object}");
+        _log.warning("re-queuing failed operation: ${ope.type} ${ope.object}");
         if (ope.object is RecipeUpdate && ope.type == OperationType.update) {
-          RecipeUpdate update = ope.object as RecipeUpdate;
-          print("${update.toJson()}");
+          _log.fine((ope.object as RecipeUpdate).toJson().toString());
         }
         if (ope.object is BookUpdate && ope.type == OperationType.update) {
-          BookUpdate update = ope.object as BookUpdate;
-          print("${update.toJson()}");
+          _log.fine((ope.object as BookUpdate).toJson().toString());
         }
         if (ope.object is RecipeImage && ope.type == OperationType.create) {
-          RecipeImage update = ope.object as RecipeImage;
-          print(update.path);
+          _log.fine((ope.object as RecipeImage).path);
         }
         _localMgr.addQueueOperation(type: ope.type, object: ope.object, pushAfter: false);
       }
@@ -108,7 +107,7 @@ class Synchronization {
 
   Future<bool> fetchNew() async {
     String? lastChange = DatabaseMgr().localMgr.getLastChange();
-    print("Last change: $lastChange");
+    _log.fine("last change: $lastChange");
 
     if (lastChange != null) {
       // already sync before

@@ -12,6 +12,9 @@ import '../../widgets/core_widgets/social_button.dart';
 import '../home_page.dart';
 import './email_check_page.dart';
 import './onboarding_page.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('AuthenticationPage');
 
 class LogInPage extends StatefulWidget {
   static const String route = '/';
@@ -71,9 +74,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     if (DatabaseMgr().isOnline) {
       AppUser? user = await DatabaseMgr().remoteMgr.tryReconnect();
       if (user != null) {
-        print('synch + goto homepage');
-        print("Pending operations in queue: ${DatabaseMgr().localMgr.getQueueLength()}");
-        print("Operations: ${DatabaseMgr().localMgr.getOperationLength()}");
+        _log.fine("sync + goto homepage (queue=${DatabaseMgr().localMgr.getQueueLength()} ops=${DatabaseMgr().localMgr.getOperationLength()})");
         // synchronize
         await DatabaseMgr().synchronization.sync();
         // goto home page
@@ -83,7 +84,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         if (mounted) Navigator.of(context).pushNamedAndRemoveUntil(dest, (Route<dynamic> route) => false);
       }
       else {
-        print('need to register');
+        _log.info('need to register');
         // need to register or reconnect
       }
     }
@@ -96,7 +97,7 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
           description: Text(S.of(context).offline_alert_description)
         );
         if (goOffline != null && goOffline) {
-          print('offline switch to local mode');
+          _log.info('offline: switching to local mode');
           tryOfflineConnexion();
         } 
         else {

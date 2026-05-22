@@ -14,9 +14,12 @@ import '../models/data_model.dart';
 import '../models/default_data.dart';
 import '../models/update_model.dart';
 import '../models/sync_model.dart';
+import '../utilities/logger.dart';
 import './database_mgr.dart';
 import 'file_storage.dart';
 import 'hive_migration.dart';
+
+final _log = Logger('HiveConnector');
 
 class HiveConnector {
   late Box<dynamic> _settingBox;
@@ -76,7 +79,7 @@ class HiveConnector {
       await _queueBox.add(OperationQueue());
     }
     await HiveMigration.run(this);
-    if (kDebugMode) print('Hive initialized');
+    _log.info('Hive initialized');
   }
 
   Future<void> clearAllUserData() async {
@@ -363,7 +366,7 @@ class HiveConnector {
       }
     }
     else {
-      print('Disconnected');
+      _log.info('Disconnected');
       return [];
     }
   }
@@ -571,7 +574,7 @@ class HiveConnector {
       }
 
     } on StateError {
-      print("book not found");
+      _log.warning("book not found");
       return;
     }
   }
@@ -606,7 +609,7 @@ class HiveConnector {
       BookIngredient? bookIngredient = getBookIngredient(bookIngredientId);
       if (book != null && bookIngredient != null) {
         if (getIngredientsRelatedToBookIngredient(bookIngredient).isNotEmpty) {
-          print("You can't delete this ingredient because it's used in a recipe");
+          _log.warning("ingredient in use, skipping delete");
           return false;
         }
         List<BookIngredient> updatedIngredients = List.from(book.bookIngredients)..removeWhere((ingredient) => ingredient.id == bookIngredientId);
@@ -694,7 +697,6 @@ class HiveConnector {
     Set<String> seenIds = {};
 
     Book? book = getBook(bookId);
-    print("$bookId => $book");
     if (book != null) {
       for (String recipeId in book.recipeIds) {
         if (!seenIds.add(recipeId)) continue;
@@ -752,10 +754,10 @@ class HiveConnector {
       Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
       recipe.copyFromUpdate(recipeUpdate);
       recipe.isDirty = true;
-      print(recipe.toJson());
+      _log.fine("addRecipe: ${recipe.toJson()}");
       await recipe.save();
     } catch (e) {
-      print(e);
+      _log.warning('addRecipe error', e);
       return;
     }
 
@@ -820,7 +822,7 @@ class HiveConnector {
   Future<void> duplicateRecipe(Recipe recipe, String destinationBookId) async {
     AccessLevel? accessLevel = getUserAccess(destinationBookId);
     if (accessLevel == null || accessLevel.index == AccessLevel.read.index) {
-      print("You don't have access to this book");
+      _log.warning("access denied for book");
       return;
     }
     String newRecipeId = await addNewRecipe(name: recipe.name, bookId: destinationBookId);
@@ -862,7 +864,7 @@ class HiveConnector {
       }
 
     } on StateError {
-      print("recipe not found");
+      _log.warning("recipe not found");
       return;
     }
   }
@@ -930,9 +932,9 @@ class HiveConnector {
     if (result) {
       Recipe? recipe = getRecipe(recipeId);
       if (recipe != null) {
-        print("recipe.pictures before removal: ${recipe.pictures}");
+        _log.fine("pictures before removal: ${recipe.pictures}");
         recipe.pictures.remove(imageId);
-        print("recipe.pictures after removal: ${recipe.pictures}");
+        _log.fine("pictures after removal: ${recipe.pictures}");
         updateRecipe(
           recipeId,
           RecipeUpdate(
@@ -946,7 +948,6 @@ class HiveConnector {
 
   Future<Image> getRecipeImage(String recipeId, imageId) async {
     Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: imageId);
-    print("Is image null? ${image == null}");
     if (image != null) {
       return image;
     }
@@ -969,7 +970,6 @@ class HiveConnector {
   Future<Image> getFirstRecipeImage(String recipeId) async {
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
-      print("recipe.pictures: ${recipe.pictures}");
       if (recipe.pictures.isNotEmpty) {
         return await getRecipeImage(recipeId, recipe.pictures[0]);
       }
@@ -978,15 +978,15 @@ class HiveConnector {
   }
 
   Future<void> cleanExtraImages(Recipe recipe) async {
-    print("Cleaning extra images for recipe ${recipe.id} ($recipe.name)");
+    _log.fine("cleaning extra images for ${recipe.id}");
     List<String> allRecipeImages = await fileStorage.getAllRecipeImages(recipe.id);
-    print("All recipe images: $allRecipeImages");
+    _log.fine("all recipe images: $allRecipeImages");
     for (String path in allRecipeImages) {
       Map<String, String>? ids = fileStorage.pathToId(path);
-      print("IDs from path: $ids");
+      _log.fine("IDs from path: $ids");
       if (ids != null && ids.containsKey('imageId')) {
         if (!recipe.pictures.contains(ids['imageId'])) {
-          print("Deleting image ${ids['imageId']} from recipe ${recipe.id}");
+          _log.fine("deleting image ${ids['imageId']} from recipe ${recipe.id}");
           await fileStorage.deleteImage(recipeId: recipe.id, imageId: ids['imageId']!);
         }
       }
@@ -1073,7 +1073,7 @@ class HiveConnector {
     String? operationId = queue.getFirstOperationId();
 
     if (operationId != null) {
-      print(operationId);
+      _log.fine("addQueueOperation: $operationId");
       Operation? ope = await popOperationFromId(operationId);
       if (ope != null) {
         return ope;

@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cuicuisine/database/database_mgr.dart';
+import 'package:cuicuisine/utilities/logger.dart';
 import 'package:oauth2/oauth2.dart' as oauth2;
+
+final _log = Logger('OAuth2');
 
 class InvalidEmailException implements Exception {
   @override
@@ -46,7 +49,7 @@ class OAuth2Connexion {
   }
 
   static Future<oauth2.Client?> connectFromPassword({required String serverUri, required String email, required String password}) async {
-    print(email);
+    _log.fine("connectFromPassword: $serverUri");
     try {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/token"), email, password);
 
@@ -65,9 +68,7 @@ class OAuth2Connexion {
   }
 
   static Future<oauth2.Client?> createClientFromPassword({required String serverUri, required String email, required String password}) async {
-    print(serverUri);
-    print(email);
-    print(password);
+    _log.fine("createClientFromPassword: $serverUri");
     try {
       oauth2.Client client = await oauth2.resourceOwnerPasswordGrant(Uri.parse("$serverUri/register"), email, password);
 
@@ -85,7 +86,7 @@ class OAuth2Connexion {
         throw EmailAlreadyExistsException();
       }
       else {
-        print(e);
+        _log.warning('registration error', e);
       }
     }
     

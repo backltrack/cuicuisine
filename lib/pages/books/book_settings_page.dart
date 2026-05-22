@@ -10,6 +10,9 @@ import '../../pages/books/book_name_page.dart';
 import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import 'book_share_page.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('BookSettingsPage');
 
 class BookSettingsPage extends StatefulWidget {
   static const route = "/home/book_settings";
@@ -34,9 +37,7 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
       // build is ready to render
       isReady = true;
       // build UI
-      print("Book settings page is ready to render");
-      print("User names: $userNames");
-      print("Is mounted: $mounted");
+      _log.fine("ready: userNames=$userNames mounted=$mounted");
       if (mounted) setState(() {});
     }
   }

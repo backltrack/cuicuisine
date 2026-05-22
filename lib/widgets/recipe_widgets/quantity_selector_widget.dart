@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../generated/l10n.dart';
 import '../../themes/theme_mgr.dart';
 import '../../widgets/recipe_widgets/quantity_name_dialog.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('QuantitySelectorWidget');
 
 class QuantitySelectorWidget extends StatefulWidget {
   final int quantity;
@@ -29,7 +32,7 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Building quantity selector widget with quantity $_quantity and quantity type $_quantityType");
+    _log.fine("build: qty=$_quantity type=$_quantityType");
     return Container(
         height: 35,
         //width: double.infinity,
@@ -55,7 +58,7 @@ class _QuantitySelectorWidgetState extends State<QuantitySelectorWidget> {
               onPressed: () async {
                 String? newType = await showQuantityNameDialog(context: context, currentType: _quantityType);
                 if (newType != null) {
-                  print(newType);
+                  _log.fine("quantity type changed: $newType");
                   if (newType != "" && newType != _quantityType) {
                     _quantityType = newType;
                     if (widget.onTypeChanged != null) widget.onTypeChanged!(_quantityType);

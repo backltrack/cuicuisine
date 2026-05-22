@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:dynamic_themes/dynamic_themes.dart';
 
 import 'package:cuicuisine/themes/themes.dart';
+import 'package:cuicuisine/utilities/logger.dart';
+
+final _log = Logger('ThemeMgr');
 
 class ThemeMgr {
   static final ThemeMgr _instance = ThemeMgr._();
@@ -15,7 +18,7 @@ class ThemeMgr {
 
   static Future<void> setTheme(context, int themeId) async {
     DatabaseMgr().localMgr.saveTheme(themeId);
-    print('Save theme $themeId');
+    _log.fine('save theme $themeId');
 
     await DynamicTheme.of(context)?.setTheme(themeId);
   }

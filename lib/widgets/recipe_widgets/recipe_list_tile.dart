@@ -17,16 +17,34 @@ class RecipeListTile extends StatefulWidget {
 }
 
 class _RecipeListTileState extends State<RecipeListTile> {
+  Future<Image>? _imageFuture;
+  bool _isFav = false;
 
   @override
   void initState() {
     super.initState();
+    _isFav = DatabaseMgr().localMgr.getUser()?.favoriteRecipes.contains(widget.recipe.id) ?? false;
+    _updateImageFuture();
+  }
+
+  @override
+  void didUpdateWidget(RecipeListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.recipe.id != widget.recipe.id ||
+        oldWidget.recipe.pictures.length != widget.recipe.pictures.length) {
+      _updateImageFuture();
+    }
+    _isFav = DatabaseMgr().localMgr.getUser()?.favoriteRecipes.contains(widget.recipe.id) ?? false;
+  }
+
+  void _updateImageFuture() {
+    _imageFuture = widget.recipe.pictures.isNotEmpty
+        ? DatabaseMgr().localMgr.getFirstRecipeImage(widget.recipe.id)
+        : null;
   }
 
   @override
   Widget build(BuildContext context) {
-    // get is favorite recipe
-    bool isFav = DatabaseMgr().localMgr.getUser()!.favoriteRecipes.contains(widget.recipe.id);
 
     const double cardHeight = 110;
     const double spacing = 8;
@@ -103,25 +121,15 @@ class _RecipeListTileState extends State<RecipeListTile> {
                       children: [
                         IconButton(
                           onPressed: () async {
-                            //set favorite in database
                             DatabaseMgr().localMgr.toggleFavorite(widget.recipe.id);
-                            AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
-
+                            final newAppUser = DatabaseMgr().localMgr.getUser();
                             if (newAppUser != null) {
-                              if (newAppUser.favoriteRecipes.contains(widget.recipe.id)) {
-                                setState(() {
-                                  isFav = true;
-                                });
-                              } else {
-                                setState(() {
-                                  isFav = false;
-                                });
-                              }
-                            } else {
-                              print("Connexion issue");
+                              setState(() {
+                                _isFav = newAppUser.favoriteRecipes.contains(widget.recipe.id);
+                              });
                             }
                           },
-                          icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color),
+                          icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: _isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color),
                         ),
                         FaIcon(widget.recipe.isDirty ? FontAwesomeIcons.arrowsRotate : FontAwesomeIcons.check, size: 14, color: widget.recipe.isDirty ? Colors.blue : Colors.green)
                       ],
@@ -144,7 +152,7 @@ class _RecipeListTileState extends State<RecipeListTile> {
                   );
                 } else {
                   return FutureBuilder(
-                    future: DatabaseMgr().localMgr.getFirstRecipeImage(widget.recipe.id),
+                    future: _imageFuture,
                     builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
                       if (snapshot.hasData) {
                         return CircleAvatar(

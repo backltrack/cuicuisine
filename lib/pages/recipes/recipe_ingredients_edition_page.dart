@@ -8,6 +8,9 @@ import '../../models/data_model.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
 import '../../widgets/recipe_widgets/recipe_ingredients_edition_widget.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('RecipeIngredientsEditionPage');
 
 class RecipeIngredientsEditionPage extends StatefulWidget {
 
@@ -74,7 +77,7 @@ class _RecipeIngredientsEditionPageState extends State<RecipeIngredientsEditionP
                 ],
               ),
             ).then((value) {
-              print(value);
+              _log.fine("ingredients updated: $value");
               if (value != null && value) {
                 returnValue = true;
               }

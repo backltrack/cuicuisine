@@ -13,6 +13,9 @@ import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
 import '../../models/data_model.dart';
 import '../core_widgets/circular_button.dart';
 import '../core_widgets/my_outlined_button.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('RecipeStepsEditionWidget');
 
 class RecipeStepsEditionWidget extends StatefulWidget {
   final List<RecipeStep> steps;
@@ -144,7 +147,7 @@ class _RecipeStepsEditionWidgetState extends State<RecipeStepsEditionWidget> {
                                 "stepNumber": index,
                                 "stepDescription": newSteps[index].step
                               }).then((value) {
-                                print(value);
+                                _log.fine("step updated: $value");
                                 if (value != null) {
                                   if (widget.onStepChanged != null) {
                                     widget.onStepChanged!({

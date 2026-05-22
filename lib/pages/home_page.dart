@@ -32,6 +32,9 @@ import '../widgets/recipe_widgets/recipe_list_tile.dart';
 import '../widgets/recipe_widgets/filter_bottom_menu.dart';
 import '../widgets/recipe_widgets/recipe_popup_menu.dart';
 import '../widgets/recipe_widgets/book_picker_popup.dart';
+import '../utilities/logger.dart';
+
+final _log = Logger('HomePage');
 
 class HomePage extends StatefulWidget {
   static const String route = '/home';
@@ -163,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                   books: DatabaseMgr().localMgr.getUserBooks(getWritableOnly: true)
               ).then((bookId) async {
                 if (bookId != null) {
-                  print("add ${recipe.name} to $bookId");
+                  _log.fine("copying '${recipe.name}' to $bookId");
                   DatabaseMgr().localMgr.duplicateRecipe(recipe, bookId);
                   // update books and recipes
                   books = DatabaseMgr().localMgr.getUserBooks();
@@ -209,7 +212,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
     else {
-      print("Can't show menu");
+      _log.warning("overlay not found, cannot show menu");
     }
   }
 
@@ -301,7 +304,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> refreshData() async {
     await DatabaseMgr().remoteMgr.testConnexion();
-    print("isOnline: ${DatabaseMgr().isOnline}");
+    _log.fine("isOnline: ${DatabaseMgr().isOnline}");
     if (DatabaseMgr().isOnline) {
       await DatabaseMgr().synchronization.sync();
     }
@@ -315,10 +318,10 @@ class _HomePageState extends State<HomePage> {
       } else {
         // current book has been deleted
         if (books!.isNotEmpty) {
-          print('set first as default');
+          _log.fine('current book deleted, selecting first');
           selectedBook = books![0];
         } else {
-          print('no more book');
+          _log.info('no books remaining');
           selectedBook = null;
           return;
         }
@@ -409,7 +412,7 @@ class _HomePageState extends State<HomePage> {
               builder: (context) {
                 if (recipes != null && recipes!.isNotEmpty) {
 
-                  // sort Recipe list
+                  // sort
                   List<Recipe> sortedData = List<Recipe>.from(recipes!);
                   if (_sortingMethod == "alphaDown") {
                     sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -425,83 +428,68 @@ class _HomePageState extends State<HomePage> {
                     sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
                   }
 
+                  // pre-filter so itemCount matches visible items
+                  final AppUser? appUser = DatabaseMgr().localMgr.getUser();
+                  final List<Recipe> filteredData = sortedData.where((recipe) {
+                    if (_mandatoryTags.isNotEmpty &&
+                        !_mandatoryTags.every((tag) => recipe.tags.contains(tag.id))) return false;
+                    if (_mandatoryIngredients.isNotEmpty) {
+                      final names = List<String>.generate(recipe.recipeIngredients.length,
+                          (i) => removeDiacritics(recipe.recipeIngredients[i].getName()).toLowerCase().trim());
+                      if (!_mandatoryIngredients.every(
+                          (ing) => names.contains(removeDiacritics(ing.toLowerCase().trim())))) return false;
+                    }
+                    if (_displayFavorites && !(appUser?.favoriteRecipes.contains(recipe.id) ?? false)) return false;
+                    if (_time > 0) {
+                      final total = recipe.getTotalTime();
+                      if (_isTimeMax && total >= _time) return false;
+                      if (!_isTimeMax && total <= _time) return false;
+                    }
+                    if (_research.isNotEmpty &&
+                        !removeDiacritics(recipe.name.toLowerCase())
+                            .contains(removeDiacritics(_research.toLowerCase()))) return false;
+                    return true;
+                  }).toList();
+
                   return ListView.builder(
-                    key: UniqueKey(),
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: sortedData.length + 1,
+                    itemCount: filteredData.length + 1,
                     itemBuilder: (context, index) {
+                      if (index == filteredData.length) return const SizedBox(height: 8);
+                      final recipe = filteredData[index];
+
                       void onTap() async {
-                        final result = await Navigator.of(context).pushNamed("${RecipePage.route}/${sortedData[index].id}", arguments: {
-                          'recipe': sortedData[index]
-                        });
-                        if (result != null && result == "reloadRecipes") {
-                          print('reload');
+                        final navigator = Navigator.of(context);
+                        final result = await navigator.pushNamed(
+                            "${RecipePage.route}/${recipe.id}",
+                            arguments: {'recipe': recipe});
+                        if (!mounted) return;
+                        if (result == "reloadRecipes") {
                           recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                          // refresh UI
                           setState(() {});
-                        } else if (result != null && result == "reloadBooks") {
-                          // get user books
+                        } else if (result == "reloadBooks") {
                           books = DatabaseMgr().localMgr.getUserBooks();
                           setState(() {});
                         }
                       }
 
-                      Widget returnedWidget = const SizedBox();
-
-                      if (index == sortedData.length) {
-                        return const SizedBox(height: 8);
+                      if (_isListed) {
+                        return RecipeListTile(
+                          key: ValueKey(recipe.id),
+                          recipe: recipe,
+                          onTap: onTap,
+                          onLongPress: DatabaseMgr().isCompatible ? () => _showCustomMenu(recipe) : null,
+                          onTapDown: _storePosition,
+                        );
+                      } else {
+                        return RecipeCardTile(
+                          key: ValueKey(recipe.id),
+                          recipe: recipe,
+                        );
                       }
-
-                      // tags test
-                      bool tagCondition = true;
-                      for (Tag tag in _mandatoryTags) {
-                        tagCondition = tagCondition && sortedData[index].tags.contains(tag.id);
-                      }
-                      // ingredient test
-                      bool ingredientCondition = true;
-                      for (String ingredient in _mandatoryIngredients) {
-                        ingredientCondition =
-                            ingredientCondition && List<String>.generate(sortedData[index].recipeIngredients.length,
-                                (int i) => removeDiacritics(sortedData[index].recipeIngredients[i].getName()).toLowerCase().trim()).contains(removeDiacritics(ingredient.toLowerCase().trim()));
-                      }
-
-                      if (_mandatoryTags.isNotEmpty && tagCondition || _mandatoryTags.isEmpty) {
-                        if (_mandatoryIngredients.isNotEmpty && ingredientCondition || _mandatoryIngredients.isEmpty) {
-                          AppUser? appUser = DatabaseMgr().localMgr.getUser();
-                          if (_displayFavorites && appUser!.favoriteRecipes.contains(sortedData[index].id) || !_displayFavorites) {
-                            if (_time > 0 && _isTimeMax && sortedData[index].getTotalTime() < _time ||
-                                _time > 0 && !_isTimeMax && sortedData[index].getTotalTime() > _time ||
-                                _time == 0) {
-                              if (_research != "" && removeDiacritics(sortedData[index].name.toLowerCase()).contains(removeDiacritics(_research.toLowerCase())) || _research == "") {
-                                if (_isListed) {
-                                  returnedWidget = RecipeListTile(
-                                    key: UniqueKey(),
-                                    recipe: sortedData[index],
-                                    onTap: onTap,
-                                    onLongPress: DatabaseMgr().isCompatible ? () async {
-                                      // if (canVibrate) {
-                                      //   Vibrate.feedback(FeedbackType.medium);
-                                      // }
-                                      _showCustomMenu(sortedData[index]);
-                                    } : null,
-                                    onTapDown: _storePosition,
-                                  );
-                                } else {
-                                  returnedWidget = RecipeCardTile(
-                                    key: UniqueKey(),
-                                    recipe: sortedData[index],
-                                  );
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                      return  returnedWidget;
-                    }
-                  ); 
+                    },
+                  );
                 }
                 else if (recipes != null) {
                   return ListTile(

@@ -2,8 +2,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../themes/theme_mgr.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('AnimatedSearchBar');
 
 class AnimSearchBar extends StatefulWidget {
   ///  width - double ,isRequired : Yes
@@ -172,7 +174,7 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                           }
                         } catch (e) {
                           ///print the error if the try block fails
-                          print(e);
+                          _log.warning('error', e);
                         }
                       },
 

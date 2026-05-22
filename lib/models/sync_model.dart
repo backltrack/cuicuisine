@@ -1,8 +1,11 @@
 import 'package:hive/hive.dart';
 
 import 'data_model.dart';
+import '../utilities/logger.dart';
 
-  part 'sync_model.g.dart';
+part 'sync_model.g.dart';
+
+final _log = Logger('SyncModel');
 
 enum UpdateStatus {
   success,
@@ -48,7 +51,7 @@ enum OperationResultAction {
   delete;
   
   static getActionFromUpdateStatus(UpdateStatus status) {
-    print("Getting action from status: $status");
+    _log.fine("getting action from status: $status");
     switch (status) {
       case UpdateStatus.success:
         // delete operation because it was successful
@@ -110,8 +113,7 @@ class OperationQueue extends HiveObject {
     queue.add(operationId);
     save();
     
-    print('added');
-    print(length());
+    _log.fine("operation added, queue length: ${length()}");
   }
 
   String? getFirstOperationId() {

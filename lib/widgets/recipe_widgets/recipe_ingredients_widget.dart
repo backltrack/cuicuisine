@@ -7,6 +7,9 @@ import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
 import '../../widgets/recipe_widgets/ingredient_tile_widget.dart';
 import '../../widgets/recipe_widgets/quantity_widget.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('RecipeIngredientsWidget');
 
 
 class RecipeIngredientsWidget extends StatefulWidget {
@@ -43,7 +46,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
   void dispose() {
     super.dispose();
     // Dispose of any resources if needed
-    print('dispose recipe ingredients widget ${widget.key}');
+    _log.fine('dispose recipe ingredients widget ${widget.key}');
   }
   
   String parseQuantity(double quantity) {
@@ -63,7 +66,7 @@ class _RecipeIngredientsWidgetState extends State<RecipeIngredientsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Building recipe ingredients widget with quantity $_quantity and quantity type ${widget.quantityType}");
+    _log.fine("build: qty=$_quantity type=${widget.quantityType}");
 
     return locale == null ? const Center(child: CircularProgressIndicator()) :
     Container(

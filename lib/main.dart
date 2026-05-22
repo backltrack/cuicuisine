@@ -15,6 +15,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_size/window_size.dart';
 
 import 'database/database_mgr.dart';
+import 'utilities/logger.dart';
 import 'generated/l10n.dart';
 import 'package:dynamic_themes/dynamic_themes.dart';
 import 'pages/404.dart';
@@ -47,6 +48,7 @@ import 'pages/settings/synchronization_status_page.dart';
 import 'themes/themes.dart';
 
 void main() async {
+  setupLogging();
   WidgetsFlutterBinding.ensureInitialized();
   // Disable landscape mode
   SystemChrome.setPreferredOrientations(

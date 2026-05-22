@@ -19,6 +19,9 @@ import '../../widgets/recipe_widgets/recipe_steps_widget.dart';
 import '../../widgets/recipe_widgets/recipe_tags_widget.dart';
 import '../../widgets/recipe_widgets/recipe_time_widget.dart';
 import 'recipe_name_page.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('RecipePage');
 
 class RecipePage extends StatefulWidget {
   static const route = "/home/recipe";
@@ -334,7 +337,7 @@ class _RecipePageState extends State<RecipePage> {
                         if (tmpRecipe != null) {
                           setState(() {
                             recipe = tmpRecipe;
-                            print("Update recipe: ${recipe.quantityType}, ${recipe.quantity})");
+                            _log.fine("recipe updated: qty=${recipe.quantity} type=${recipe.quantityType}");
                           });
                         }
                       }

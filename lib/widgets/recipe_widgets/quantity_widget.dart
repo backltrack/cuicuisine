@@ -3,6 +3,9 @@ import '../../utilities/custom_enum.dart';
 import '../../widgets/recipe_widgets/quantity_selector_widget.dart';
 
 import '../core_widgets/calculation_button.dart';
+import '../../utilities/logger.dart';
+
+final _log = Logger('QuantityWidget');
 
 class QuantityEditorWidget extends StatefulWidget {
   final int quantity;
@@ -36,7 +39,7 @@ class _QuantityEditorWidgetState extends State<QuantityEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print("Building quantity editor widget with quantity $_quantity and quantity type $_quantityType");
+    _log.fine("build: qty=$_quantity type=$_quantityType");
     return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
