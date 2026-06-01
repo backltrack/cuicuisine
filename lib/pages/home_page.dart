@@ -369,142 +369,158 @@ class _HomePageState extends State<HomePage> {
               setState(() {});
             }
           },
-        body: Column(
-          children: [
-            if (!DatabaseMgr().isCompatible)
-              MaterialBanner(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                backgroundColor: const Color(0xFFE6A817),
-                leading: const FaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
-                content: Text(
-                  S.of(context).outdated_version_banner,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                actions: [
-                  IconButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFFE6A817),
-                    ),
-                    onPressed: () async {
-                      final serverUri = DatabaseMgr().localMgr.getServerUri();
-                      if (serverUri == null) return;
-                      final url = "$serverUri/apk/download";
-                      if (kIsWeb) {
-                        downloadFile(url);
-                      } else {
-                        launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                      }
-                    },
-                    icon: const FaIcon(FontAwesomeIcons.download, size: 14),
-                    // label: Text(S.of(context).outdated_version_download),
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: Theme.of(context).brightness == Brightness.dark
+                  ? const AssetImage("assets/images/background.png")
+                  : const AssetImage("assets/images/background_light.png"),
+              //colorFilter: ColorFilter.mode(Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5), BlendMode.dstATop),
+              fit: BoxFit.cover,
+            )
+          ),
+          child: Column(
+            children: [
+              if (!DatabaseMgr().isCompatible)
+                MaterialBanner(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  backgroundColor: const Color(0xFFE6A817),
+                  leading: const FaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
+                  content: Text(
+                    S.of(context).outdated_version_banner,
+                    style: const TextStyle(color: Colors.white),
                   ),
-                ],
-              ),
-            Expanded(
-              child: selectedBook == null ?
-              ListTile(
-                title: Text(S.of(context).book_choice),
-              ):
-              RefreshIndicator(
-            onRefresh: refreshData,
-            child: Builder(
-              builder: (context) {
-                if (recipes != null && recipes!.isNotEmpty) {
+                  actions: [
+                    IconButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFFE6A817),
+                      ),
+                      onPressed: () async {
+                        final serverUri = DatabaseMgr().localMgr.getServerUri();
+                        if (serverUri == null) return;
+                        final url = "$serverUri/apk/download";
+                        if (kIsWeb) {
+                          downloadFile(url);
+                        } else {
+                          launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                        }
+                      },
+                      icon: const FaIcon(FontAwesomeIcons.download, size: 14),
+                      // label: Text(S.of(context).outdated_version_download),
+                    ),
+                  ],
+                ),
+              Expanded(
+                child: selectedBook == null ?
+                ListTile(
+                  title: Text(S.of(context).book_choice),
+                ):
+                RefreshIndicator(
+              onRefresh: refreshData,
+              child: Builder(
+                builder: (context) {
+                  if (recipes != null && recipes!.isNotEmpty) {
 
-                  // sort
-                  List<Recipe> sortedData = List<Recipe>.from(recipes!);
-                  if (_sortingMethod == "alphaDown") {
-                    sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-                  } else if (_sortingMethod == "alphaUp") {
-                    sortedData.sort((Recipe a, Recipe b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
-                  } else if (_sortingMethod == "timeDown") {
-                    sortedData.sort((Recipe a, Recipe b) => a.getTotalTime().compareTo(b.getTotalTime()));
-                  } else if (_sortingMethod == "timeUp") {
-                    sortedData.sort((Recipe a, Recipe b) => b.getTotalTime().compareTo(a.getTotalTime()));
-                  } else if (_sortingMethod == "lastUpdatedDown") {
-                    sortedData.sort((Recipe a, Recipe b) => b.lastUpdate!.compareTo(a.lastUpdate!));
-                  } else if (_sortingMethod == "lastUpdatedUp") {
-                    sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
-                  }
-
-                  // pre-filter so itemCount matches visible items
-                  final AppUser? appUser = DatabaseMgr().localMgr.getUser();
-                  final List<Recipe> filteredData = sortedData.where((recipe) {
-                    if (_mandatoryTags.isNotEmpty &&
-                        !_mandatoryTags.every((tag) => recipe.tags.contains(tag.id))) return false;
-                    if (_mandatoryIngredients.isNotEmpty) {
-                      final names = List<String>.generate(recipe.recipeIngredients.length,
-                          (i) => removeDiacritics(recipe.recipeIngredients[i].getName()).toLowerCase().trim());
-                      if (!_mandatoryIngredients.every(
-                          (ing) => names.contains(removeDiacritics(ing.toLowerCase().trim())))) return false;
+                    // sort
+                    List<Recipe> sortedData = List<Recipe>.from(recipes!);
+                    if (_sortingMethod == "alphaDown") {
+                      sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+                    } else if (_sortingMethod == "alphaUp") {
+                      sortedData.sort((Recipe a, Recipe b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+                    } else if (_sortingMethod == "timeDown") {
+                      sortedData.sort((Recipe a, Recipe b) => a.getTotalTime().compareTo(b.getTotalTime()));
+                    } else if (_sortingMethod == "timeUp") {
+                      sortedData.sort((Recipe a, Recipe b) => b.getTotalTime().compareTo(a.getTotalTime()));
+                    } else if (_sortingMethod == "lastUpdatedDown") {
+                      sortedData.sort((Recipe a, Recipe b) => b.lastUpdate!.compareTo(a.lastUpdate!));
+                    } else if (_sortingMethod == "lastUpdatedUp") {
+                      sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
                     }
-                    if (_displayFavorites && !(appUser?.favoriteRecipes.contains(recipe.id) ?? false)) return false;
-                    if (_time > 0) {
-                      final total = recipe.getTotalTime();
-                      if (_isTimeMax && total >= _time) return false;
-                      if (!_isTimeMax && total <= _time) return false;
-                    }
-                    if (_research.isNotEmpty &&
-                        !removeDiacritics(recipe.name.toLowerCase())
-                            .contains(removeDiacritics(_research.toLowerCase()))) return false;
-                    return true;
-                  }).toList();
 
-                  return ListView.builder(
-                    padding: EdgeInsets.zero,
-                    scrollDirection: Axis.vertical,
-                    itemCount: filteredData.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index == filteredData.length) return const SizedBox(height: 8);
-                      final recipe = filteredData[index];
-
-                      void onTap() async {
-                        final navigator = Navigator.of(context);
-                        final result = await navigator.pushNamed(
-                            "${RecipePage.route}/${recipe.id}",
-                            arguments: {'recipe': recipe});
-                        if (!mounted) return;
-                        if (result == "reloadRecipes") {
-                          recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                          setState(() {});
-                        } else if (result == "reloadBooks") {
-                          books = DatabaseMgr().localMgr.getUserBooks();
-                          setState(() {});
+                    // pre-filter so itemCount matches visible items
+                    final AppUser? appUser = DatabaseMgr().localMgr.getUser();
+                    final List<Recipe> filteredData = sortedData.where((recipe) {
+                      if (_mandatoryTags.isNotEmpty &&
+                          !_mandatoryTags.every((tag) => recipe.tags.contains(tag.id))) {
+                        return false;
+                      }
+                      if (_mandatoryIngredients.isNotEmpty) {
+                        final names = List<String>.generate(recipe.recipeIngredients.length,
+                            (i) => removeDiacritics(recipe.recipeIngredients[i].getName()).toLowerCase().trim());
+                        if (!_mandatoryIngredients.every(
+                            (ing) => names.contains(removeDiacritics(ing.toLowerCase().trim())))) {
+                          return false;
                         }
                       }
-
-                      if (_isListed) {
-                        return RecipeListTile(
-                          key: ValueKey(recipe.id),
-                          recipe: recipe,
-                          onTap: onTap,
-                          onLongPress: DatabaseMgr().isCompatible ? () => _showCustomMenu(recipe) : null,
-                          onTapDown: _storePosition,
-                        );
-                      } else {
-                        return RecipeCardTile(
-                          key: ValueKey(recipe.id),
-                          recipe: recipe,
-                        );
+                      if (_displayFavorites && !(appUser?.favoriteRecipes.contains(recipe.id) ?? false)) return false;
+                      if (_time > 0) {
+                        final total = recipe.getTotalTime();
+                        if (_isTimeMax && total >= _time) return false;
+                        if (!_isTimeMax && total <= _time) return false;
                       }
-                    },
-                  );
-                }
-                else if (recipes != null) {
-                  return ListTile(
-                    title: Text(S.of(context).no_recipe),
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            )
-          ),    // closes RefreshIndicator
-            ),  // closes Expanded
-          ],    // closes Column.children
-        ),      // closes Column (body)
+                      if (_research.isNotEmpty &&
+                          !removeDiacritics(recipe.name.toLowerCase())
+                              .contains(removeDiacritics(_research.toLowerCase()))) {
+                        return false;
+                      }
+                      return true;
+                    }).toList();
 
+                    return ListView.builder(
+                      padding: EdgeInsets.zero,
+                      scrollDirection: Axis.vertical,
+                      itemCount: filteredData.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == filteredData.length) return const SizedBox(height: 8);
+                        final recipe = filteredData[index];
+
+                        void onTap() async {
+                          final navigator = Navigator.of(context);
+                          final result = await navigator.pushNamed(
+                              "${RecipePage.route}/${recipe.id}",
+                              arguments: {'recipe': recipe});
+                          if (!mounted) return;
+                          if (result == "reloadRecipes") {
+                            recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+                            setState(() {});
+                          } else if (result == "reloadBooks") {
+                            books = DatabaseMgr().localMgr.getUserBooks();
+                            setState(() {});
+                          }
+                        }
+
+                        if (_isListed) {
+                          return RecipeListTile(
+                            key: ValueKey(recipe.id),
+                            recipe: recipe,
+                            onTap: onTap,
+                            onLongPress: DatabaseMgr().isCompatible ? () => _showCustomMenu(recipe) : null,
+                            onTapDown: _storePosition,
+                          );
+                        } else {
+                          return RecipeCardTile(
+                            key: ValueKey(recipe.id),
+                            recipe: recipe,
+                          );
+                        }
+                      },
+                    );
+                  }
+                  else if (recipes != null) {
+                    return ListTile(
+                      title: Text(S.of(context).no_recipe),
+                    );
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              )
+            ),    // closes RefreshIndicator
+              ),  // closes Expanded
+            ],    // closes Column.children
+          ),      // closes Column (body)
+        ),
         floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read || !DatabaseMgr().isCompatible) ? null : FloatingActionButton(
           onPressed: () async {
             await Navigator.of(context).push(MaterialPageRoute(
@@ -587,8 +603,17 @@ class _HomePageState extends State<HomePage> {
             fit: StackFit.loose,
             children: [
               UserAccountsDrawerHeader(
-                accountName: Text(appUser.name),
-                accountEmail: Text(appUser.email),
+                decoration: BoxDecoration(
+                  color: ThemeMgr.getTheme(context)!.appBarTheme.backgroundColor,
+                ),
+                accountName: Text(
+                  appUser.name,
+                  style: ThemeMgr.getTheme(context)!.appBarTheme.titleTextStyle,
+                ),
+                accountEmail: Text(
+                  appUser.email,
+                  style: ThemeMgr.getTheme(context)!.appBarTheme.titleTextStyle!.copyWith(fontSize: 13),
+                ),
                 currentAccountPicture: Stack(
                   fit: StackFit.expand,
                   children: [
@@ -640,8 +665,8 @@ class _HomePageState extends State<HomePage> {
                                           sortedBooks[index].access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.write ? CustomIcons.book_write :
                                             CustomIcons.book_read),
                         title: Text(sortedBooks[index].name),
-                        textColor: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
-                        iconColor: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
+                        textColor: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? ThemeMgr.getTheme(context)!.colorScheme.primary : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
+                        iconColor: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? ThemeMgr.getTheme(context)!.colorScheme.primary : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color,
                         trailing: selectedBook != null && selectedBook!.id == sortedBooks[index].id ? CircularIconButton(
                           icon: FaIcon(FontAwesomeIcons.gear, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color),
                           color: ThemeMgr.getTheme(context)!.cardColor,

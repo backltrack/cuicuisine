@@ -69,7 +69,9 @@ flutter_app_name:
 flutter:
   uses-material-design: true
 
-  assets:
+  assets: 
+    - assets/images/background.png
+    - assets/images/background_light.png
     - assets/icons/splash_icon.png
     - assets/images/default_image.png
     - assets/images/default_circle_image.png
@@ -100,14 +102,14 @@ flutter_launcher_icons:
 
 flutter_native_splash:
   color: "#0b1313"
-  #background_image: "assets/background.png"
+  background_image: "assets/images/background.png"
 
   # Optional parameters are listed below.  To enable a parameter, uncomment the line by removing
   # the leading # character.
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
-  image: assets/icons/splash_icon.png
+  image: assets/icons/icon.png
   android: true
   web: true
   ios: false

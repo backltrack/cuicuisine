@@ -1,3 +1,11 @@
+new theme:
+- primary (brique) : d65931ff
+- primary alternative : b84623ff
+- secondary (sand) : f6d3b0ff
+- tertiary (sauge green) : 6f8061ff
+- tertiary alternative : 536048ff
+- background : fdf6e8ff
+
 TODO:
 - pull to refresh download tout si aucun change créé
 

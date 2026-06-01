@@ -22,7 +22,7 @@ ThemeCollection setThemeCollection(context) {
           seedColor: DarkColors.accentColor,
           secondary: DarkColors.menuColor,
           surface: DarkColors.backgroundColor,
-          brightness: Brightness.light,
+          brightness: Brightness.dark,
         ),
 
         appBarTheme: AppBarTheme(
@@ -76,7 +76,7 @@ ThemeCollection setThemeCollection(context) {
           ),
         ),
         drawerTheme: const DrawerThemeData(
-          backgroundColor: DarkColors.blackColor
+          backgroundColor: DarkColors.tileBackgroundColor
         ),
         popupMenuTheme: const PopupMenuThemeData(
           color: DarkColors.tileBackgroundColor
@@ -146,15 +146,15 @@ ThemeCollection setThemeCollection(context) {
             textStyle: const TextStyle(color: LightColors.writingColor),
           ),
         ),
-        drawerTheme: DrawerThemeData(
-          backgroundColor: LightColors.backgroundColor
+        drawerTheme: const DrawerThemeData(
+          backgroundColor: LightColors.tileBackgroundColor
         ),
-        popupMenuTheme: PopupMenuThemeData(
+        popupMenuTheme: const PopupMenuThemeData(
           color: LightColors.tileBackgroundColor
         ),
-        dialogTheme: DialogThemeData(
+        dialogTheme: const DialogThemeData(
           backgroundColor: LightColors.tileBackgroundColor,
-          titleTextStyle: const TextStyle(color: LightColors.writingColor, fontSize: 20)
+          titleTextStyle: TextStyle(color: LightColors.writingColor, fontSize: 20)
         )
       )
     },
