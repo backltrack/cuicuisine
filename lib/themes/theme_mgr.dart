@@ -31,7 +31,7 @@ class ThemeMgr {
   }
 
   static ThemeData? getTheme(context) {
-    return DynamicTheme.of(context)?.theme;
+    return DynamicTheme.of(context)?.theme ?? Theme.of(context);
   }
 
   static bool isDarkTheme(context) {

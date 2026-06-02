@@ -420,6 +420,16 @@ class S {
     );
   }
 
+  /// `Exporter en pdf`
+  String get recipe_menu_export_to_pdf {
+    return Intl.message(
+      'Exporter en pdf',
+      name: 'recipe_menu_export_to_pdf',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Supprimer`
   String get recipe_menu_remove {
     return Intl.message(

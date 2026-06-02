@@ -8,6 +8,7 @@ import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
 import '../../pages/404.dart';
 import '../../themes/theme_mgr.dart';
+import '../../utilities/import_export.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/recipe_widgets/image_slideshow.dart';
 import '../../widgets/recipe_widgets/recipe_popup_menu.dart';
@@ -99,15 +100,6 @@ class _RecipePageState extends State<RecipePage> {
       }
 
       shouldInit = false;
-
-      // trigger Edit recipe name
-      // WidgetsBinding.instance.addPostFrameCallback((_){
-      //   if (isNewRecipe) {
-      //     Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/rename", arguments: {
-      //       "currentName": recipe.name
-      //     }).then((value) => updateAfterRename(value));
-      //   }
-      // });
     }
 
     // get is favorite recipe
@@ -125,13 +117,6 @@ class _RecipePageState extends State<RecipePage> {
         appBar: AppBar(
           title: Text(recipe.name, maxLines: 2, overflow: TextOverflow.ellipsis),
           actions: [
-            IconButton(
-              icon: const FaIcon(FontAwesomeIcons.shareNodes),
-              onPressed: () => Share.share(
-                'cuicuisine://recipe/${recipe.id}',
-                subject: recipe.name,
-              ),
-            ),
             if (DatabaseMgr().isCompatible)
               isEditMode ?
                 Container(
@@ -157,6 +142,18 @@ class _RecipePageState extends State<RecipePage> {
                             if (mounted) Navigator.pop(context, "reloadBooks");
                           }
                         });
+                      case "share":
+                        return Share.share(
+                          'cuicuisine://recipe/${recipe.id}',
+                          subject: recipe.name,
+                        );
+                      case "export_to_pdf":
+                        exportRecipeToPdf(
+                          recipe: recipe,
+                          bookName: currentBook.name,
+                          s: S.of(context),
+                        );
+                        return;
                       case "remove":
                         return showAlertDialog(
                             context: context,
@@ -203,130 +200,76 @@ class _RecipePageState extends State<RecipePage> {
             },
           ) : null,
         body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    WidgetSelectionOverlay(
-                      widget: MyImageSlideshow(
-                          recipeId: recipe.id,
-                      ),
-                      editModeController: isEditMode,
-                      opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
-                      borderRadius: 0,
-                      margin: 0,
-                      onTap: () {
-                        Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/images", arguments: {
-                          "recipe": recipe
-                        }).then((value) async {
-                          // reload local recipe
-                          Recipe? tmp = DatabaseMgr().localMgr.getRecipe(recipe.id);
-                          if (tmp != null) {
-                            setState(() {
-                              recipe = tmp;
-                            });
-                          }
-                        });
-                      }
-                    ),
-                    Visibility(
-                      visible: !isEditMode,
-                      child: Positioned(
-                          top: 4,
-                          right: 4,
-                          child: IconButton(
-                            onPressed: () async {
-                              //set favorite in database
-                              DatabaseMgr().localMgr.toggleFavorite(recipe.id);
-                              AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
-
-                              if (newAppUser != null && newAppUser.favoriteRecipes.contains(recipe.id)) {
-                                setState(() {
-                                  isFav = true;
-                                });
-                              } else {
-                                setState(() {
-                                  isFav = false;
-                                });
-                              }
-
-                              // make refresh recipes
-                              updateRecipes = "reloadRecipes";
-                            },
-                            icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color!.withOpacity(0.5)),
-                          )
-                      ),
-                    )
-                  ],
-                ),
-                WidgetSelectionOverlay(
-                    widget: RecipeTimeWidget(
-                        preparationTime: recipe.preparationTime,
-                        waitingTime: recipe.waitingTime,
-                        cookingTime: recipe.cookingTime
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  WidgetSelectionOverlay(
+                    widget: MyImageSlideshow(
+                        recipeId: recipe.id,
                     ),
                     editModeController: isEditMode,
                     opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
+                    borderRadius: 0,
+                    margin: 0,
                     onTap: () {
-                      Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/time", arguments: {
-                        "id": recipe.id,
-                        "preparation": recipe.preparationTime,
-                        "waiting": recipe.waitingTime,
-                        "cooking": recipe.cookingTime
+                      Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/images", arguments: {
+                        "recipe": recipe
                       }).then((value) async {
-                        if (value != null && value == 'update') {
-                          // make refresh recipes
-                          updateRecipes = "reloadRecipes";
-
-                          // reload local recipe
-                          Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
-                          if (tmpRecipe != null) {
-                            setState(() {
-                              recipe = tmpRecipe;
-                            });
-                          }
+                        // reload local recipe
+                        Recipe? tmp = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                        if (tmp != null) {
+                          setState(() {
+                            recipe = tmp;
+                          });
                         }
                       });
                     }
-                ),
-                WidgetSelectionOverlay(
-                    widget: RecipeTagsWidget(key: UniqueKey(), tags: DatabaseMgr().localMgr.getRecipeTags(recipe.id)),
-                    editModeController: isEditMode,
-                    opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
-                    onTap: () {
-                      Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/tags", arguments: {
-                        "currentTags": DatabaseMgr().localMgr.getRecipeTags(recipe.id),
-                        "id": recipe.id
-                      }).then((value) async {
-                        if (value != null && value == 'update') {
-                          // make refresh recipes
-                          updateRecipes = "reloadRecipes";
+                  ),
+                  Visibility(
+                    visible: !isEditMode,
+                    child: Positioned(
+                        top: 4,
+                        right: 4,
+                        child: IconButton(
+                          onPressed: () async {
+                            //set favorite in database
+                            DatabaseMgr().localMgr.toggleFavorite(recipe.id);
+                            AppUser? newAppUser = DatabaseMgr().localMgr.getUser();
 
-                          // reload local recipe
-                          Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
-                          if (tmpRecipe != null) {
-                            setState(() {
-                              recipe = tmpRecipe;
-                            });
-                          }
-                        }
-                      });
-                    },
-                ),
-                WidgetSelectionOverlay(
-                  widget: RecipeIngredientsWidget(
-                    ingredients: recipe.recipeIngredients,
-                    defaultQuantity: recipe.quantity,
-                    quantityType: recipe.quantityType,
+                            if (newAppUser != null && newAppUser.favoriteRecipes.contains(recipe.id)) {
+                              setState(() {
+                                isFav = true;
+                              });
+                            } else {
+                              setState(() {
+                                isFav = false;
+                              });
+                            }
+
+                            // make refresh recipes
+                            updateRecipes = "reloadRecipes";
+                          },
+                          icon: FaIcon(FontAwesomeIcons.solidStar, size: 21, color: isFav ? Colors.amber : ThemeMgr.getTheme(context)!.iconTheme.color!.withOpacity(0.5)),
+                        )
+                    ),
+                  )
+                ],
+              ),
+              WidgetSelectionOverlay(
+                  widget: RecipeTimeWidget(
+                      preparationTime: recipe.preparationTime,
+                      waitingTime: recipe.waitingTime,
+                      cookingTime: recipe.cookingTime
                   ),
                   editModeController: isEditMode,
                   opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                   onTap: () {
-                    Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/ingredients", arguments: {
+                    Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/time", arguments: {
                       "id": recipe.id,
-                      "ingredients": recipe.recipeIngredients,
-                      "quantity": recipe.quantity,
-                      "quantityType": recipe.quantityType
+                      "preparation": recipe.preparationTime,
+                      "waiting": recipe.waitingTime,
+                      "cooking": recipe.cookingTime
                     }).then((value) async {
                       if (value != null && value == 'update') {
                         // make refresh recipes
@@ -337,21 +280,20 @@ class _RecipePageState extends State<RecipePage> {
                         if (tmpRecipe != null) {
                           setState(() {
                             recipe = tmpRecipe;
-                            _log.fine("recipe updated: qty=${recipe.quantity} type=${recipe.quantityType}");
                           });
                         }
                       }
                     });
-                  },
-                ),
-                WidgetSelectionOverlay(
-                  widget: RecipeStepsWidget(steps: recipe.steps),
+                  }
+              ),
+              WidgetSelectionOverlay(
+                  widget: RecipeTagsWidget(key: UniqueKey(), tags: DatabaseMgr().localMgr.getRecipeTags(recipe.id)),
                   editModeController: isEditMode,
                   opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
                   onTap: () {
-                    Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/steps", arguments: {
-                      "recipeId": recipe.id,
-                      "steps": recipe.steps
+                    Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/tags", arguments: {
+                      "currentTags": DatabaseMgr().localMgr.getRecipeTags(recipe.id),
+                      "id": recipe.id
                     }).then((value) async {
                       if (value != null && value == 'update') {
                         // make refresh recipes
@@ -359,22 +301,31 @@ class _RecipePageState extends State<RecipePage> {
 
                         // reload local recipe
                         Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
-                          if (tmpRecipe != null) {
-                            setState(() {
-                              recipe = tmpRecipe;
-                            });
-                          }
+                        if (tmpRecipe != null) {
+                          setState(() {
+                            recipe = tmpRecipe;
+                          });
+                        }
                       }
                     });
                   },
+              ),
+              WidgetSelectionOverlay(
+                widget: RecipeIngredientsWidget(
+                  ingredients: recipe.recipeIngredients,
+                  defaultQuantity: recipe.quantity,
+                  quantityType: recipe.quantityType,
                 ),
-                Transform(
-                  transform: Matrix4.translationValues(0, -12, 0),
-                  child: RecipeVariantsWidget(
-                    recipeId: recipe.id,
-                    variants: recipe.variants,
-                    userAccess: userAccess,
-                    onUpdate: () async {
+                editModeController: isEditMode,
+                opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
+                onTap: () {
+                  Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/ingredients", arguments: {
+                    "id": recipe.id,
+                    "ingredients": recipe.recipeIngredients,
+                    "quantity": recipe.quantity,
+                    "quantityType": recipe.quantityType
+                  }).then((value) async {
+                    if (value != null && value == 'update') {
                       // make refresh recipes
                       updateRecipes = "reloadRecipes";
 
@@ -383,18 +334,64 @@ class _RecipePageState extends State<RecipePage> {
                       if (tmpRecipe != null) {
                         setState(() {
                           recipe = tmpRecipe;
+                          _log.fine("recipe updated: qty=${recipe.quantity} type=${recipe.quantityType}");
                         });
                       }
-                    },
-                  ),
+                    }
+                  });
+                },
+              ),
+              WidgetSelectionOverlay(
+                widget: RecipeStepsWidget(steps: recipe.steps),
+                editModeController: isEditMode,
+                opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,
+                onTap: () {
+                  Navigator.pushNamed(context, "${RecipePage.route}/${recipe.id}/edition/steps", arguments: {
+                    "recipeId": recipe.id,
+                    "steps": recipe.steps
+                  }).then((value) async {
+                    if (value != null && value == 'update') {
+                      // make refresh recipes
+                      updateRecipes = "reloadRecipes";
+
+                      // reload local recipe
+                      Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                        if (tmpRecipe != null) {
+                          setState(() {
+                            recipe = tmpRecipe;
+                          });
+                        }
+                    }
+                  });
+                },
+              ),
+              Transform(
+                transform: Matrix4.translationValues(0, -12, 0),
+                child: RecipeVariantsWidget(
+                  recipeId: recipe.id,
+                  variants: recipe.variants,
+                  userAccess: userAccess,
+                  onUpdate: () async {
+                    // make refresh recipes
+                    updateRecipes = "reloadRecipes";
+
+                    // reload local recipe
+                    Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                    if (tmpRecipe != null) {
+                      setState(() {
+                        recipe = tmpRecipe;
+                      });
+                    }
+                  },
                 ),
+              ),
 
 
-                const SizedBox(height: 96)
-              ],
-            )
+              const SizedBox(height: 96)
+            ],
+          )
         )
-      )
-    );
+    )
+  );
   }
 }

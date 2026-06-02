@@ -20,19 +20,6 @@ List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAc
     //       ),
     //     )
     // ),
-    // share
-    // PopupMenuItem(
-    //     child: Container(
-    //       width: MediaQuery.of(context).size.width / 2,
-    //       child: Row(
-    //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //         children: [
-    //           Text(S.of(context).recipe_menu_share, style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
-    //           Icon(Icons.link)
-    //         ],
-    //       ),
-    //     )
-    // ),
     // Send to other book
     PopupMenuItem(
         value: "copy_into",
@@ -43,6 +30,34 @@ List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAc
             children: [
               Text(S.of(context).recipe_menu_copy_to_book, style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
               Icon(Icons.copy, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color)
+            ],
+          ),
+        )
+    ),
+    // share
+    PopupMenuItem(
+        value: "share",
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width / 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(S.of(context).recipe_menu_share, style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+              Icon(Icons.share, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color)
+            ],
+          ),
+        )
+    ),
+    // export to pdf
+    PopupMenuItem(
+        value: "export_to_pdf",
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width / 2,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(S.of(context).recipe_menu_export_to_pdf, style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+              Icon(Icons.picture_as_pdf, color: ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.color)
             ],
           ),
         )

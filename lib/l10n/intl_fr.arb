@@ -49,6 +49,7 @@
   "recipe_menu_share": "Copier le lien",
   "recipe_menu_cart": "Ajouter au panier",
   "recipe_menu_copy_to_book": "Copier dans",
+  "recipe_menu_export_to_pdf": "Exporter en pdf",
   "recipe_menu_remove": "Supprimer",
   "new_recipe_name": "Nouvelle recette",
   "new_recipe_step": "Nouvelle étape",

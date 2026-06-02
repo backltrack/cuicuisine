@@ -275,6 +275,8 @@ class MessageLookup extends MessageLookupByLibrary {
             MessageLookupByLibrary.simpleMessage("Ajouter au panier"),
         "recipe_menu_copy_to_book":
             MessageLookupByLibrary.simpleMessage("Copier dans"),
+        "recipe_menu_export_to_pdf":
+            MessageLookupByLibrary.simpleMessage("Exporter en pdf"),
         "recipe_menu_remove": MessageLookupByLibrary.simpleMessage("Supprimer"),
         "recipe_menu_share":
             MessageLookupByLibrary.simpleMessage("Copier le lien"),
