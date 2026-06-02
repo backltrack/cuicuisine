@@ -186,7 +186,7 @@ class _RecipePageState extends State<RecipePage> {
                         throw UnimplementedError();
                     }
                   },
-                  itemBuilder: (context) => makeRecipePopupMenu(context, userAccess)
+                  itemBuilder: (context) => makeRecipePopupMenu(context, userAccess, isRecipe: true)
               ),
           ],
         ),

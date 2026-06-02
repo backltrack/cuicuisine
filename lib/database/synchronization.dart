@@ -110,14 +110,20 @@ class Synchronization {
     _log.fine("last change: $lastChange");
 
     if (lastChange != null) {
-      // already sync before
       bool result = await DatabaseMgr().remoteMgr.getLatestChanges(lastChange);
       if (!result) {
         await DatabaseMgr().remoteMgr.fetchAllFromUser();
       }
     }
     else {
-      await DatabaseMgr().remoteMgr.fetchAllFromUser();
+      // fetchAll only when there is no local data — avoids redundant full
+      // re-fetch when the server has no change record yet (e.g. new account
+      // with no writes) but local data is already present.
+      if (_localMgr.getUserBooks().isEmpty) {
+        await DatabaseMgr().remoteMgr.fetchAllFromUser();
+      } else {
+        _log.fine("skipping fetchAll — local data present, no lastChange");
+      }
     }
     return true;
   }

@@ -4,7 +4,7 @@ import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
 import '../../themes/theme_mgr.dart';
 
-List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAccess) {
+List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAccess, {bool isRecipe=false}) {
   return [
     // Add to shopping list
     /// v1
@@ -49,6 +49,7 @@ List<PopupMenuItem> makeRecipePopupMenu(BuildContext context, AccessLevel userAc
         )
     ),
     // export to pdf
+    if (isRecipe)
     PopupMenuItem(
         value: "export_to_pdf",
         child: SizedBox(
