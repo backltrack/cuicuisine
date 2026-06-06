@@ -234,5 +234,7 @@
   "onboarding_skip": "Passer",
   "onboarding_start": "Commencer",
 
-  "deeplink_recipe_not_found": "Recette introuvable. Vérifie que tu as bien accès à ce livre."
+  "deeplink_recipe_not_found": "Recette introuvable. Vérifie que tu as bien accès à ce livre.",
+
+  "select_a_recipe": "Sélectionne une recette"
 }

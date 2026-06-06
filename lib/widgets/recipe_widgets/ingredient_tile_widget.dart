@@ -72,7 +72,7 @@ class _IngredientTileState extends State<IngredientTile> {
         child: Row(
           children: [
             SizedBox(
-                width: MediaQuery.of(context).size.width / 5,
+                width: 80.0,
                 child: parseQuantity(quantity) == '0' ? const SizedBox() :
                   Text([
                     parseQuantity(quantity),

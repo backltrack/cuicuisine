@@ -1,4 +1,7 @@
 TODO:
+- theme issue focus inputs / buttons
+- tuto at first launch after loggin, should be done at loggin
+- fetchall each start (web/linux)
 
 - research all book
 

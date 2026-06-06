@@ -1979,6 +1979,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Sélectionne une recette`
+  String get select_a_recipe {
+    return Intl.message(
+      'Sélectionne une recette',
+      name: 'select_a_recipe',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

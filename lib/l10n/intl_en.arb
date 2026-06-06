@@ -234,5 +234,7 @@
   "onboarding_skip": "Skip",
   "onboarding_start": "Get started",
 
-  "deeplink_recipe_not_found": "Recipe not found. Make sure you have access to this book."
+  "deeplink_recipe_not_found": "Recipe not found. Make sure you have access to this book.",
+
+  "select_a_recipe": "Select a recipe"
 }

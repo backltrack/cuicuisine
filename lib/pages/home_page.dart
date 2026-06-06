@@ -32,6 +32,7 @@ import '../widgets/recipe_widgets/recipe_list_tile.dart';
 import '../widgets/recipe_widgets/filter_bottom_menu.dart';
 import '../widgets/recipe_widgets/recipe_popup_menu.dart';
 import '../widgets/recipe_widgets/book_picker_popup.dart';
+import '../widgets/recipe_widgets/recipe_panel_widget.dart';
 import '../utilities/breakpoints.dart';
 import '../utilities/logger.dart';
 
@@ -52,6 +53,9 @@ class _HomePageState extends State<HomePage> {
   List<Recipe>? recipes;
   Book? selectedBook;
   AccessLevel userAccess = AccessLevel.read;
+
+  // Recipe shown in the ultra-wide third column (≥ 1200px)
+  Recipe? _panelRecipe;
 
   bool askForBookCreation = false;
 
@@ -345,7 +349,8 @@ class _HomePageState extends State<HomePage> {
       askForBookCreation = false;
     }
     
-    final bool isWide = Breakpoints.isWide(context);
+    final bool isUltraWide = Breakpoints.isUltraWide(context);
+    final bool isWide = isUltraWide || Breakpoints.isWide(context);
     final AppUser? appUser = DatabaseMgr().localMgr.getUser();
 
     return Scaffold(
@@ -384,45 +389,64 @@ class _HomePageState extends State<HomePage> {
           ),
           child: isWide
             ? Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                // ── Sidebar ──────────────────────────────────────────
                 Material(
                   color: ThemeMgr.getTheme(context)!.drawerTheme.backgroundColor!,
                   child: SizedBox(width: 280, child: appUser != null ? _sidebarContent(appUser, isWide: true) : const SizedBox()),
                 ),
                 VerticalDivider(width: 1, thickness: 1, color: ThemeMgr.getTheme(context)!.dividerColor),
-                Expanded(child: _buildMainContent(context, isWide: true)),
+                // ── Recipe list ───────────────────────────────────────
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: Theme.of(context).brightness == Brightness.dark
+                            ? const AssetImage('assets/images/background.png')
+                            : const AssetImage('assets/images/background_light.png'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    child: Stack(children: [
+                      Positioned.fill(child: _buildMainContent(context, isWide: true, isUltraWide: isUltraWide)),
+                      if (selectedBook != null && userAccess != AccessLevel.read && DatabaseMgr().isCompatible)
+                        Positioned(
+                          bottom: 16, right: 16,
+                          child: FloatingActionButton(
+                            heroTag: 'fab_add_recipe',
+                            onPressed: _addRecipe,
+                            child: const Icon(Icons.add),
+                          ),
+                        ),
+                    ])
+                  ),
+                ),
+                // ── Recipe panel (≥ 1200px) — fixed 440px so the list always has room ──
+                if (isUltraWide) ...[
+                  VerticalDivider(width: 1, thickness: 1, color: ThemeMgr.getTheme(context)!.dividerColor),
+                  Expanded(
+                    child: Stack(children: [
+                      Positioned.fill(child: RecipePanelWidget(recipe: _panelRecipe)),
+                      if (_panelRecipe != null && userAccess != AccessLevel.read && DatabaseMgr().isCompatible)
+                        Positioned(
+                          bottom: 16, right: 16,
+                          child: FloatingActionButton(
+                            heroTag: 'fab_edit_recipe',
+                            onPressed: _editPanelRecipe,
+                            child: const Icon(Icons.edit),
+                          ),
+                        ),
+                    ]),
+                  ),
+                ],
               ])
             : _buildMainContent(context, isWide: false),
         ),
-        floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read || !DatabaseMgr().isCompatible) ? null : FloatingActionButton(
-          onPressed: () async {
-            await Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => RecipeNamePage(currentName: "")
-            )).then((value) async { 
-              if (value != null && value is String) {
-                String newRecipeId = await DatabaseMgr().localMgr.addNewRecipe(name: value, bookId: selectedBook!.id);
-                // Edit recipe
-                await Navigator.of(context).pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
-                  'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),
-                  'isNewRecipe': true
-                });
-                // reload
-                books = DatabaseMgr().localMgr.getUserBooks();
-                // set updated Book
-                Book? foundBook = findBookFromId(selectedBook!.id);
-                if (foundBook != null) {
-                  selectedBook = foundBook;
-                }
-                // reload recipes
-                recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                // update UI
-                setState(() {});
-              }
-            });
-          },
-          child: const Icon(Icons.add),
-          
-
-        ),
+        floatingActionButton: (isUltraWide || selectedBook == null || userAccess == AccessLevel.read || !DatabaseMgr().isCompatible)
+            ? null
+            : FloatingActionButton(
+                onPressed: _addRecipe,
+                child: const Icon(Icons.add),
+              ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
         bottomNavigationBar: selectedBook == null ? null : BottomActionBar(
           currentBook: selectedBook,
@@ -458,7 +482,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildMainContent(BuildContext context, {required bool isWide}) {
+  Widget _buildMainContent(BuildContext context, {required bool isWide, bool isUltraWide = false}) {
     return Column(
       children: [
         if (!DatabaseMgr().isCompatible)
@@ -561,6 +585,10 @@ class _HomePageState extends State<HomePage> {
                           final recipe = filteredData[index];
 
                           void onTap() async {
+                            if (isUltraWide) {
+                              setState(() { _panelRecipe = recipe; });
+                              return;
+                            }
                             final navigator = Navigator.of(context);
                             final result = await navigator.pushNamed(
                                 "${RecipePage.route}/${recipe.id}",
@@ -599,6 +627,41 @@ class _HomePageState extends State<HomePage> {
         ),
       ],
     );
+  }
+
+  Future<void> _addRecipe() async {
+    final navigator = Navigator.of(context);
+    final name = await navigator.push<String>(
+      MaterialPageRoute(builder: (_) => RecipeNamePage(currentName: "")),
+    );
+    if (!mounted || name == null) return;
+    final newRecipeId = await DatabaseMgr().localMgr.addNewRecipe(name: name, bookId: selectedBook!.id);
+    if (!mounted) return;
+    await navigator.pushNamed("${RecipePage.route}/$newRecipeId", arguments: {
+      'recipe': DatabaseMgr().localMgr.getRecipe(newRecipeId),
+      'isNewRecipe': true,
+    });
+    if (!mounted) return;
+    books = DatabaseMgr().localMgr.getUserBooks();
+    final found = findBookFromId(selectedBook!.id);
+    if (found != null) selectedBook = found;
+    recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+    setState(() {});
+  }
+
+  Future<void> _editPanelRecipe() async {
+    if (_panelRecipe == null) return;
+    final navigator = Navigator.of(context);
+    final result = await navigator.pushNamed(
+      "${RecipePage.route}/${_panelRecipe!.id}",
+      arguments: {'recipe': _panelRecipe},
+    );
+    if (!mounted) return;
+    if (result == "reloadRecipes" || result == "reloadBooks") {
+      final updated = DatabaseMgr().localMgr.getRecipe(_panelRecipe!.id);
+      recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+      setState(() { _panelRecipe = updated ?? _panelRecipe; });
+    }
   }
 
   Drawer homepageDrawer(AppUser? appUser) {

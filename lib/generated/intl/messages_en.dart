@@ -278,6 +278,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Confirm your email address in order to delete definitely your account."),
         "remove_button": MessageLookupByLibrary.simpleMessage("Remove"),
         "search": MessageLookupByLibrary.simpleMessage("Search"),
+        "select_a_recipe":
+            MessageLookupByLibrary.simpleMessage("Select a recipe"),
         "settings": MessageLookupByLibrary.simpleMessage("Settings"),
         "shopping_list": MessageLookupByLibrary.simpleMessage("Shopping cart"),
         "sign_out_popup_description": MessageLookupByLibrary.simpleMessage(

@@ -60,9 +60,7 @@ void main() async {
   // SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
 
   if (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS) {
-    setWindowMinSize(const Size(400, 400));
-    setWindowMaxSize(const Size(900, double.infinity));
-    setWindowFrame(const Rect.fromLTWH(100, 100, 500, 800)); // <--- taille initiale ici
+    setWindowMinSize(const Size(400, 500));
   }
 
   await DatabaseMgr().initialize();

@@ -292,6 +292,8 @@ class MessageLookup extends MessageLookupByLibrary {
             "Confirme ton email afin de supprimer ton compte définitivement."),
         "remove_button": MessageLookupByLibrary.simpleMessage("Supprimer"),
         "search": MessageLookupByLibrary.simpleMessage("Recherche"),
+        "select_a_recipe":
+            MessageLookupByLibrary.simpleMessage("Sélectionne une recette"),
         "settings": MessageLookupByLibrary.simpleMessage("Paramètres"),
         "shopping_list":
             MessageLookupByLibrary.simpleMessage("Liste des courses"),
