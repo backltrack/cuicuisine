@@ -199,7 +199,10 @@ class _RecipePageState extends State<RecipePage> {
               });
             },
           ) : null,
-        body: SingleChildScrollView(
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 900),
+            child: SingleChildScrollView(
           child: Column(
             children: [
               Stack(
@@ -391,6 +394,8 @@ class _RecipePageState extends State<RecipePage> {
             ],
           )
         )
+      )         // closes ConstrainedBox
+    )           // closes Center
     )
   );
   }

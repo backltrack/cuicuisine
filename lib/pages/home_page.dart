@@ -32,6 +32,7 @@ import '../widgets/recipe_widgets/recipe_list_tile.dart';
 import '../widgets/recipe_widgets/filter_bottom_menu.dart';
 import '../widgets/recipe_widgets/recipe_popup_menu.dart';
 import '../widgets/recipe_widgets/book_picker_popup.dart';
+import '../utilities/breakpoints.dart';
 import '../utilities/logger.dart';
 
 final _log = Logger('HomePage');
@@ -344,6 +345,9 @@ class _HomePageState extends State<HomePage> {
       askForBookCreation = false;
     }
     
+    final bool isWide = Breakpoints.isWide(context);
+    final AppUser? appUser = DatabaseMgr().localMgr.getUser();
+
     return Scaffold(
         appBar: SearchAppBar(
           myTitle: selectedBook != null ? selectedBook!.name : S.of(context).title,
@@ -362,8 +366,8 @@ class _HomePageState extends State<HomePage> {
             },
           )
         ),
-        drawer: homepageDrawer(DatabaseMgr().localMgr.getUser()),
-        onDrawerChanged: (isOpened) async {
+        drawer: isWide ? null : homepageDrawer(appUser),
+        onDrawerChanged: isWide ? null : (isOpened) async {
             if (isOpened) {
               await DatabaseMgr().remoteMgr.testConnexion();
               setState(() {});
@@ -375,151 +379,19 @@ class _HomePageState extends State<HomePage> {
               image: Theme.of(context).brightness == Brightness.dark
                   ? const AssetImage("assets/images/background.png")
                   : const AssetImage("assets/images/background_light.png"),
-              //colorFilter: ColorFilter.mode(Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5), BlendMode.dstATop),
               fit: BoxFit.cover,
             )
           ),
-          child: Column(
-            children: [
-              if (!DatabaseMgr().isCompatible)
-                MaterialBanner(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  backgroundColor: const Color(0xFFE6A817),
-                  leading: const FaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
-                  content: Text(
-                    S.of(context).outdated_version_banner,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  actions: [
-                    IconButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFFE6A817),
-                      ),
-                      onPressed: () async {
-                        final serverUri = DatabaseMgr().localMgr.getServerUri();
-                        if (serverUri == null) return;
-                        final url = "$serverUri/apk/download";
-                        if (kIsWeb) {
-                          downloadFile(url);
-                        } else {
-                          launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                        }
-                      },
-                      icon: const FaIcon(FontAwesomeIcons.download, size: 14),
-                      // label: Text(S.of(context).outdated_version_download),
-                    ),
-                  ],
+          child: isWide
+            ? Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Material(
+                  color: ThemeMgr.getTheme(context)!.drawerTheme.backgroundColor!,
+                  child: SizedBox(width: 280, child: appUser != null ? _sidebarContent(appUser, isWide: true) : const SizedBox()),
                 ),
-              Expanded(
-                child: selectedBook == null ?
-                ListTile(
-                  title: Text(S.of(context).book_choice),
-                ):
-                RefreshIndicator(
-              onRefresh: refreshData,
-              child: Builder(
-                builder: (context) {
-                  if (recipes != null && recipes!.isNotEmpty) {
-
-                    // sort
-                    List<Recipe> sortedData = List<Recipe>.from(recipes!);
-                    if (_sortingMethod == "alphaDown") {
-                      sortedData.sort((Recipe a, Recipe b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-                    } else if (_sortingMethod == "alphaUp") {
-                      sortedData.sort((Recipe a, Recipe b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
-                    } else if (_sortingMethod == "timeDown") {
-                      sortedData.sort((Recipe a, Recipe b) => a.getTotalTime().compareTo(b.getTotalTime()));
-                    } else if (_sortingMethod == "timeUp") {
-                      sortedData.sort((Recipe a, Recipe b) => b.getTotalTime().compareTo(a.getTotalTime()));
-                    } else if (_sortingMethod == "lastUpdatedDown") {
-                      sortedData.sort((Recipe a, Recipe b) => b.lastUpdate!.compareTo(a.lastUpdate!));
-                    } else if (_sortingMethod == "lastUpdatedUp") {
-                      sortedData.sort((Recipe a, Recipe b) => a.lastUpdate!.compareTo(b.lastUpdate!));
-                    }
-
-                    // pre-filter so itemCount matches visible items
-                    final AppUser? appUser = DatabaseMgr().localMgr.getUser();
-                    final List<Recipe> filteredData = sortedData.where((recipe) {
-                      if (_mandatoryTags.isNotEmpty &&
-                          !_mandatoryTags.every((tag) => recipe.tags.contains(tag.id))) {
-                        return false;
-                      }
-                      if (_mandatoryIngredients.isNotEmpty) {
-                        final names = List<String>.generate(recipe.recipeIngredients.length,
-                            (i) => removeDiacritics(recipe.recipeIngredients[i].getName()).toLowerCase().trim());
-                        if (!_mandatoryIngredients.every(
-                            (ing) => names.contains(removeDiacritics(ing.toLowerCase().trim())))) {
-                          return false;
-                        }
-                      }
-                      if (_displayFavorites && !(appUser?.favoriteRecipes.contains(recipe.id) ?? false)) return false;
-                      if (_time > 0) {
-                        final total = recipe.getTotalTime();
-                        if (_isTimeMax && total >= _time) return false;
-                        if (!_isTimeMax && total <= _time) return false;
-                      }
-                      if (_research.isNotEmpty &&
-                          !removeDiacritics(recipe.name.toLowerCase())
-                              .contains(removeDiacritics(_research.toLowerCase()))) {
-                        return false;
-                      }
-                      return true;
-                    }).toList();
-
-                    return ListView.builder(
-                      padding: EdgeInsets.zero,
-                      scrollDirection: Axis.vertical,
-                      itemCount: filteredData.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == filteredData.length) return const SizedBox(height: 8);
-                        final recipe = filteredData[index];
-
-                        void onTap() async {
-                          final navigator = Navigator.of(context);
-                          final result = await navigator.pushNamed(
-                              "${RecipePage.route}/${recipe.id}",
-                              arguments: {'recipe': recipe});
-                          if (!mounted) return;
-                          if (result == "reloadRecipes") {
-                            recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
-                            setState(() {});
-                          } else if (result == "reloadBooks") {
-                            books = DatabaseMgr().localMgr.getUserBooks();
-                            setState(() {});
-                          }
-                        }
-
-                        if (_isListed) {
-                          return RecipeListTile(
-                            key: ValueKey(recipe.id),
-                            recipe: recipe,
-                            onTap: onTap,
-                            onLongPress: DatabaseMgr().isCompatible ? () => _showCustomMenu(recipe) : null,
-                            onTapDown: _storePosition,
-                          );
-                        } else {
-                          return RecipeCardTile(
-                            key: ValueKey(recipe.id),
-                            recipe: recipe,
-                          );
-                        }
-                      },
-                    );
-                  }
-                  else if (recipes != null) {
-                    return ListTile(
-                      title: Text(S.of(context).no_recipe),
-                    );
-                  } else {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                },
-              )
-            ),    // closes RefreshIndicator
-              ),  // closes Expanded
-            ],    // closes Column.children
-          ),      // closes Column (body)
+                VerticalDivider(width: 1, thickness: 1, color: ThemeMgr.getTheme(context)!.dividerColor),
+                Expanded(child: _buildMainContent(context, isWide: true)),
+              ])
+            : _buildMainContent(context, isWide: false),
         ),
         floatingActionButton: (selectedBook == null || userAccess == AccessLevel.read || !DatabaseMgr().isCompatible) ? null : FloatingActionButton(
           onPressed: () async {
@@ -586,9 +458,155 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildMainContent(BuildContext context, {required bool isWide}) {
+    return Column(
+      children: [
+        if (!DatabaseMgr().isCompatible)
+          MaterialBanner(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            backgroundColor: const Color(0xFFE6A817),
+            leading: const FaIcon(FontAwesomeIcons.triangleExclamation, color: Colors.white),
+            content: Text(
+              S.of(context).outdated_version_banner,
+              style: const TextStyle(color: Colors.white),
+            ),
+            actions: [
+              IconButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFFE6A817),
+                ),
+                onPressed: () async {
+                  final serverUri = DatabaseMgr().localMgr.getServerUri();
+                  if (serverUri == null) return;
+                  final url = "$serverUri/apk/download";
+                  if (kIsWeb) {
+                    downloadFile(url);
+                  } else {
+                    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                  }
+                },
+                icon: const FaIcon(FontAwesomeIcons.download, size: 14),
+              ),
+            ],
+          ),
+        Expanded(
+          child: selectedBook == null
+            ? ListTile(title: Text(S.of(context).book_choice))
+            : RefreshIndicator(
+                onRefresh: refreshData,
+                child: Builder(
+                  builder: (context) {
+                    if (recipes != null && recipes!.isNotEmpty) {
+                      List<Recipe> sortedData = List<Recipe>.from(recipes!);
+                      if (_sortingMethod == "alphaDown") {
+                        sortedData.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+                      } else if (_sortingMethod == "alphaUp") {
+                        sortedData.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+                      } else if (_sortingMethod == "timeDown") {
+                        sortedData.sort((a, b) => a.getTotalTime().compareTo(b.getTotalTime()));
+                      } else if (_sortingMethod == "timeUp") {
+                        sortedData.sort((a, b) => b.getTotalTime().compareTo(a.getTotalTime()));
+                      } else if (_sortingMethod == "lastUpdatedDown") {
+                        sortedData.sort((a, b) => b.lastUpdate!.compareTo(a.lastUpdate!));
+                      } else if (_sortingMethod == "lastUpdatedUp") {
+                        sortedData.sort((a, b) => a.lastUpdate!.compareTo(b.lastUpdate!));
+                      }
+
+                      final AppUser? user = DatabaseMgr().localMgr.getUser();
+                      final List<Recipe> filteredData = sortedData.where((recipe) {
+                        if (_mandatoryTags.isNotEmpty &&
+                            !_mandatoryTags.every((tag) => recipe.tags.contains(tag.id))) return false;
+                        if (_mandatoryIngredients.isNotEmpty) {
+                          final names = List<String>.generate(recipe.recipeIngredients.length,
+                              (i) => removeDiacritics(recipe.recipeIngredients[i].getName()).toLowerCase().trim());
+                          if (!_mandatoryIngredients.every(
+                              (ing) => names.contains(removeDiacritics(ing.toLowerCase().trim())))) return false;
+                        }
+                        if (_displayFavorites && !(user?.favoriteRecipes.contains(recipe.id) ?? false)) return false;
+                        if (_time > 0) {
+                          final total = recipe.getTotalTime();
+                          if (_isTimeMax && total >= _time) return false;
+                          if (!_isTimeMax && total <= _time) return false;
+                        }
+                        if (_research.isNotEmpty &&
+                            !removeDiacritics(recipe.name.toLowerCase())
+                                .contains(removeDiacritics(_research.toLowerCase()))) return false;
+                        return true;
+                      }).toList();
+
+                      // On wide screens use a 2-column grid for card mode
+                      if (!_isListed && isWide) {
+                        return GridView.builder(
+                          padding: const EdgeInsets.all(8),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                            childAspectRatio: 1.4,
+                          ),
+                          itemCount: filteredData.length,
+                          itemBuilder: (context, index) => RecipeCardTile(
+                            key: ValueKey(filteredData[index].id),
+                            recipe: filteredData[index],
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: filteredData.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == filteredData.length) return const SizedBox(height: 8);
+                          final recipe = filteredData[index];
+
+                          void onTap() async {
+                            final navigator = Navigator.of(context);
+                            final result = await navigator.pushNamed(
+                                "${RecipePage.route}/${recipe.id}",
+                                arguments: {'recipe': recipe});
+                            if (!mounted) return;
+                            if (result == "reloadRecipes") {
+                              recipes = DatabaseMgr().localMgr.getRecipesFromBook(selectedBook!.id);
+                              setState(() {});
+                            } else if (result == "reloadBooks") {
+                              books = DatabaseMgr().localMgr.getUserBooks();
+                              setState(() {});
+                            }
+                          }
+
+                          if (_isListed) {
+                            return RecipeListTile(
+                              key: ValueKey(recipe.id),
+                              recipe: recipe,
+                              onTap: onTap,
+                              onLongPress: DatabaseMgr().isCompatible ? () => _showCustomMenu(recipe) : null,
+                              onTapDown: _storePosition,
+                            );
+                          } else {
+                            return RecipeCardTile(key: ValueKey(recipe.id), recipe: recipe);
+                          }
+                        },
+                      );
+                    } else if (recipes != null) {
+                      return ListTile(title: Text(S.of(context).no_recipe));
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
+        ),
+      ],
+    );
+  }
+
   Drawer homepageDrawer(AppUser? appUser) {
     if (appUser == null) return const Drawer();
+    return Drawer(child: _sidebarContent(appUser, isWide: false));
+  }
 
+  Widget _sidebarContent(AppUser appUser, {required bool isWide}) {
     Widget addButton = MyOutlinedButton(
         text: S.of(context).add_button,
         icon: FontAwesomeIcons.plus,
@@ -596,8 +614,7 @@ class _HomePageState extends State<HomePage> {
         onPressed: addNewBook
     );
 
-    return Drawer(
-      child: Column(
+    return Column(
         children: <Widget>[
           Stack(
             fit: StackFit.loose,
@@ -689,7 +706,7 @@ class _HomePageState extends State<HomePage> {
                         ) : null,
                         onTap: () async {
                           setBookAsDefaultAndRefresh(sortedBooks[index]);
-                          Navigator.pop(context);
+                          if (!isWide) Navigator.pop(context);
                         },
                       ) :
                       addButton;
@@ -717,7 +734,6 @@ class _HomePageState extends State<HomePage> {
             }
           )
         ],
-      ),
     );
   }
 }
