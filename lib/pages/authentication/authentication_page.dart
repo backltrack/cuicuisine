@@ -91,11 +91,13 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
     else {
       AppUser? user =  DatabaseMgr().localMgr.getUser();
       if (user != null) {
+        if (!mounted) return;
         bool? goOffline = await showAlertDialog(
           context: context,
           title: S.of(context).offline_alert_title,
           description: Text(S.of(context).offline_alert_description)
         );
+        if (!mounted) return;
         if (goOffline != null && goOffline) {
           _log.info('offline: switching to local mode');
           tryOfflineConnexion();
@@ -257,22 +259,67 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
         )
       ) :
       // connexion not tested
-      const LoadingScreen();
+      LoadingScreen();
   }
 }
 
-class LoadingScreen extends StatelessWidget {
+class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
 
   @override
+  State<LoadingScreen> createState() => _LoadingScreenState();
+}
+
+class _LoadingScreenState extends State<LoadingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    DatabaseMgr().addListener(_onChanged);
+  }
+
+  @override
+  void dispose() {
+    DatabaseMgr().removeListener(_onChanged);
+    super.dispose();
+  }
+
+  void _onChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final double? progress = DatabaseMgr().syncProgress;
+    const double avatarRadius = 128 / 2 + 36;
+    const double strokeWidth = 4.0;
+    const double boxSize = (avatarRadius + strokeWidth / 2) * 2;
+
     return Container(
       color: ThemeMgr.getTheme(context)!.cardColor,
       child: Center(
-        child: CircleAvatar(
-          radius: 128 / 2 + 36,
-          backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
-          child: Image.asset('assets/icons/splash_icon.png', width: 128)
+        child: SizedBox(
+          width: boxSize,
+          height: boxSize,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircleAvatar(
+                radius: avatarRadius,
+                backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
+                child: Image.asset('assets/icons/splash_icon.png', width: 128),
+              ),
+              if (progress != null)
+                SizedBox(
+                  width: boxSize,
+                  height: boxSize,
+                  child: CircularProgressIndicator(
+                    value: progress,
+                    strokeWidth: strokeWidth,
+                    color: ThemeMgr.getTheme(context)!.primaryColor,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

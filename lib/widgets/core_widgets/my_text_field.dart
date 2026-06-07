@@ -121,9 +121,9 @@ class _MyTextFieldState extends State<MyTextField> {
             },
           ) : widget.suffixIcon != null ?
             IconButton(
-              onPressed: () {
-                if (widget.onSubmit != null) widget.onSubmit!();
-              },
+              onPressed: null, // widget.onSubmit != null ? () {
+                // if (widget.onSubmit != null) widget.onSubmit!();
+              // } : null,
               icon: Icon(widget.suffixIcon!, color: ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)
             )
             : null,

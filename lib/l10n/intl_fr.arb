@@ -208,10 +208,10 @@
   "book_add_dialog_title": "Nouveau livre",
   "book_add_dialog_description": "Veux-tu créer un nouveau livre ou rejoindre un existant ?",
 
-  "variant_widget_title": "Variantes",
-  "variant_widget_new": "Nouvelle variante",
-  "variant_remove_description": "Veux-tu vraiment supprimer cette variante ?",
-  "variant_remove_title": "Supprimer une variante",
+  "comment_widget_title": "Commentaires",
+  "comment_widget_new": "Nouveau commentaire",
+  "comment_remove_description": "Veux-tu vraiment supprimer ce commentaire ?",
+  "comment_remove_title": "Supprimer un commentaire",
 
   "registration": "Inscription",
   "wrong_password": "Mauvais mot de passe",
@@ -225,7 +225,7 @@
   "onboarding_books_title": "Les Livres",
   "onboarding_books_desc": "Organisez vos recettes dans des livres. Créez-en plusieurs pour différentes occasions : quotidien, fêtes, voyages...",
   "onboarding_recipes_title": "Les Recettes",
-  "onboarding_recipes_desc": "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.",
+  "onboarding_recipes_desc": "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et commentaires.",
   "onboarding_sharing_title": "Le Partage",
   "onboarding_sharing_desc": "Partagez vos livres avec vos proches. Choisissez les droits de chaque collaborateur : lecture, écriture ou administration.",
   "onboarding_ready_title": "C'est parti !",

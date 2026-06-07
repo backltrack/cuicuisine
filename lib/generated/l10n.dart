@@ -1750,41 +1750,41 @@ class S {
     );
   }
 
-  /// `Variantes`
-  String get variant_widget_title {
+  /// `Commentaires`
+  String get comment_widget_title {
     return Intl.message(
-      'Variantes',
-      name: 'variant_widget_title',
+      'Commentaires',
+      name: 'comment_widget_title',
       desc: '',
       args: [],
     );
   }
 
-  /// `Nouvelle variante`
-  String get variant_widget_new {
+  /// `Nouveau commentaire`
+  String get comment_widget_new {
     return Intl.message(
-      'Nouvelle variante',
-      name: 'variant_widget_new',
+      'Nouveau commentaire',
+      name: 'comment_widget_new',
       desc: '',
       args: [],
     );
   }
 
-  /// `Veux-tu vraiment supprimer cette variante ?`
-  String get variant_remove_description {
+  /// `Veux-tu vraiment supprimer ce commentaire ?`
+  String get comment_remove_description {
     return Intl.message(
-      'Veux-tu vraiment supprimer cette variante ?',
-      name: 'variant_remove_description',
+      'Veux-tu vraiment supprimer ce commentaire ?',
+      name: 'comment_remove_description',
       desc: '',
       args: [],
     );
   }
 
-  /// `Supprimer une variante`
-  String get variant_remove_title {
+  /// `Supprimer un commentaire`
+  String get comment_remove_title {
     return Intl.message(
-      'Supprimer une variante',
-      name: 'variant_remove_title',
+      'Supprimer un commentaire',
+      name: 'comment_remove_title',
       desc: '',
       args: [],
     );
@@ -1890,10 +1890,10 @@ class S {
     );
   }
 
-  /// `Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.`
+  /// `Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et commentaires.`
   String get onboarding_recipes_desc {
     return Intl.message(
-      'Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées.',
+      'Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et commentaires.',
       name: 'onboarding_recipes_desc',
       desc: '',
       args: [],

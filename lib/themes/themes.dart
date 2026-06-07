@@ -17,9 +17,11 @@ ThemeCollection setThemeCollection(context) {
     themes: {
       AppThemes.Dark: ThemeData(
         useMaterial3: true,
+        primaryColor: DarkColors.accentColor,
 
         colorScheme: ColorScheme.fromSeed(
           seedColor: DarkColors.accentColor,
+          primary: DarkColors.accentColor,
           secondary: DarkColors.menuColor,
           surface: DarkColors.backgroundColor,
           brightness: Brightness.dark,
@@ -68,6 +70,12 @@ ThemeCollection setThemeCollection(context) {
         iconTheme: const IconThemeData(color: DarkColors.writingColor, size: 20),
         hintColor: DarkColors.notificationColor,
         dividerColor: DarkColors.secondaryWritingColor,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: DarkColors.accentColor,
+            foregroundColor: DarkColors.writingColor,
+          ),
+        ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             shape: const StadiumBorder(),
@@ -88,9 +96,11 @@ ThemeCollection setThemeCollection(context) {
       ),
       AppThemes.Light: ThemeData(
         useMaterial3: true,
+        primaryColor: LightColors.accentColor,
 
         colorScheme: ColorScheme.fromSeed(
           seedColor: LightColors.accentColor,
+          primary: LightColors.accentColor,
           secondary: LightColors.menuColor,
           surface: LightColors.backgroundColor,
           brightness: Brightness.light,
@@ -139,6 +149,12 @@ ThemeCollection setThemeCollection(context) {
         iconTheme: const IconThemeData(color: LightColors.writingColor, size: 20),
         hintColor: LightColors.notificationColor,
         dividerColor: LightColors.secondaryWritingColor,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: LightColors.accentColor,
+            foregroundColor: DarkColors.writingColor,
+          ),
+        ),
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             shape: const StadiumBorder(),

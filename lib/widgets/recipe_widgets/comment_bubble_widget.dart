@@ -5,17 +5,17 @@ import '../../themes/theme_mgr.dart';
 
 import '../../models/data_model.dart';
 
-class VariantWidget extends StatefulWidget {
-  final Variant variant;
+class CommentWidget extends StatefulWidget {
+  final Comment comment;
   final Function()? onRemove;
 
-  const VariantWidget({super.key, required this.variant, this.onRemove});
+  const CommentWidget({super.key, required this.comment, this.onRemove});
 
   @override
-  State<VariantWidget> createState() => _VariantWidgetState();
+  State<CommentWidget> createState() => _CommentWidgetState();
 }
 
-class _VariantWidgetState extends State<VariantWidget> {
+class _CommentWidgetState extends State<CommentWidget> {
   String? initials;
   bool isLoaded = false;
 
@@ -23,11 +23,11 @@ class _VariantWidgetState extends State<VariantWidget> {
   void initState() {
     super.initState();
   }
-  
+
   @override
   Widget build(BuildContext context) {
 
-    List<Widget> orderedVariantWidget = [
+    List<Widget> orderedCommentWidget = [
       CircleAvatar(
           backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
           child: Text(isLoaded ? initials! : "")
@@ -47,9 +47,9 @@ class _VariantWidgetState extends State<VariantWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-                child: Text(widget.variant.variant)
+                child: Text(widget.comment.comment)
             ),
-            if (widget.variant.userId == DatabaseMgr().localMgr.getUserId())
+            if (widget.comment.userId == DatabaseMgr().localMgr.getUserId())
               IconButton(
                   onPressed: () {
                     if (widget.onRemove != null) {
@@ -68,7 +68,7 @@ class _VariantWidgetState extends State<VariantWidget> {
         SizedBox(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: widget.variant.userId == DatabaseMgr().localMgr.getUserId() ? orderedVariantWidget.reversed.toList() : orderedVariantWidget,
+            children: widget.comment.userId == DatabaseMgr().localMgr.getUserId() ? orderedCommentWidget.reversed.toList() : orderedCommentWidget,
           ),
         )
         :

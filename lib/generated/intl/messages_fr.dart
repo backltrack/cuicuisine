@@ -104,6 +104,14 @@ class MessageLookup extends MessageLookupByLibrary {
             "Un problème est survenu, essaie à nouveau."),
         "change_password_label_new":
             MessageLookupByLibrary.simpleMessage("Nouveau mot de passe"),
+        "comment_remove_description": MessageLookupByLibrary.simpleMessage(
+            "Veux-tu vraiment supprimer ce commentaire ?"),
+        "comment_remove_title":
+            MessageLookupByLibrary.simpleMessage("Supprimer un commentaire"),
+        "comment_widget_new":
+            MessageLookupByLibrary.simpleMessage("Nouveau commentaire"),
+        "comment_widget_title":
+            MessageLookupByLibrary.simpleMessage("Commentaires"),
         "connexion_needed": MessageLookupByLibrary.simpleMessage(
             "Attends d\'être en ligne pour pouvoir te connecter."),
         "connexion_needed2": MessageLookupByLibrary.simpleMessage(
@@ -214,7 +222,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "onboarding_ready_title":
             MessageLookupByLibrary.simpleMessage("C\'est parti !"),
         "onboarding_recipes_desc": MessageLookupByLibrary.simpleMessage(
-            "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et variantes personnalisées."),
+            "Ajoutez vos recettes avec ingrédients, étapes de préparation, photos et commentaires."),
         "onboarding_recipes_title":
             MessageLookupByLibrary.simpleMessage("Les Recettes"),
         "onboarding_sharing_desc": MessageLookupByLibrary.simpleMessage(
@@ -339,14 +347,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "unit_pinch": MessageLookupByLibrary.simpleMessage("pincée"),
         "unit_tbs": MessageLookupByLibrary.simpleMessage("cas"),
         "unit_tsp": MessageLookupByLibrary.simpleMessage("cac"),
-        "variant_remove_description": MessageLookupByLibrary.simpleMessage(
-            "Veux-tu vraiment supprimer cette variante ?"),
-        "variant_remove_title":
-            MessageLookupByLibrary.simpleMessage("Supprimer une variante"),
-        "variant_widget_new":
-            MessageLookupByLibrary.simpleMessage("Nouvelle variante"),
-        "variant_widget_title":
-            MessageLookupByLibrary.simpleMessage("Variantes"),
         "weak_password":
             MessageLookupByLibrary.simpleMessage("Mot de passe trop simple"),
         "wrong_password":

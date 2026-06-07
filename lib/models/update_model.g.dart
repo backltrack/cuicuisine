@@ -127,7 +127,7 @@ class RecipeUpdateAdapter extends TypeAdapter<RecipeUpdate> {
       quantityType: fields[8] as String?,
       recipeIngredients: (fields[9] as List?)?.cast<Ingredient>(),
       steps: (fields[10] as List?)?.cast<RecipeStep>(),
-      variants: (fields[11] as List?)?.cast<Variant>(),
+      comments: (fields[11] as List?)?.cast<Comment>(),
     )..requestDate = fields[12] as DateTime;
   }
 
@@ -158,7 +158,7 @@ class RecipeUpdateAdapter extends TypeAdapter<RecipeUpdate> {
       ..writeByte(10)
       ..write(obj.steps)
       ..writeByte(11)
-      ..write(obj.variants)
+      ..write(obj.comments)
       ..writeByte(12)
       ..write(obj.requestDate);
   }

@@ -12,11 +12,13 @@ class DatabaseMgr with ChangeNotifier {
 
   bool _isOnline = false;
   bool _isCompatible = true; // optimistic: stays true until server says otherwise
+  double? _syncProgress;
 
   String? pendingDeepLinkRecipeId;
 
   bool get isOnline => _isOnline;
   bool get isCompatible => _isCompatible;
+  double? get syncProgress => _syncProgress;
 
   set isOnline(bool value) {
     _isOnline = value;
@@ -25,6 +27,11 @@ class DatabaseMgr with ChangeNotifier {
 
   set isCompatible(bool value) {
     _isCompatible = value;
+    notifyListeners();
+  }
+
+  set syncProgress(double? value) {
+    _syncProgress = value;
     notifyListeners();
   }
 

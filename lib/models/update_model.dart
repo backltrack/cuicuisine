@@ -135,7 +135,7 @@ class RecipeUpdate implements DatabaseObject {
   @HiveField(10)
   List<RecipeStep>? steps;
   @HiveField(11)
-  List<Variant>? variants;
+  List<Comment>? comments;
   @HiveField(12)
   late DateTime requestDate;
 
@@ -151,7 +151,7 @@ class RecipeUpdate implements DatabaseObject {
     this.quantityType,
     this.recipeIngredients,
     this.steps,
-    this.variants
+    this.comments
   }) {
     requestDate = DateTime.now().toUtc();
   }
@@ -192,8 +192,8 @@ class RecipeUpdate implements DatabaseObject {
     if (steps != null) {
       json['steps'] = List<Map>.generate(steps!.length, (index) => steps![index].toJson());
     }
-    if (variants != null) {
-      json['variants'] = variants;
+    if (comments != null) {
+      json['comments'] = comments;
     }
 
     return json;

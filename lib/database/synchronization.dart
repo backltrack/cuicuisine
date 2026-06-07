@@ -108,11 +108,13 @@ class Synchronization {
   Future<bool> fetchNew() async {
     String? lastChange = DatabaseMgr().localMgr.getLastChange();
     _log.fine("last change: $lastChange");
+    DatabaseMgr().syncProgress = 0.0;
 
     if (lastChange != null) {
       bool result = await DatabaseMgr().remoteMgr.getLatestChanges(lastChange);
       if (!result) {
-        await DatabaseMgr().remoteMgr.fetchAllFromUser();
+        _log.fine("last change not found on server");
+        // await DatabaseMgr().remoteMgr.fetchAllFromUser();
       }
     }
     else {
@@ -125,6 +127,7 @@ class Synchronization {
         _log.fine("skipping fetchAll — local data present, no lastChange");
       }
     }
+    DatabaseMgr().syncProgress = null;
     return true;
   }
 

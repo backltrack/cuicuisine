@@ -498,7 +498,10 @@ class MongoConnector {
         }
         List<MongoChange> changes = [];
         for (var element in tmp) {changes.add(MongoChange.fromJson(element));}
-        
+
+        final int totalChanges = changes.length;
+        int processedChanges = 0;
+
         for (MongoChange change in changes) {
           if (change.objectType == 'user') {
             AppUser user = await fetchUser();
@@ -553,6 +556,7 @@ class MongoConnector {
 
           // add change to local list
           DatabaseMgr().localMgr.addChange(change.changeId);
+          if (totalChanges > 0) DatabaseMgr().syncProgress = ++processedChanges / totalChanges;
         }
         return true;
       }
@@ -572,12 +576,16 @@ class MongoConnector {
         await DatabaseMgr().localMgr.clearRecipes();
 
         List<dynamic> bookIds = data['books'];
+        List<dynamic> recipeIds = data['recipes'];
+        final int totalItems = bookIds.length + recipeIds.length;
+        int processedItems = 0;
+
         for (String bookId in bookIds) {
           Book? book = await fetchBook(bookId);
           await DatabaseMgr().localMgr.addBook(book, addToQueue: false);
+          if (totalItems > 0) DatabaseMgr().syncProgress = ++processedItems / totalItems;
         }
 
-        List<dynamic> recipeIds = data['recipes'];
         for (String recipeId in recipeIds) {
           Recipe? recipe = await fetchRecipe(recipeId);
           if (recipe != null) {
@@ -589,6 +597,7 @@ class MongoConnector {
           else {
             _log.warning("failed to fetch recipe $recipeId");
           }
+          if (totalItems > 0) DatabaseMgr().syncProgress = ++processedItems / totalItems;
         }
 
         String? lastChange = data['lastChange'];

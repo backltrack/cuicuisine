@@ -1,7 +1,8 @@
 TODO:
-- theme issue focus inputs / buttons
 - tuto at first launch after loggin, should be done at loggin
-- fetchall each start (web/linux)
+- variant to comment migration db
+- check recipe steps consistance after migration
+- crash editing steps or other stuf in Linux app
 
 - research all book
 

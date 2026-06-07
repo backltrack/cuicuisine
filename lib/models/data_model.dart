@@ -182,7 +182,7 @@ class Recipe extends HiveObject implements DatabaseObject {
   @HiveField(10)
   List<RecipeStep> steps;
   @HiveField(11)
-  List<Variant> variants;
+  List<Comment> comments;
   @HiveField(12)
   DateTime creationDate;
   @HiveField(13)
@@ -203,7 +203,7 @@ class Recipe extends HiveObject implements DatabaseObject {
     this.quantityType = "",
     required this.recipeIngredients,
     required this.steps,
-    this.variants=const [],
+    this.comments=const [],
     required this.creationDate,
     this.lastUpdate,
     this.isDirty=true
@@ -224,7 +224,7 @@ class Recipe extends HiveObject implements DatabaseObject {
       quantityType: data['quantityType'] ?? "",
       recipeIngredients: List.generate(data['recipeIngredients'].length, (index) => Ingredient.fromJson(data['recipeIngredients'][index])),
       steps: List.generate(data['steps'].length, (index) => RecipeStep.fromJson(data['steps'][index])),
-      variants: List.generate(data['variants'].length, (index) => Variant.fromJson(data['variants'][index])),
+      comments: List.generate(data['comments'].length, (index) => Comment.fromJson(data['comments'][index])),
       creationDate: DateTime.parse(data['creationDate']),
       lastUpdate: DateTime.parse(data['lastUpdate'])
     );
@@ -243,7 +243,7 @@ class Recipe extends HiveObject implements DatabaseObject {
       quantityType: recipe.quantityType,
       recipeIngredients: [...recipe.recipeIngredients],
       steps: [...recipe.steps],
-      variants: [...recipe.variants],
+      comments: [...recipe.comments],
       creationDate: recipe.creationDate,
       lastUpdate: recipe.lastUpdate
     );
@@ -261,7 +261,7 @@ class Recipe extends HiveObject implements DatabaseObject {
     'quantityType': quantityType,
     'recipeIngredients': List<Map>.generate(recipeIngredients.length, (index) => recipeIngredients[index].toJson()).toString(),
     'steps': List<Map>.generate(steps.length, (index) => steps[index].toJson()).toString(),
-    'variants': variants.toString()
+    'comments': comments.toString()
   };
 
   void copyFromRecipe(Recipe recipe) {
@@ -275,7 +275,7 @@ class Recipe extends HiveObject implements DatabaseObject {
     quantityType = recipe.quantityType;
     recipeIngredients = List.generate(recipe.recipeIngredients.length, (index) => recipe.recipeIngredients[index].copy());
     steps = List.generate(recipe.steps.length, (index) => recipe.steps[index].copy());
-    variants = List.generate(recipe.variants.length, (index) => recipe.variants[index].copy());
+    comments = List.generate(recipe.comments.length, (index) => recipe.comments[index].copy());
     lastUpdate = recipe.lastUpdate;
   }
 
@@ -290,7 +290,7 @@ class Recipe extends HiveObject implements DatabaseObject {
     quantityType = recipeUpdate.quantityType ?? quantityType;
     recipeIngredients = recipeUpdate.recipeIngredients != null ? List.generate(recipeUpdate.recipeIngredients!.length, (index) => recipeUpdate.recipeIngredients![index].copy()) : recipeIngredients;
     steps = recipeUpdate.steps != null ? List.generate(recipeUpdate.steps!.length, (index) => recipeUpdate.steps![index].copy()) : steps;
-    variants = recipeUpdate.variants != null ? List.generate(recipeUpdate.variants!.length, (index) => recipeUpdate.variants![index].copy()) : variants;
+    comments = recipeUpdate.comments != null ? List.generate(recipeUpdate.comments!.length, (index) => recipeUpdate.comments![index].copy()) : comments;
   }
 
   int getTotalTime() {
@@ -299,36 +299,36 @@ class Recipe extends HiveObject implements DatabaseObject {
 }
 
 @HiveType(typeId: 3)
-class Variant extends HiveObject {
+class Comment extends HiveObject {
   @HiveField(0)
   String userId;
   @HiveField(1)
-  String variant;
+  String comment;
   @HiveField(2)
   String initials;
 
-  Variant({
-    required this.variant,
+  Comment({
+    required this.comment,
     required this.userId,
     required this.initials
   });
 
   Map<String, dynamic> toJson() => {
     "userId": userId,
-    "variant": variant,
+    "comment": comment,
     "initials": initials
   };
 
-  factory Variant.fromJson(Map<String, dynamic> data) {
-    return Variant(
-      variant: data['variant'] as String,
+  factory Comment.fromJson(Map<String, dynamic> data) {
+    return Comment(
+      comment: data['comment'] as String,
       userId: data['userId'] as String,
       initials: data['initials'] as String
     );
   }
 
-  Variant copy() {
-    return Variant(variant: variant, userId: userId, initials: initials);
+  Comment copy() {
+    return Comment(comment: comment, userId: userId, initials: initials);
   }
 }
 

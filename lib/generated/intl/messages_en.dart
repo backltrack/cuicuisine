@@ -98,6 +98,14 @@ class MessageLookup extends MessageLookupByLibrary {
             "Something went wrong, try again."),
         "change_password_label_new":
             MessageLookupByLibrary.simpleMessage("New password"),
+        "comment_remove_description": MessageLookupByLibrary.simpleMessage(
+            "Do you really want to remove this comment?"),
+        "comment_remove_title":
+            MessageLookupByLibrary.simpleMessage("Remove comment"),
+        "comment_widget_new":
+            MessageLookupByLibrary.simpleMessage("New comment"),
+        "comment_widget_title":
+            MessageLookupByLibrary.simpleMessage("Comments"),
         "connexion_needed": MessageLookupByLibrary.simpleMessage(
             "You need to be online to log in."),
         "connexion_needed2": MessageLookupByLibrary.simpleMessage(
@@ -203,7 +211,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "onboarding_ready_title":
             MessageLookupByLibrary.simpleMessage("Let\'s go!"),
         "onboarding_recipes_desc": MessageLookupByLibrary.simpleMessage(
-            "Add your recipes with ingredients, preparation steps, photos and custom variants."),
+            "Add your recipes with ingredients, preparation steps, photos and comments."),
         "onboarding_recipes_title":
             MessageLookupByLibrary.simpleMessage("Recipes"),
         "onboarding_sharing_desc": MessageLookupByLibrary.simpleMessage(
@@ -325,14 +333,6 @@ class MessageLookup extends MessageLookupByLibrary {
         "unit_pinch": MessageLookupByLibrary.simpleMessage("pinch"),
         "unit_tbs": MessageLookupByLibrary.simpleMessage("Tbs"),
         "unit_tsp": MessageLookupByLibrary.simpleMessage("tsp"),
-        "variant_remove_description": MessageLookupByLibrary.simpleMessage(
-            "Do you really want to remove this variant?"),
-        "variant_remove_title":
-            MessageLookupByLibrary.simpleMessage("Remove variant"),
-        "variant_widget_new":
-            MessageLookupByLibrary.simpleMessage("New variant"),
-        "variant_widget_title":
-            MessageLookupByLibrary.simpleMessage("Variants"),
         "weak_password":
             MessageLookupByLibrary.simpleMessage("Password too weak"),
         "wrong_password":

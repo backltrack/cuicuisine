@@ -49,7 +49,7 @@ class HiveConnector {
     Hive
       ..registerAdapter(AppUserAdapter())
       ..registerAdapter(BookAdapter())
-      ..registerAdapter(VariantAdapter())
+      ..registerAdapter(CommentAdapter())
       ..registerAdapter(IngredientAdapter())
       ..registerAdapter(BookIngredientAdapter())
       ..registerAdapter(TagAdapter())
@@ -795,8 +795,8 @@ class HiveConnector {
     if (data.keys.contains('steps')) {
       recipe.steps = List<RecipeStep>.from(data['steps']);
     }
-    if (data.keys.contains('variants')) {
-      recipe.variants = List<Variant>.from(data['variants']);
+    if (data.keys.contains('comments')) {
+      recipe.comments = List<Comment>.from(data['comments']);
     }
     if (data.keys.contains('lastUpdate')) {
       recipe.lastUpdate = DateTime.parse(data['lastUpdate']);
@@ -848,7 +848,7 @@ class HiveConnector {
         recipeIngredients: recipe.recipeIngredients,
         steps: recipe.steps,
         tags: recipe.tags,
-        variants: recipe.variants
+        comments: recipe.comments
       )
     );
   }

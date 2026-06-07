@@ -14,7 +14,7 @@ import '../../widgets/recipe_widgets/image_popup.dart';
 import '../../widgets/recipe_widgets/image_slideshow.dart';
 import '../../widgets/recipe_widgets/recipe_popup_menu.dart';
 import '../../widgets/recipe_widgets/book_picker_popup.dart';
-import '../../widgets/recipe_widgets/recipe_variants_widget.dart';
+import '../../widgets/recipe_widgets/recipe_comments_widget.dart';
 import '../../widgets/recipe_widgets/widget_selection_overlay_widget.dart';
 import '../../widgets/recipe_widgets/recipe_ingredients_widget.dart';
 import '../../widgets/recipe_widgets/recipe_steps_widget.dart';
@@ -374,9 +374,9 @@ class _RecipePageState extends State<RecipePage> {
                   ),
                   Transform(
                     transform: Matrix4.translationValues(0, -12, 0),
-                    child: RecipeVariantsWidget(
+                    child: RecipeCommentsWidget(
                       recipeId: recipe.id,
-                      variants: recipe.variants,
+                      comments: recipe.comments,
                       userAccess: userAccess,
                       onUpdate: () async {
                         // make refresh recipes
