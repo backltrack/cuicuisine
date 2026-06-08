@@ -6,7 +6,6 @@ import '../../generated/l10n.dart';
 import '../../models/data_model.dart';
 import '../../utilities/string_functions.dart';
 import '../../widgets/recipe_widgets/quantity_widget.dart';
-import 'package:reorderables/reorderables.dart';
 
 import 'ingredient_edition_tile_widget.dart';
 import '../core_widgets/my_outlined_button.dart';
@@ -38,30 +37,26 @@ class RecipeIngredientsEditionWidget extends StatefulWidget {
 }
 
 class _RecipeIngredientsEditionWidgetState extends State<RecipeIngredientsEditionWidget> {
-
   int _quantity = 1;
   String _quantityType = "";
   List<Ingredient> _ingredients = [];
-
-  String? locale;
+  late String locale;
+  bool _initialized = false;
 
   @override
-  void initState() {
-    super.initState();
-
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
     _quantity = widget.defaultQuantity;
     _quantityType = widget.quantityType;
     _ingredients = widget.ingredients;
-
     locale = LocaleMgr.getLocale(context);
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return locale == null ? const Center(child: CircularProgressIndicator()) :
-    Container(
+    return Container(
       decoration: BoxDecoration(
           color: ThemeMgr.getTheme(context)!.cardColor,
           borderRadius: BorderRadius.circular(12)
@@ -76,41 +71,36 @@ class _RecipeIngredientsEditionWidgetState extends State<RecipeIngredientsEditio
             style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
           ),
           const SizedBox(height: 12),
-          // persons selector
           QuantityEditorWidget(
             quantity: _quantity,
             quantityType: _quantityType,
             isEdition: true,
             onQuantityChanged: (int value) {
               widget.onNumberChanged(value);
-                _quantity = value;
+              _quantity = value;
             },
             onTypeChanged: (String value) {
               widget.onQuantityTypeChanged(value);
-                _quantityType = value;
+              _quantityType = value;
             },
           ),
-
           const SizedBox(height: 12),
-          //Ingredient Viewer
-          ReorderableColumn(
+          ReorderableListView(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
             children: List<Widget>.generate(_ingredients.length, (ingredientIndex) {
-              Ingredient ingredient = _ingredients[ingredientIndex];
-
-              // return IngredientTile(ingredient: ingredient, locale: locale!);
+              final ingredient = _ingredients[ingredientIndex];
               return IngredientEditionTile(
-                key: UniqueKey(),
+                key: ObjectKey(ingredient),
                 ingredient: ingredient,
-                locale: locale!,
-                onEdit: () {
-                  widget.onEdit(ingredientIndex);
-                },
-                onRemove: () {
-                  widget.onRemove(ingredientIndex);
-                }
+                locale: locale,
+                onEdit: () { widget.onEdit(ingredientIndex); },
+                onRemove: () { widget.onRemove(ingredientIndex); },
               );
-            }).toList(),
+            }),
             onReorder: (int oldIndex, int newIndex) {
+              if (newIndex > oldIndex) newIndex--;
               _ingredients = moveListItem(_ingredients, oldIndex, newIndex) as List<Ingredient>;
               setState(() {});
             },

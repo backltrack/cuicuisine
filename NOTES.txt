@@ -1,10 +1,14 @@
 TODO:
 - tuto at first launch after loggin, should be done at loggin
-- variant to comment migration db
-- check recipe steps consistance after migration
-- crash editing steps or other stuf in Linux app
+- synchro problem : conflict on some update -> synch status wrong then
 
+ROADMAP:
 - research all book
+- speach to text
+- text to speach
+- import from Marmiton
+- rework filter widget
+- 
 
 
 HIVE - REMOTE DB SYNC
