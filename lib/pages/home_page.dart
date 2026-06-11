@@ -654,7 +654,7 @@ class _HomePageState extends State<HomePage> {
     final navigator = Navigator.of(context);
     final result = await navigator.pushNamed(
       "${RecipePage.route}/${_panelRecipe!.id}",
-      arguments: {'recipe': _panelRecipe},
+      arguments: {'recipe': _panelRecipe, 'isEditMode': true},
     );
     if (!mounted) return;
     if (result == "reloadRecipes" || result == "reloadBooks") {

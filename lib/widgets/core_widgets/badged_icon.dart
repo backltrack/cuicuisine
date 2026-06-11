@@ -34,23 +34,25 @@ class _BadgedIconButtonState extends State<BadgedIconButton> {
   Widget build(BuildContext context) {
     final double iconHeight = widget.icon.size == null ? ThemeMgr.getTheme(context)!.iconTheme.size! : widget.icon.size!;
     return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
       children: [
         IconButton(
             onPressed: widget.onPressed ?? () {},
             icon: widget.icon
         ),
         if (!widget.hideBadgeOnNull || widget.hideBadgeOnNull && _badgeNumber > 0) Positioned(
-          right: 4,
-          top: 4,
+          right: 0,
+          top: 0,
           child: Container(
             decoration: BoxDecoration(
               color: widget.badgeColor,
-              borderRadius: BorderRadius.circular(iconHeight / 3.5)
+              borderRadius: BorderRadius.circular(iconHeight / 3)
             ),
             constraints: BoxConstraints(
-              minHeight: iconHeight / 1.75,
-              minWidth: iconHeight / 1.75,
-              maxHeight: iconHeight / 1.75,
+              minHeight: iconHeight / 1.7,
+              minWidth: iconHeight / 1.5,
+              maxHeight: iconHeight / 1.5,
             ),
             alignment: AlignmentDirectional.center,
             child: Container(

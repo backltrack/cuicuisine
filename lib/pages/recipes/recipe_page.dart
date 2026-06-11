@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/update_model.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +39,7 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
 
   bool isEditMode = false;
+  bool canOpenImagePopup = !(Platform.isAndroid || Platform.isIOS);
 
   // Modal Rout args not loaded yet
   bool shouldInit = true;
@@ -91,6 +94,7 @@ class _RecipePageState extends State<RecipePage> {
         if (routeArgs['recipe'] != null) {
           recipe = routeArgs['recipe']!;
           isNewRecipe = routeArgs['isNewRecipe'] ?? false;
+          isEditMode = routeArgs['isEditMode'] ?? false;
         }
         else {
           Navigator.of(context).pushNamed(PageNotFound.route);
@@ -211,9 +215,9 @@ class _RecipePageState extends State<RecipePage> {
                       WidgetSelectionOverlay(
                         widget: MyImageSlideshow(
                             recipeId: recipe.id,
-                            onTap: (image) {
+                            onTap: canOpenImagePopup ?(image) {
                               showImagePopup(context: context, image: image);
-                            }
+                            } : null
                         ),
                         editModeController: isEditMode,
                         opacity: ThemeMgr.isDarkTheme(context) ? 0.7 : 0.6,

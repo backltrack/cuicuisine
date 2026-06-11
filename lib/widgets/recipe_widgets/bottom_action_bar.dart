@@ -50,14 +50,14 @@ class _BottomActionBarState extends State<BottomActionBar> {
               children: [
                 BadgedIconButton(
                   key: UniqueKey(),
-                  icon: const Icon(Icons.filter_list, size: 28, color: DarkColors.writingColor),
+                  icon: const FaIcon(FontAwesomeIcons.filter, size: 20, color: DarkColors.writingColor),
                   badgeColor: ThemeMgr.getTheme(context)!.hintColor,
                   number: _badgeNumber,
                   onPressed: () {
                     setState(() {
                       showModalBottomSheet(
                           context: context,
-                          backgroundColor: Colors.black.withOpacity(0.04),
+                          backgroundColor: Colors.black.withValues(alpha: .04),
                           builder: (BuildContext context) {
                             return FilterBottomMenu(
                               onReset: () {

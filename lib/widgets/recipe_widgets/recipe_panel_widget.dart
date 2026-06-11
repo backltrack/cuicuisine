@@ -60,12 +60,13 @@ class RecipePanelWidget extends StatelessWidget {
 
             // Tags
             RecipeTagsWidget(
-              key: ValueKey(recipe!.id),
+              key: ValueKey('tags_${recipe!.id}'),
               tags: DatabaseMgr().localMgr.getRecipeTags(recipe!.id),
             ),
 
             // Ingredients
             RecipeIngredientsWidget(
+              key: ValueKey('ingredients_${recipe!.id}'),
               ingredients: recipe!.recipeIngredients,
               defaultQuantity: recipe!.quantity,
               quantityType: recipe!.quantityType,
