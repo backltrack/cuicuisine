@@ -81,7 +81,6 @@ flutter:
     - fonts/google_fonts/Comfortaa-VariableFont_wght.ttf
     - fonts/google_fonts/comfortaa/
     - assets/keys/
-    - assets/ca/
   
   fonts:
     - family: CustomIcons

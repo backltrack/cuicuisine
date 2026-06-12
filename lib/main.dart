@@ -56,9 +56,6 @@ void main() async {
 
   HttpOverrides.global = MyHttpOverrides();
 
-  // ByteData data = await PlatformAssetBundle().load('assets/ca/cuicuisine.crt');
-  // SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
-
   if (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS) {
     setWindowMinSize(const Size(400, 500));
   }

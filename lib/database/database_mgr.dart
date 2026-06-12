@@ -45,9 +45,7 @@ class DatabaseMgr with ChangeNotifier {
     localMgr = HiveConnector();
     await localMgr.initialize();
 
-    // const String defaultServer = 'https://localhost:8000';
-    // const String defaultServer = 'https://192.168.1.28:8000';
-    const String defaultServer = 'https://mycuicuisine.duckdns.org:8000';
+    const String defaultServer = 'https://mycuicuisine.duckdns.org';
     
     String? uri = localMgr.getServerUri();
 
