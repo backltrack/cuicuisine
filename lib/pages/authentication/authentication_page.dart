@@ -9,6 +9,7 @@ import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import '../../widgets/core_widgets/animated_icon_button.dart';
 import '../../widgets/core_widgets/social_button.dart';
+import '../../widgets/core_widgets/sync_progress_indicator.dart';
 import '../home_page.dart';
 import './email_check_page.dart';
 import './onboarding_page.dart';
@@ -263,65 +264,14 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
   }
 }
 
-class LoadingScreen extends StatefulWidget {
+class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
 
   @override
-  State<LoadingScreen> createState() => _LoadingScreenState();
-}
-
-class _LoadingScreenState extends State<LoadingScreen> {
-  @override
-  void initState() {
-    super.initState();
-    DatabaseMgr().addListener(_onChanged);
-  }
-
-  @override
-  void dispose() {
-    DatabaseMgr().removeListener(_onChanged);
-    super.dispose();
-  }
-
-  void _onChanged() {
-    if (mounted) setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final double? progress = DatabaseMgr().syncProgress;
-    const double avatarRadius = 128 / 2 + 36;
-    const double strokeWidth = 4.0;
-    const double boxSize = (avatarRadius + strokeWidth / 2) * 2;
-
     return Container(
       color: ThemeMgr.getTheme(context)!.cardColor,
-      child: Center(
-        child: SizedBox(
-          width: boxSize,
-          height: boxSize,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CircleAvatar(
-                radius: avatarRadius,
-                backgroundColor: ThemeMgr.getTheme(context)!.colorScheme.surface,
-                child: Image.asset('assets/icons/splash_icon.png', width: 128),
-              ),
-              if (progress != null)
-                SizedBox(
-                  width: boxSize,
-                  height: boxSize,
-                  child: CircularProgressIndicator(
-                    value: progress,
-                    strokeWidth: strokeWidth,
-                    color: ThemeMgr.getTheme(context)!.primaryColor,
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+      child: const Center(child: SyncProgressIndicator()),
     );
   }
 }

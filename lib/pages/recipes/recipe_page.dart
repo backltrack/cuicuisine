@@ -394,6 +394,20 @@ class _RecipePageState extends State<RecipePage> {
                           });
                         }
                       },
+                      onRemove: (int index) async {
+                        DatabaseMgr().localMgr.updateRecipe(recipe.id, RecipeUpdate(id: recipe.id, comments: List.from(recipe.comments)..removeAt(index)));
+
+                        // make refresh recipes
+                        updateRecipes = "reloadRecipes";
+
+                        // reload local recipe
+                        Recipe? tmpRecipe = DatabaseMgr().localMgr.getRecipe(recipe.id);
+                        if (tmpRecipe != null) {
+                          setState(() {
+                            recipe = tmpRecipe;
+                          });
+                        }
+                      },
                     ),
                   ),
 

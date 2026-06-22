@@ -250,6 +250,8 @@ class _AnimSearchBarState extends State<AnimSearchBar>
                 children: [
                   IconButton(
                     splashRadius: 19.0,
+                    constraints: const BoxConstraints.tightFor(width: 48.0, height: 48.0),
+                    padding: EdgeInsets.zero,
                     icon: toggle == 1 ?
                     const Icon(Icons.arrow_forward_ios_rounded,
                       size: 20.0,

@@ -5,6 +5,7 @@ import '../../database/database_mgr.dart';
 import '../../utilities/toast_notifier.dart';
 import '../../widgets/core_widgets/my_text_field.dart';
 import '../../widgets/core_widgets/social_button.dart';
+import '../../widgets/core_widgets/sync_progress_indicator.dart';
 
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
@@ -13,6 +14,7 @@ import '../account/update_password.dart';
 import '../home_page.dart';
 import '../404.dart';
 import 'forgotten_password.dart';
+import 'onboarding_page.dart';
 // import 'forgotten_password.dart';
 
 class EmailConnexion extends StatefulWidget {
@@ -74,8 +76,11 @@ class _EmailConnexionState extends State<EmailConnexion> {
         onSuccess: (AppUser user) async {
           await DatabaseMgr().synchronization.sync();
           if (!context.mounted) return;
+          final dest = DatabaseMgr().localMgr.isOnboardingDone()
+              ? HomePage.route
+              : OnboardingPage.route;
           Navigator.of(context).pushNamedAndRemoveUntil(
-              HomePage.route, (Route<dynamic> route) => false);
+              dest, (Route<dynamic> route) => false);
           if (_password == 'ToChange01') {
             Navigator.of(context).pushNamed(
               UpdatePassword.route,
@@ -120,7 +125,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
                         _password = val;
                       });
                     },
-                    onSubmit: (String val) {
+                    onSubmit: () {
                       if (canSubmit) submitPassword();
                     },
                   ),
@@ -147,19 +152,7 @@ class _EmailConnexionState extends State<EmailConnexion> {
           if (_isSyncing)
             Container(
               color: Colors.black45,
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 16),
-                    Text(
-                      S.of(context).synchronizing,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  ],
-                ),
-              ),
+              child: const Center(child: SyncProgressIndicator()),
             ),
         ],
       )

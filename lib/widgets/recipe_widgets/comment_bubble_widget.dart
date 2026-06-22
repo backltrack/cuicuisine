@@ -7,7 +7,7 @@ import '../../models/data_model.dart';
 
 class CommentWidget extends StatefulWidget {
   final Comment comment;
-  final Function()? onRemove;
+  final Function? onRemove;
 
   const CommentWidget({super.key, required this.comment, this.onRemove});
 
@@ -16,8 +16,6 @@ class CommentWidget extends StatefulWidget {
 }
 
 class _CommentWidgetState extends State<CommentWidget> {
-  String? initials;
-  bool isLoaded = false;
 
   @override
   void initState() {
@@ -30,50 +28,44 @@ class _CommentWidgetState extends State<CommentWidget> {
     List<Widget> orderedCommentWidget = [
       CircleAvatar(
           backgroundColor: ThemeMgr.getTheme(context)!.primaryColorDark,
-          child: Text(isLoaded ? initials! : "")
+          child: Text(widget.comment.initials)
       ),
-      Container(
-        width: MediaQuery.of(context).size.width - 16-3*12-48,
-        constraints: const BoxConstraints(
-            minHeight: 48
-        ),
-        padding: const EdgeInsets.only(left: 12),
-        margin: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-        decoration: BoxDecoration(
-            color: ThemeMgr.getTheme(context)!.colorScheme.surface,
-            borderRadius: BorderRadius.circular(12)
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-                child: Text(widget.comment.comment)
-            ),
-            if (widget.comment.userId == DatabaseMgr().localMgr.getUserId())
-              IconButton(
-                  onPressed: () {
-                    if (widget.onRemove != null) {
-                      widget.onRemove!();
-                    }
-                  },
-                  icon: const Icon(FontAwesomeIcons.times, size: 14),
-                  padding: EdgeInsets.zero
-              )
-          ],
+      Expanded(
+        child: Container(
+          constraints: const BoxConstraints(
+              minHeight: 48
+          ),
+          padding: const EdgeInsets.only(left: 12),
+          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 4, top: 4),
+          decoration: BoxDecoration(
+              color: ThemeMgr.getTheme(context)!.colorScheme.surface,
+              borderRadius: BorderRadius.circular(12)
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                  child: Text(widget.comment.comment)
+              ),
+              if (widget.onRemove != null)
+                IconButton(
+                    onPressed: () {
+                        widget.onRemove!();
+                    },
+                    icon: const Icon(FontAwesomeIcons.xmark, size: 14),
+                    padding: EdgeInsets.zero
+                )
+            ],
+          ),
         ),
       )
     ];
 
-    return isLoaded ?
-        SizedBox(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: widget.comment.userId == DatabaseMgr().localMgr.getUserId() ? orderedCommentWidget.reversed.toList() : orderedCommentWidget,
-          ),
-        )
-        :
-        const Center(
-          child: CircularProgressIndicator(),
-        );
+    return SizedBox(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: widget.comment.userId == DatabaseMgr().localMgr.getUserId() ? orderedCommentWidget.reversed.toList() : orderedCommentWidget,
+      ),
+    );
   }
 }

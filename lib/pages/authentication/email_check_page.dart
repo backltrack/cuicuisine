@@ -57,7 +57,7 @@ class _EmailCheckState extends State<EmailCheck> {
               },
               icon: FontAwesomeIcons.at,
               autofocus: true,
-              onSubmit: (String val) {
+              onSubmit: () {
                 if (EmailPasswordValidator.isEmailValid(_email)) {
                   submitEmail();
                 }

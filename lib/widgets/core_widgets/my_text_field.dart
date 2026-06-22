@@ -9,6 +9,7 @@ class MyTextField extends StatefulWidget {
   final IconData? icon;
   final Function? onChanged;
   final Function? onSubmit;
+  final bool bSubmitOnSuffixIconPressed;
   final Function? onTap;
   final TextEditingController? textEditingController;
   final bool autofocus;
@@ -18,6 +19,7 @@ class MyTextField extends StatefulWidget {
   final IconData? suffixIcon;
   final bool isPassword;
   final int? maxLength;
+  final int maxLines;
   final Color? overrideTextColor;
   final TextCapitalization? textCapitalization;
 
@@ -37,7 +39,9 @@ class MyTextField extends StatefulWidget {
     this.suffixIcon,
     this.isPassword=false,
     this.maxLength,
-    this.overrideTextColor
+    this.maxLines=1,
+    this.overrideTextColor,
+    this.bSubmitOnSuffixIconPressed=false
   });
 
   @override
@@ -76,6 +80,17 @@ class _MyTextFieldState extends State<MyTextField> {
     super.dispose();
   }
 
+  KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
+    if (widget.onSubmit != null &&
+        event is KeyDownEvent &&
+        (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.numpadEnter) &&
+        HardwareKeyboard.instance.isShiftPressed) {
+      widget.onSubmit!();
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
   @override
   Widget build(BuildContext context) {
     var outlineInputBorder = OutlineInputBorder(
@@ -88,65 +103,71 @@ class _MyTextFieldState extends State<MyTextField> {
 
     return Container(
       padding: const EdgeInsets.all(8),
-      child: TextField(
-        inputFormatters: [
-          if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength)
-        ],
-        keyboardType: widget.keyboardType,
-        textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
-        controller: widget.textEditingController,
-        focusNode: _focusNode,
-        autofocus: widget.autofocus,
-        obscureText: isObscured,
-        decoration: InputDecoration(
-          labelText: widget.label,
-          labelStyle: isFocused ? ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.primaryColor) : ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
-          prefixIcon: widget.icon != null ? (Icon(widget.icon, color: isFocused ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)) : null,
-          focusedBorder: OutlineInputBorder(
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            borderSide: BorderSide(
-              color: ThemeMgr.getTheme(context)!.primaryColor,
-              width: 2
-            )
+      child: Focus(
+        canRequestFocus: false,
+        skipTraversal: true,
+        onKeyEvent: widget.maxLines > 1 ? _handleKeyEvent : null,
+        child: TextField(
+          minLines: 1,
+          maxLines: widget.maxLines,
+          textInputAction: widget.maxLines > 1 ? TextInputAction.newline : null,
+          inputFormatters: [
+            if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength)
+          ],
+          keyboardType: widget.maxLines > 1 ? TextInputType.multiline : widget.keyboardType,
+          textCapitalization: widget.textCapitalization ?? TextCapitalization.none,
+          controller: widget.textEditingController,
+          focusNode: _focusNode,
+          autofocus: widget.autofocus,
+          obscureText: isObscured,
+          decoration: InputDecoration(
+            labelText: widget.label,
+            labelStyle: isFocused ? ThemeMgr.getTheme(context)!.textTheme.bodyLarge!.copyWith(color: ThemeMgr.getTheme(context)!.primaryColor) : ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
+            prefixIcon: widget.icon != null ? (Icon(widget.icon, color: isFocused ? ThemeMgr.getTheme(context)!.primaryColor : ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)) : null,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: const BorderRadius.all(Radius.circular(12)),
+              borderSide: BorderSide(
+                color: ThemeMgr.getTheme(context)!.primaryColor,
+                width: 2
+              )
+            ),
+            suffixText: widget.suffixText,
+            suffixStyle: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+            suffixIcon: widget.isPassword ? IconButton(
+              padding: EdgeInsets.zero,
+              icon: FaIcon(isObscured ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, color: Colors.grey, size: 20),
+              onPressed: () {
+                setState(() {
+                  isObscured = !isObscured;
+                });
+              },
+            ) : widget.suffixIcon != null ?
+              IconButton(
+                onPressed: widget.bSubmitOnSuffixIconPressed ? () => widget.onSubmit!() : null,
+                icon: Icon(widget.suffixIcon!, color: ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)
+              )
+              : null,
+            border: outlineInputBorder,
+            enabledBorder: outlineInputBorder,
           ),
-          suffixText: widget.suffixText,
-          suffixStyle: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
-          suffixIcon: widget.isPassword ? IconButton(
-            padding: EdgeInsets.zero,
-            icon: FaIcon(isObscured ? FontAwesomeIcons.eye : FontAwesomeIcons.eyeSlash, color: Colors.grey, size: 20),
-            onPressed: () {
-              setState(() {
-                isObscured = !isObscured;
-              });
-            },
-          ) : widget.suffixIcon != null ?
-            IconButton(
-              onPressed: null, // widget.onSubmit != null ? () {
-                // if (widget.onSubmit != null) widget.onSubmit!();
-              // } : null,
-              icon: Icon(widget.suffixIcon!, color: ThemeMgr.getTheme(context)!.textTheme.bodyMedium!.color, size: 20)
-            )
-            : null,
-          border: outlineInputBorder,
-          enabledBorder: outlineInputBorder,
-        ),
-        style: widget.overrideTextColor != null ? ThemeMgr.getTheme(context)!.textTheme.displayMedium!.copyWith(color: widget.overrideTextColor) : ThemeMgr.getTheme(context)!.textTheme.displayMedium,
-        onChanged: (String val) {
-          if (widget.onChanged != null) widget.onChanged!(val);
-        },
-        onTap: () {
-          if (widget.onTap != null) {
-            widget.onTap!();
-          }
-          else if (widget.keyboardType == TextInputType.number) {
-            if (widget.textEditingController != null) {
-                widget.textEditingController!.selection = TextSelection(baseOffset: 0, extentOffset: widget.textEditingController!.text.length);
-              }
+          style: widget.overrideTextColor != null ? ThemeMgr.getTheme(context)!.textTheme.displayMedium!.copyWith(color: widget.overrideTextColor) : ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+          onChanged: (String val) {
+            if (widget.onChanged != null) widget.onChanged!(val);
+          },
+          onTap: () {
+            if (widget.onTap != null) {
+              widget.onTap!();
             }
-        },
-        onSubmitted: (String val) {
-          if (widget.onSubmit != null) widget.onSubmit!(val);
-        }
+            else if (widget.keyboardType == TextInputType.number) {
+              if (widget.textEditingController != null) {
+                  widget.textEditingController!.selection = TextSelection(baseOffset: 0, extentOffset: widget.textEditingController!.text.length);
+                }
+              }
+          },
+          onSubmitted: (String val) {
+            if (widget.onSubmit != null) widget.onSubmit!();
+          }
+        ),
       ),
     );
   }

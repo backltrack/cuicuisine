@@ -1,3 +1,5 @@
+import 'package:cuicuisine/models/update_model.dart';
+import 'package:cuicuisine/utilities/string_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../database/database_mgr.dart';
@@ -13,8 +15,9 @@ class RecipeCommentsWidget extends StatefulWidget {
   final String recipeId;
   final List<Comment> comments;
   final AccessLevel userAccess;
-  final Function()? onUpdate;
-  const RecipeCommentsWidget({super.key, required this.recipeId, required this.comments, required this.userAccess, this.onUpdate});
+  final Function? onUpdate;
+  final Function(int)? onRemove;
+  const RecipeCommentsWidget({super.key, required this.recipeId, required this.comments, required this.userAccess, this.onUpdate, this.onRemove});
 
   @override
   _RecipeCommentsWidgetState createState() => _RecipeCommentsWidgetState();
@@ -22,7 +25,7 @@ class RecipeCommentsWidget extends StatefulWidget {
 
 class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
   final TextEditingController _newCommentTextController = TextEditingController();
-  bool widgetApertureState = false;
+  bool widgetApertureState = true;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,7 @@ class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
 
     return Container(
       decoration: BoxDecoration(
-        color: ThemeMgr.getTheme(context)!.cardColor.withOpacity(0.5),
+        color: ThemeMgr.getTheme(context)!.cardColor.withValues(alpha: 0.5),
         borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))
       ),
       padding: const EdgeInsets.all(12),
@@ -42,45 +45,53 @@ class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
             width: double.infinity,
             child: Column(
               children: [
+                if (widget.userAccess.index > AccessLevel.read.index && widgetApertureState)
+                  MyTextField(
+                    textEditingController: _newCommentTextController,
+                    label: S.of(context).comment_widget_new,
+                    suffixIcon: FontAwesomeIcons.paperPlane,
+                    bSubmitOnSuffixIconPressed: true,
+                    maxLines: 20,
+                    onSubmit: () async {
+                      if (_newCommentTextController.text.trim().isEmpty) return;
+                      
+                      String? userId = DatabaseMgr().localMgr.getUserId();
+                      if (userId != null) {
+                        DatabaseMgr().localMgr.updateRecipe(widget.recipeId, RecipeUpdate(id: widget.recipeId, comments: widget.comments + [Comment(userId: userId, comment: _newCommentTextController.text, initials: getInitials(DatabaseMgr().localMgr.getUserName()))])).then((value) {
+                          _newCommentTextController.clear();
+                          if (widget.onUpdate != null) widget.onUpdate!();
+                        });
+                      }
+                    },
+                  ),
                 Column(
                     children: List<Widget>.generate(commentLength, (index) {
                       int invertedIndex = widget.comments.length - 1 - index;
                       return CommentWidget(
                         comment: widget.comments[invertedIndex],
 
-                        onRemove: () {
+                        onRemove: widget.onRemove != null ? (widget.comments[invertedIndex].userId == DatabaseMgr().localMgr.getUserId()) || widget.userAccess == AccessLevel.own ? () {
                           showAlertDialog(
                               context: context,
                               title: S.of(context).comment_remove_title,
                               description: Text(S.of(context).comment_remove_description)
                           ).then((value) {
                             if (value != null && value) {
-                              // TODO: implement comment removal
+                              widget.onRemove!(invertedIndex);
                             }
                           });
-                        },
+                        } : null : null,
                       );
                     })
                 ),
-                if (widget.userAccess.index > AccessLevel.read.index && widgetApertureState)
-                  MyTextField(
-                    textEditingController: _newCommentTextController,
-                    label: S.of(context).comment_widget_new,
-                    suffixIcon: FontAwesomeIcons.paperPlane,
-                    onSubmit: () async {
-                      String? userId = DatabaseMgr().localMgr.getUserId();
-                      if (userId != null) {}
-                      // TODO: implement comment add
-                    },
-                  ),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      widgetApertureState = !widgetApertureState;
-                    });
-                  },
-                  icon: widgetApertureState ? const Icon(Icons.keyboard_arrow_up_rounded) : const Icon(Icons.keyboard_arrow_down_rounded)
-                )
+                // IconButton(
+                //   onPressed: () {
+                //     setState(() {
+                //       widgetApertureState = !widgetApertureState;
+                //     });
+                //   },
+                //   icon: widgetApertureState ? const Icon(Icons.keyboard_arrow_up_rounded) : const Icon(Icons.keyboard_arrow_down_rounded)
+                // )
               ],
             )
           )

@@ -1,8 +1,7 @@
 TODO:
-- tuto at first launch after loggin, should be done at loggin
+- steps line return still not good
 - synchro problem : conflict on some update -> synch status wrong then
 - change server then reconnect -> no data
-- check certificate regen 
 
 ROADMAP:
 - research all book
