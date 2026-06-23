@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=cuicuisine
+Comment=A recipe book app, built with Flutter (targets Android, Linux desktop and Web).
+
+Exec=cuicuisine
+Icon=cuicuisine
+
+Terminal=false
+Categories=Utility;Food;
+
+StartupNotify=true
+StartupWMClass=cuicuisine

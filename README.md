@@ -45,6 +45,34 @@ The Hive models (`lib/models/data_model.dart`, `update_model.dart`, `sync_model.
 dart run build_runner build --delete-conflicting-outputs
 ```
 
+## Bumping the schema version after a data model change
+
+Whenever you add/change/remove a `@HiveField` on `AppUser`, `Recipe`, `Book`, or any other Hive model in `lib/models/data_model.dart` (or `update_model.dart`/`sync_model.dart`), existing installs already have data on disk in the old shape. To migrate it, bump `HiveMigration.currentVersion` in `lib/database/hive_migration.dart`:
+
+```dart
+class HiveMigration {
+  static const int currentVersion = 1; // bump this, e.g. to 2
+  ...
+  static Future<void> _migrate(HiveConnector db, int version) async {
+    switch (version) {
+      case 1:
+        // ...
+      case 2:
+        // backfill/transform the data for the new schema here
+        break;
+    }
+  }
+}
+```
+
+`HiveMigration.run()` is called once on startup (`lib/database/hive_db.dart`). It reads the schema version last persisted on the device, then runs every `_migrate` case between that version (exclusive) and `currentVersion` (inclusive), in order, before saving the new version. So:
+
+1. Bump `currentVersion` by 1.
+2. Add a matching `case <newVersion>:` in `_migrate` that transforms existing Hive data to satisfy the new model shape (e.g. backfilling a new required field).
+3. Leave older `case` blocks untouched — they must stay so devices that are several versions behind still migrate step by step.
+
+This is independent from the app's release version in `pubspec.yaml` (`version: x.y.z`), which is only checked against a `minimum_app_version` served by the backend (`lib/database/mongodb_connector.dart`) to block outdated app installs — it has no bearing on local Hive data and doesn't need to change just because a model changed.
+
 ## Encrypted credentials (RSAEncrypter)
 
 `lib/security/rsa.dart` defines `RSAEncrypter`, a singleton used to encrypt sensitive data (email, password, password-reset codes) before sending it to the backend — see its usages in `lib/database/mongodb_connector.dart`.

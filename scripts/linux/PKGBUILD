@@ -1,0 +1,39 @@
+pkgname=cuicuisine
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="A recipe book app, built with Flutter (targets Android, Linux desktop and Web)."
+arch=('x86_64')
+url="https://mycuicuisine.duckdns.org"
+license=('GPL-3.0-or-later')
+
+source=(
+    "bundle.tar.gz"
+    "cuicuisine.desktop"
+    "cuicuisine.svg"
+)
+
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'
+)
+
+package() {
+    install -dm755 "$pkgdir/usr/lib/$pkgname"
+
+    tar -xzf bundle.tar.gz
+    cp -a bundle/* "$pkgdir/usr/lib/cuicuisine/"
+
+    install -Dm755 /dev/stdin "$pkgdir/usr/bin/$pkgname" << 'EOF'
+#!/bin/sh
+exec /usr/lib/cuicuisine/cuicuisine "$@"
+EOF
+
+    install -Dm644 \
+        cuicuisine.desktop \
+        "$pkgdir/usr/share/applications/cuicuisine.desktop"
+
+    install -Dm644 \
+        cuicuisine.svg \
+        "$pkgdir/usr/share/icons/hicolor/scalable/apps/cuicuisine.svg"
+}

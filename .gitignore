@@ -1,5 +1,10 @@
 public_key.pem
 
+scripts/linux/*
+!scripts/linux/cuicuisine.desktop
+!scripts/linux/cuicuisine.svg
+!scripts/linux/PKGBUILD
+
 # See https://www.dartlang.org/guides/libraries/private-files
 
 # Files and directories created by pub
