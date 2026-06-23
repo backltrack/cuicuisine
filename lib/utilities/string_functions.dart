@@ -51,7 +51,7 @@ class EmailPasswordValidator {
   }
 
   static bool isPasswordValid(String password) {
-    return checkPasswordLength(password);// && checkPasswordContainsLowerUpper(password) && checkPasswordContainsDigit(password) && checkPasswordContainsSpecials(password);
+    return checkPasswordLength(password) && checkPasswordContainsLowerUpper(password) && checkPasswordContainsDigit(password);// && checkPasswordContainsSpecials(password);
   }
 }
 
