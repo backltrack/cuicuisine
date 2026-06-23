@@ -256,9 +256,6 @@ class HiveConnector {
     if (user != null) {
       if (name != null || email != null || favoriteRecipes != null) {
         UserUpdate userUpdate = UserUpdate(id: user.id);
-        // Use the last known server timestamp so the conflict check (server.lastUpdate > requestDate)
-        // compares equal timestamps rather than client-clock vs server-clock.
-        userUpdate.requestDate = (user.lastUpdate ?? DateTime.now()).toUtc();
         if (name != null) {
           userUpdate.name = name;
           user.name = name;

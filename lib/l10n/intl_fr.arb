@@ -32,6 +32,8 @@
   "settings": "Paramètres",
 
   "account": "Compte",
+  "account_edit_name": "Modifier le nom",
+  "account_name_label": "Nom",
 
   "time_widget_text": "Temps",
   "time_widget_preparation": "Préparation",

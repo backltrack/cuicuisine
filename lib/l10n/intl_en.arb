@@ -32,6 +32,8 @@
   "settings": "Settings",
 
   "account": "Account",
+  "account_edit_name": "Edit name",
+  "account_name_label": "Name",
 
   "time_widget_text": "Time",
   "time_widget_preparation": "Preparation",

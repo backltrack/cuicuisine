@@ -290,6 +290,26 @@ class S {
     );
   }
 
+  /// `Modifier le nom`
+  String get account_edit_name {
+    return Intl.message(
+      'Modifier le nom',
+      name: 'account_edit_name',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nom`
+  String get account_name_label {
+    return Intl.message(
+      'Nom',
+      name: 'account_name_label',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Temps`
   String get time_widget_text {
     return Intl.message(

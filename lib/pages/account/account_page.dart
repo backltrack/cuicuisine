@@ -8,6 +8,8 @@ import '../../themes/theme_mgr.dart';
 import '../../generated/l10n.dart';
 import '../../utilities/string_functions.dart';
 import '../../utilities/toast_notifier.dart';
+import '../../widgets/core_widgets/alert_dialog.dart';
+import '../../widgets/core_widgets/my_text_field.dart';
 import 'remove_account.dart';
 
 class AccountPage extends StatefulWidget {
@@ -21,6 +23,35 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   AppUser? user = DatabaseMgr().localMgr.getUser();
+
+  Future<void> _editName(BuildContext context) async {
+    final TextEditingController nameEditingController = TextEditingController(text: user!.name);
+
+    final bool? confirmed = await showAlertDialog(
+      context: context,
+      title: S.of(context).account_edit_name,
+      description: MyTextField(
+        autofocus: true,
+        textEditingController: nameEditingController,
+        label: S.of(context).account_name_label,
+        icon: FontAwesomeIcons.idCard,
+        textCapitalization: TextCapitalization.words,
+      ),
+    );
+
+    if (confirmed == null) return;
+    if (!confirmed) return;
+
+    final String newName = nameEditingController.text.trim();
+    if (newName.isEmpty || newName == user!.name) return;
+
+    await DatabaseMgr().localMgr.updateUser(name: newName);
+
+    if (!context.mounted) return;
+    setState(() {
+      user = DatabaseMgr().localMgr.getUser();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +77,12 @@ class _AccountPageState extends State<AccountPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ListTile(
-                title: Text(user!.name, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
-                trailing: IconButton(
-                  onPressed: () {},
-                  icon: const FaIcon(FontAwesomeIcons.pen)
-                )
+                title: Text(user!.email, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
               ),
               ListTile(
-                title: Text(user!.email, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+                title: Text(user!.name, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
                 trailing: IconButton(
-                  onPressed: () {},
+                  onPressed: () => _editName(context),
                   icon: const FaIcon(FontAwesomeIcons.pen)
                 )
               ),

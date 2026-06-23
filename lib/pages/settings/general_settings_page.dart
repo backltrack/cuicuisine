@@ -54,7 +54,9 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
                     itemBuilder: (context) => List<PopupMenuItem>.generate(AppThemes.themes.length, (index) => PopupMenuItem(
                       child: Text(AppThemes.themes[index], style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
                       onTap: () {
-                        ThemeMgr.setTheme(context, index);
+                        setState(() {
+                          ThemeMgr.setTheme(context, index);
+                        });
                       },
                     ))
                 )
