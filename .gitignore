@@ -1,4 +1,4 @@
-public_key.pem
+assets/keys/public_key.pem
 
 scripts/linux/*
 !scripts/linux/cuicuisine.desktop
