@@ -11,6 +11,7 @@ import '../../utilities/import_export.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import '../account/account_page.dart';
 import '../authentication/authentication_page.dart';
+import 'credits_page.dart';
 import 'synchronization_status_page.dart';
 
 class GeneralSettingsPage extends StatefulWidget {
@@ -104,25 +105,34 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
               )
           ),
 
-          const Divider(),
-          // Export
-          ListTile(
-            title: Text(S.of(context).general_settings_export, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
-            trailing: const FaIcon(FontAwesomeIcons.fileExport),
-            onTap: () async {
-              await exportAllAsJson();
-            }
-          ),
-          const Divider(),
-          // Synchronization
-          ListTile(
-            title: Text(S.of(context).general_settings_synchronization, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
-            trailing: const FaIcon(FontAwesomeIcons.arrowsRotate),
-            onTap: () {
-              Navigator.pushNamed(context, SynchronizationStatusPage.route);
-            }
-          ),
+          // const Divider(),
+          // // Export
+          // ListTile(
+          //   title: Text(S.of(context).general_settings_export, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+          //   trailing: const FaIcon(FontAwesomeIcons.fileExport),
+          //   onTap: () async {
+          //     await exportAllAsJson();
+          //   }
+          // ),
+          // const Divider(),
+          // // Synchronization
+          // ListTile(
+          //   title: Text(S.of(context).general_settings_synchronization, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+          //   trailing: const FaIcon(FontAwesomeIcons.arrowsRotate),
+          //   onTap: () {
+          //     Navigator.pushNamed(context, SynchronizationStatusPage.route);
+          //   }
+          // ),
           const Spacer(),
+          const Divider(),
+          // Credits
+          ListTile(
+            title: Text(S.of(context).general_settings_credits),
+            leading: const FaIcon(FontAwesomeIcons.circleInfo),
+            onTap: () {
+              Navigator.pushNamed(context, CreditsPage.route);
+            }
+          ),
           const Divider(),
           // remove account
           ListTile(
@@ -149,7 +159,7 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
                 Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
               }
             }
-          ),
+          )
         ],
       ),
     );

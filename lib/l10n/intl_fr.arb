@@ -74,6 +74,12 @@
   "general_settings_import": "Importer des livres",
   "general_settings_server": "Adresse serveur",
   "general_settings_synchronization": "État de la synchronisation",
+  "general_settings_credits": "Crédits",
+
+  "credits_title": "Crédits",
+  "credits_license_label": "Licence",
+  "credits_developed_by": "Développé par",
+  "credits_plugins_title": "Bibliothèques open-source utilisées",
 
   "synchronization_status_title": "État de la synchronisation",
   "synchronization_status_up_to_date": "À jour",

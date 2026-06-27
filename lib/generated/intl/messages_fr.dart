@@ -121,6 +121,13 @@ class MessageLookup extends MessageLookupByLibrary {
             "Attends d\'être en ligne pour pouvoir te connecter."),
         "connexion_needed2": MessageLookupByLibrary.simpleMessage(
             "Cette action nécessite une connexion."),
+        "credits_developed_by":
+            MessageLookupByLibrary.simpleMessage("Développé par"),
+        "credits_license_label":
+            MessageLookupByLibrary.simpleMessage("Licence"),
+        "credits_plugins_title": MessageLookupByLibrary.simpleMessage(
+            "Bibliothèques open-source utilisées"),
+        "credits_title": MessageLookupByLibrary.simpleMessage("Crédits"),
         "deeplink_recipe_not_found": MessageLookupByLibrary.simpleMessage(
             "Recette introuvable. Vérifie que tu as bien accès à ce livre."),
         "disable": MessageLookupByLibrary.simpleMessage("Désactiver"),
@@ -136,6 +143,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "filter_time": MessageLookupByLibrary.simpleMessage("Temps"),
         "general_settings_awake":
             MessageLookupByLibrary.simpleMessage("Garder l\'écran allumé"),
+        "general_settings_credits":
+            MessageLookupByLibrary.simpleMessage("Crédits"),
         "general_settings_export":
             MessageLookupByLibrary.simpleMessage("Exporter mes livres"),
         "general_settings_import":

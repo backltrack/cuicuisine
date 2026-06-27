@@ -640,6 +640,56 @@ class S {
     );
   }
 
+  /// `Crédits`
+  String get general_settings_credits {
+    return Intl.message(
+      'Crédits',
+      name: 'general_settings_credits',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Crédits`
+  String get credits_title {
+    return Intl.message(
+      'Crédits',
+      name: 'credits_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Licence`
+  String get credits_license_label {
+    return Intl.message(
+      'Licence',
+      name: 'credits_license_label',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Développé par`
+  String get credits_developed_by {
+    return Intl.message(
+      'Développé par',
+      name: 'credits_developed_by',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Bibliothèques open-source utilisées`
+  String get credits_plugins_title {
+    return Intl.message(
+      'Bibliothèques open-source utilisées',
+      name: 'credits_plugins_title',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `État de la synchronisation`
   String get synchronization_status_title {
     return Intl.message(

@@ -44,6 +44,7 @@ import 'pages/recipes/recipe_step_edition_page.dart';
 import 'pages/recipes/recipe_steps_edition_page.dart';
 import 'pages/recipes/recipe_tag_edition_page.dart';
 import 'pages/recipes/recipe_time_edition_page.dart';
+import 'pages/settings/credits_page.dart';
 import 'pages/settings/synchronization_status_page.dart';
 import 'themes/themes.dart';
 
@@ -185,6 +186,7 @@ class _CuicuisineState extends State<Cuicuisine> {
                 HomePage.route: (ctx) => HomePage(),
                 GeneralSettingsPage.route: (ctx) => const GeneralSettingsPage(),
                 SynchronizationStatusPage.route: (ctx) => const SynchronizationStatusPage(),
+                CreditsPage.route: (ctx) => const CreditsPage(),
                 AccountPage.route: (ctx) => const AccountPage(),
                 UpdatePassword.route: (ctx) => const UpdatePassword(),
                 RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),

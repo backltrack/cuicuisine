@@ -114,6 +114,13 @@ class MessageLookup extends MessageLookupByLibrary {
             "You need to be online to log in."),
         "connexion_needed2": MessageLookupByLibrary.simpleMessage(
             "This action requires to be online"),
+        "credits_developed_by":
+            MessageLookupByLibrary.simpleMessage("Developed by"),
+        "credits_license_label":
+            MessageLookupByLibrary.simpleMessage("License"),
+        "credits_plugins_title":
+            MessageLookupByLibrary.simpleMessage("Open-source packages used"),
+        "credits_title": MessageLookupByLibrary.simpleMessage("Credits"),
         "deeplink_recipe_not_found": MessageLookupByLibrary.simpleMessage(
             "Recipe not found. Make sure you have access to this book."),
         "disable": MessageLookupByLibrary.simpleMessage("Disable"),
@@ -129,6 +136,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "filter_time": MessageLookupByLibrary.simpleMessage("Time"),
         "general_settings_awake":
             MessageLookupByLibrary.simpleMessage("Keep screen awake"),
+        "general_settings_credits":
+            MessageLookupByLibrary.simpleMessage("Credits"),
         "general_settings_export":
             MessageLookupByLibrary.simpleMessage("Owned books export"),
         "general_settings_import":
