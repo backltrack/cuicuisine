@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../database/database_mgr.dart';
 import '../../generated/l10n.dart';
@@ -58,6 +60,12 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
 
     _serverTextEditingController.text = DatabaseMgr().localMgr.getServerUri() ?? "";
 
+  }
+
+  void _downloadApk() {
+    final String? serverUri = DatabaseMgr().localMgr.getServerUri();
+    if (serverUri == null) return;
+    launchUrl(Uri.parse("$serverUri/apk/download"), webOnlyWindowName: '_blank');
   }
 
   void tryOfflineConnexion() {
@@ -194,14 +202,25 @@ class _LogInPageState extends State<LogInPage> with TickerProviderStateMixin {
                       )
                     ],
                   ),
-                  IconButton(
-                    icon: const Icon(FontAwesomeIcons.gear),
-                    color: !_showSettings ? Colors.white70 : ThemeMgr.getTheme(context)!.primaryColor,
-                    onPressed: () {
-                      setState(() {
-                        _showSettings = !_showSettings;
-                      });
-                    },
+                  Row(
+                    children: [
+                      if (kIsWeb)
+                        IconButton(
+                          icon: const Icon(FontAwesomeIcons.download),
+                          color: Colors.white70,
+                          tooltip: S.of(context).auth_download_apk,
+                          onPressed: _downloadApk,
+                        ),
+                      IconButton(
+                        icon: const Icon(FontAwesomeIcons.gear),
+                        color: !_showSettings ? Colors.white70 : ThemeMgr.getTheme(context)!.primaryColor,
+                        onPressed: () {
+                          setState(() {
+                            _showSettings = !_showSettings;
+                          });
+                        },
+                      )
+                    ],
                   )
                 ],
               ),

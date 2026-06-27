@@ -85,6 +85,7 @@
   "outdated_version_banner": "Your app version is outdated. Update to continue using all features.",
   "outdated_version_download": "Download update",
   "outdated_version_login_blocked": "Please update the app to log in.",
+  "auth_download_apk": "Download the Android app",
 
   "remove_account": "Remove my account",
   "remove_button": "Remove",

@@ -83,6 +83,7 @@
   "outdated_version_banner": "Ta version de l'application est obsolète. Mets-la à jour pour continuer à utiliser toutes les fonctionnalités.",
   "outdated_version_download": "Télécharger la mise à jour",
   "outdated_version_login_blocked": "Mets l'application à jour pour te connecter.",
+  "auth_download_apk": "Télécharger l'application Android",
   "synchronization_status_failure": "État inconnu",
   "synchronization_queue": "File d'attente: ",
 

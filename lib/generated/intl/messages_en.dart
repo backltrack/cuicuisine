@@ -32,6 +32,8 @@ class MessageLookup extends MessageLookupByLibrary {
         "add_button": MessageLookupByLibrary.simpleMessage("Add"),
         "auth_code_label": MessageLookupByLibrary.simpleMessage("Code"),
         "auth_connexion": MessageLookupByLibrary.simpleMessage("Connexion"),
+        "auth_download_apk":
+            MessageLookupByLibrary.simpleMessage("Download the Android app"),
         "auth_email_label": MessageLookupByLibrary.simpleMessage("e-mail"),
         "auth_forgotten_password":
             MessageLookupByLibrary.simpleMessage("Forgotten password"),

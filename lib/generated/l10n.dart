@@ -720,6 +720,16 @@ class S {
     );
   }
 
+  /// `Télécharger l'application Android`
+  String get auth_download_apk {
+    return Intl.message(
+      'Télécharger l\'application Android',
+      name: 'auth_download_apk',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `État inconnu`
   String get synchronization_status_failure {
     return Intl.message(

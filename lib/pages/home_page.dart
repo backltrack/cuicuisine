@@ -1,6 +1,5 @@
 import 'package:cuicuisine/pages/recipes/recipe_name_page.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
-import 'package:cuicuisine/utilities/web_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
@@ -364,10 +363,10 @@ class _HomePageState extends State<HomePage> {
           extraWebButton: IconButton(
             icon: const FaIcon(FontAwesomeIcons.download),
             onPressed: () async {
-              String? apkPath = await DatabaseMgr().remoteMgr.getLatestApk();
-              if (apkPath != null) {
-                downloadFile("${DatabaseMgr().localMgr.getServerUri()!}$apkPath");
-              }
+              final serverUri = DatabaseMgr().localMgr.getServerUri();
+              if (serverUri == null) return;
+              final url = "$serverUri/apk/download";
+              launchUrl(Uri.parse(url), webOnlyWindowName: '_blank');
             },
           )
         ),
@@ -408,7 +407,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Stack(children: [
                       Positioned.fill(child: _buildMainContent(context, isWide: true, isUltraWide: isUltraWide)),
-                      if (selectedBook != null && userAccess != AccessLevel.read && DatabaseMgr().isCompatible)
+                      if (selectedBook != null && userAccess != AccessLevel.read && DatabaseMgr().isCompatible && isUltraWide)
                         Positioned(
                           bottom: 16, right: 16,
                           child: FloatingActionButton(
@@ -504,11 +503,7 @@ class _HomePageState extends State<HomePage> {
                   final serverUri = DatabaseMgr().localMgr.getServerUri();
                   if (serverUri == null) return;
                   final url = "$serverUri/apk/download";
-                  if (kIsWeb) {
-                    downloadFile(url);
-                  } else {
-                    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                  }
+                  launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication, webOnlyWindowName: '_blank');
                 },
                 icon: const FaIcon(FontAwesomeIcons.download, size: 14),
               ),
