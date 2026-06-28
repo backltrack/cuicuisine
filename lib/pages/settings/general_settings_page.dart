@@ -7,12 +7,10 @@ import '../../l10n/locale_mgr.dart';
 import '../../themes/theme_mgr.dart';
 import '../../generated/l10n.dart';
 import '../../themes/themes.dart';
-import '../../utilities/import_export.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 import '../account/account_page.dart';
 import '../authentication/authentication_page.dart';
 import 'credits_page.dart';
-import 'synchronization_status_page.dart';
 
 class GeneralSettingsPage extends StatefulWidget {
   static const String route = "/settings";

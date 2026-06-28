@@ -97,8 +97,10 @@ class Operation extends HiveObject {
   OperationType type;
   @HiveField(2)
   DatabaseObject object;
+  @HiveField(3)
+  String? targetBookId;
 
-  Operation({required this.type, required this.object, required this.id});
+  Operation({required this.type, required this.object, required this.id, this.targetBookId});
 }
 
 

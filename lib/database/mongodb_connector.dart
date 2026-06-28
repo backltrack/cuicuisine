@@ -19,6 +19,16 @@ import '../models/data_model.dart';
 
 final _log = Logger('MongoConnector');
 
+// The server's date strings carry no timezone designator, so DateTime.parse()
+// tags them isUtc=false ("local") even though the value is a UTC instant.
+// That's harmless until the value is serialized again: toIso8601String()
+// then omits the trailing 'Z', and the server fails to parse it as
+// timezone-aware. Re-tag with the same wall-clock fields (no shift, since the
+// numbers already represent UTC) before resending anything read back locally.
+DateTime _asUtc(DateTime dt) => dt.isUtc
+    ? dt
+    : DateTime.utc(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.millisecond, dt.microsecond);
+
 class MongoConnector {
   String server = '';
   oauth2.Client? client;
@@ -630,6 +640,15 @@ class MongoConnector {
   }
 
   Future<OperationResult> updateUser(UserUpdate userUpdate) async {
+    // Rebase requestDate on the locally known lastUpdate right before sending,
+    // rather than trusting the timestamp frozen when the update was queued:
+    // a still-pending create for the same object (or any operation ahead of
+    // this one in the queue) may only resolve and bump lastUpdate after this
+    // update was originally built, which would otherwise make a same-client
+    // write look like a server-side conflict.
+    DateTime? lastUpdate = DatabaseMgr().localMgr.getUser()?.lastUpdate;
+    if (lastUpdate != null) userUpdate.requestDate = _asUtc(lastUpdate);
+
     final response = await _securePostJsonRequest('/users/me/update', userUpdate.toJson());
 
     if (response != null && response.statusCode == 200) {
@@ -716,6 +735,11 @@ class MongoConnector {
   }
 
   Future<OperationResult> updateBook(BookUpdate bookUpdate) async {
+    // See updateUser() above: rebase requestDate on the locally known
+    // lastUpdate right before sending, not the timestamp frozen at queue time.
+    DateTime? lastUpdate = DatabaseMgr().localMgr.getBook(bookUpdate.id)?.lastUpdate;
+    if (lastUpdate != null) bookUpdate.requestDate = _asUtc(lastUpdate);
+
     final response = await _securePostJsonRequest('/books/update', bookUpdate.toJson());
 
     if (response != null && response.statusCode == 200) {
@@ -858,8 +882,8 @@ class MongoConnector {
     } 
   }
 
-  Future<OperationResult> createRecipe(Recipe recipe) async {
-    String bookId = DatabaseMgr().localMgr.getCurrentBookId()!;
+  Future<OperationResult> createRecipe(Recipe recipe, {String? bookId}) async {
+    bookId ??= DatabaseMgr().localMgr.getCurrentBookId()!;
 
     final response = await _securePutRequest('/recipes/create', {
       'id': recipe.id,
@@ -915,6 +939,11 @@ class MongoConnector {
   }
 
   Future<OperationResult> updateRecipe(RecipeUpdate recipeUpdate) async {
+    // See updateUser() above: rebase requestDate on the locally known
+    // lastUpdate right before sending, not the timestamp frozen at queue time.
+    DateTime? lastUpdate = DatabaseMgr().localMgr.getRecipe(recipeUpdate.id)?.lastUpdate;
+    if (lastUpdate != null) recipeUpdate.requestDate = _asUtc(lastUpdate);
+
     final response = await _securePostJsonRequest('/recipes/update', recipeUpdate.toJson());
 
     if (response != null && response.statusCode == 200) {

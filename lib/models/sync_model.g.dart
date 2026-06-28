@@ -20,19 +20,22 @@ class OperationAdapter extends TypeAdapter<Operation> {
       type: fields[1] as OperationType,
       object: fields[2] as DatabaseObject,
       id: fields[0] as String,
+      targetBookId: fields[3] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Operation obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.type)
       ..writeByte(2)
-      ..write(obj.object);
+      ..write(obj.object)
+      ..writeByte(3)
+      ..write(obj.targetBookId);
   }
 
   @override

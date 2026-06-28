@@ -39,10 +39,12 @@ class HiveConnector {
   Future<void> initialize() async {
     if (!kIsWeb) {
       if (Platform.isLinux) {
-        Hive.init('${Platform.environment['HOME']}/.local/share/com.example.cuicuisine/hive');
-      }
-      else {
-        final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
+        Hive.init(
+          '${Platform.environment['HOME']}/.local/share/com.example.cuicuisine/hive',
+        );
+      } else {
+        final appDocumentDir = await path_provider
+            .getApplicationDocumentsDirectory();
         Hive.init(appDocumentDir.path);
       }
     }
@@ -96,7 +98,6 @@ class HiveConnector {
       await _queueBox.add(OperationQueue());
     }
   }
-
 
   // SETTINGS
   Future<void> saveTheme(int id) async {
@@ -171,7 +172,8 @@ class HiveConnector {
     return null;
   }
 
-  int loadSchemaVersion() => _settingBox.get('schemaVersion', defaultValue: 0) as int;
+  int loadSchemaVersion() =>
+      _settingBox.get('schemaVersion', defaultValue: 0) as int;
   Future<void> saveSchemaVersion(int v) => _settingBox.put('schemaVersion', v);
 
   Future<void> saveBookSharingAgreement(bool isValid) async {
@@ -191,7 +193,7 @@ class HiveConnector {
   Future<void> saveServerUri(String uri) async {
     try {
       await _serverBox.put('uri', uri);
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
@@ -207,7 +209,7 @@ class HiveConnector {
   Future<void> saveCredentials(String cred) async {
     try {
       await _serverBox.put('credentials', cred);
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
@@ -224,13 +226,13 @@ class HiveConnector {
     await _serverBox.delete('credentials');
     await _userBox.clear();
   }
-  
+
   // USER //
   Future<void> setUser(AppUser appUser) async {
     try {
       await _userBox.clear();
       await _userBox.add(appUser);
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
@@ -243,14 +245,19 @@ class HiveConnector {
           return appUser;
         }
       }
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
 
     return null;
   }
 
-  Future<void> updateUser({String? name, String? email, List<String>? favoriteRecipes, bool addToQueue=true}) async {
+  Future<void> updateUser({
+    String? name,
+    String? email,
+    List<String>? favoriteRecipes,
+    bool addToQueue = true,
+  }) async {
     AppUser? user = getUser();
 
     if (user != null) {
@@ -298,7 +305,7 @@ class HiveConnector {
     AppUser? user = getUser();
 
     if (user != null) {
-      user.lastUpdate = lastUpdate; 
+      user.lastUpdate = lastUpdate;
       await user.save();
     }
   }
@@ -310,8 +317,7 @@ class HiveConnector {
         List<String> list = [...user.favoriteRecipes];
         list.remove(recipeId);
         await updateUser(favoriteRecipes: list);
-      }
-      else {
+      } else {
         await updateUser(favoriteRecipes: [...user.favoriteRecipes, recipeId]);
       }
     }
@@ -323,7 +329,8 @@ class HiveConnector {
     if (userId == null) return null;
     try {
       return _bookBox.values.firstWhere(
-        (book) => book.users.contains(userId) && book.recipeIds.contains(recipeId),
+        (book) =>
+            book.users.contains(userId) && book.recipeIds.contains(recipeId),
       );
     } catch (_) {
       return null;
@@ -345,24 +352,23 @@ class HiveConnector {
       try {
         final List<Book> userBooks = [];
         for (var book in _bookBox.values) {
-            if (book.users.contains(userId)) {
-              if (getWritableOnly) {
-                if (book.access[userId] != null && book.access[userId]!.index >= AccessLevel.write.index) {
-                  userBooks.add(book);
-                }
-              }
-              else {
+          if (book.users.contains(userId)) {
+            if (getWritableOnly) {
+              if (book.access[userId] != null &&
+                  book.access[userId]!.index >= AccessLevel.write.index) {
                 userBooks.add(book);
               }
+            } else {
+              userBooks.add(book);
             }
+          }
         }
 
         return userBooks;
-      } on Exception catch(e) {
+      } on Exception catch (e) {
         throw Exception(e);
       }
-    }
-    else {
+    } else {
       _log.info('Disconnected');
       return [];
     }
@@ -374,7 +380,8 @@ class HiveConnector {
 
     final effectiveLocale = defaultTags.containsKey(locale) ? locale : 'en';
     final List<Tag> initialTags = List<Tag>.from(defaultTags[effectiveLocale]!);
-    final List<BookIngredient> initialBookIngredients = List<BookIngredient>.from(defaultIngredients[effectiveLocale]!);
+    final List<BookIngredient> initialBookIngredients =
+        List<BookIngredient>.from(defaultIngredients[effectiveLocale]!);
 
     Book book = Book(
       id: ObjectId().hexString,
@@ -389,7 +396,7 @@ class HiveConnector {
     return book.id;
   }
 
-  Future<void> addBook(Book book, {bool addToQueue=true}) async {
+  Future<void> addBook(Book book, {bool addToQueue = true}) async {
     try {
       await _bookBox.add(book);
       await saveCurrentBookId(book.id);
@@ -397,16 +404,20 @@ class HiveConnector {
       if (addToQueue) {
         addQueueOperation(type: OperationType.create, object: book);
       }
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
 
-  Future<void> updateBook(String id, BookUpdate bookUpdate, {bool addToQueue=true}) async {
+  Future<void> updateBook(
+    String id,
+    BookUpdate bookUpdate, {
+    bool addToQueue = true,
+  }) async {
     Book book = _bookBox.values.firstWhere((book) => book.id == id);
 
     book.copyFromUpdate(bookUpdate);
-    
+
     await book.save();
 
     if (addToQueue) {
@@ -458,11 +469,13 @@ class HiveConnector {
 
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
-      Book? currentBook = DatabaseMgr().localMgr.getCurrentBookId() != null ? getBook(DatabaseMgr().localMgr.getCurrentBookId()!) : null;
+      Book? currentBook = DatabaseMgr().localMgr.getCurrentBookId() != null
+          ? getBook(DatabaseMgr().localMgr.getCurrentBookId()!)
+          : null;
       if (currentBook != null && currentBook.recipeIds.contains(recipeId)) {
         for (Tag tag in currentBook.tags) {
           if (recipe.tags.contains(tag.id)) {
-             tags.add(tag);
+            tags.add(tag);
           }
         }
       }
@@ -474,7 +487,7 @@ class HiveConnector {
   Future<void> clearBooks() async {
     try {
       await _bookBox.clear();
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
@@ -518,7 +531,7 @@ class HiveConnector {
     if (data.keys.contains('lastUpdate')) {
       book.lastUpdate = DateTime.parse(data['lastUpdate']);
     }
-    
+
     await book.save();
   }
 
@@ -529,34 +542,36 @@ class HiveConnector {
         BookUpdate(
           id: book.id,
           users: List.from(book.users)..remove(userId),
-          access: Map.from(book.access)..removeWhere((key, value) => key == userId)
-        )
+          access: Map.from(book.access)
+            ..removeWhere((key, value) => key == userId),
+        ),
       );
       return true;
-    } 
-    
+    }
+
     return false;
   }
 
-  Future<bool> updateUserAccess(Book book, String userId, AccessLevel value) async {
+  Future<bool> updateUserAccess(
+    Book book,
+    String userId,
+    AccessLevel value,
+  ) async {
     if (book.access[DatabaseMgr().localMgr.getUserId()] == AccessLevel.own) {
       Map<String, AccessLevel> newAccess = Map.from(book.access);
       newAccess[userId] = value;
 
       await DatabaseMgr().localMgr.updateBook(
         book.id,
-        BookUpdate(
-          id: book.id,
-          access: newAccess
-        )
+        BookUpdate(id: book.id, access: newAccess),
       );
       return true;
-    } 
-    
+    }
+
     return false;
   }
 
-  Future<void> deleteBook(String id, {bool addToQueue=true}) async {
+  Future<void> deleteBook(String id, {bool addToQueue = true}) async {
     try {
       Book book = _bookBox.values.firstWhere((book) => book.id == id);
       Book bookCopy = Book.fromBookCopy(book);
@@ -569,19 +584,37 @@ class HiveConnector {
       for (String recipeId in bookCopy.recipeIds) {
         await deleteRecipe(recipeId);
       }
-
     } on StateError {
       _log.warning("book not found");
       return;
     }
   }
 
-  Future<BookIngredient> addBookIngredient(String bookId, String name, String unit, double density) async {
+  Future<BookIngredient> addBookIngredient(
+    String bookId,
+    String name,
+    String unit,
+    double density,
+  ) async {
     try {
-      BookIngredient bookIngredient = BookIngredient(id: ObjectId().hexString, name: name, unit: unit, density: density);
-      await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: [...getBook(bookId)!.bookIngredients, bookIngredient]));
+      BookIngredient bookIngredient = BookIngredient(
+        id: ObjectId().hexString,
+        name: name,
+        unit: unit,
+        density: density,
+      );
+      await updateBook(
+        bookId,
+        BookUpdate(
+          id: bookId,
+          bookIngredients: [
+            ...getBook(bookId)!.bookIngredients,
+            bookIngredient,
+          ],
+        ),
+      );
       return bookIngredient;
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
@@ -600,7 +633,10 @@ class HiveConnector {
     return null;
   }
 
-  Future<bool> deleteBookIngredient(String bookId, String bookIngredientId) async {
+  Future<bool> deleteBookIngredient(
+    String bookId,
+    String bookIngredientId,
+  ) async {
     try {
       Book? book = getBook(bookId);
       BookIngredient? bookIngredient = getBookIngredient(bookIngredientId);
@@ -609,17 +645,28 @@ class HiveConnector {
           _log.warning("ingredient in use, skipping delete");
           return false;
         }
-        List<BookIngredient> updatedIngredients = List.from(book.bookIngredients)..removeWhere((ingredient) => ingredient.id == bookIngredientId);
-        await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: updatedIngredients));
+        List<BookIngredient> updatedIngredients = List.from(
+          book.bookIngredients,
+        )..removeWhere((ingredient) => ingredient.id == bookIngredientId);
+        await updateBook(
+          bookId,
+          BookUpdate(id: bookId, bookIngredients: updatedIngredients),
+        );
         return true;
       }
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
     return false;
   }
 
-  Future<void> updateBookIngredient(String bookId, String bookIngredientId, {String? name, String? unit, double? density}) async {
+  Future<void> updateBookIngredient(
+    String bookId,
+    String bookIngredientId, {
+    String? name,
+    String? unit,
+    double? density,
+  }) async {
     try {
       Book? book = getBook(bookId);
       BookIngredient? bookIngredient = getBookIngredient(bookIngredientId);
@@ -628,17 +675,25 @@ class HiveConnector {
           id: bookIngredient.id,
           name: name ?? bookIngredient.name,
           unit: unit ?? bookIngredient.unit,
-          density: density ?? bookIngredient.density
+          density: density ?? bookIngredient.density,
         );
-        List<BookIngredient> updatedIngredients = List.from(book.bookIngredients)..removeWhere((ingredient) => ingredient.id == bookIngredientId)..add(updatedBookIngredient);
-        await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: updatedIngredients));
+        List<BookIngredient> updatedIngredients =
+            List.from(book.bookIngredients)
+              ..removeWhere((ingredient) => ingredient.id == bookIngredientId)
+              ..add(updatedBookIngredient);
+        await updateBook(
+          bookId,
+          BookUpdate(id: bookId, bookIngredients: updatedIngredients),
+        );
       }
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
 
-  List<Ingredient> getIngredientsRelatedToBookIngredient(BookIngredient bookIngredient) {
+  List<Ingredient> getIngredientsRelatedToBookIngredient(
+    BookIngredient bookIngredient,
+  ) {
     List<Ingredient> ingredients = [];
     for (Recipe recipe in getAllRecipes()) {
       for (Ingredient ingredient in recipe.recipeIngredients) {
@@ -650,7 +705,6 @@ class HiveConnector {
     return ingredients;
   }
 
-
   int countRecipesUsingTag(String tagId) {
     return getAllRecipes().where((r) => r.tags.contains(tagId)).length;
   }
@@ -658,22 +712,35 @@ class HiveConnector {
   Future<void> deleteBookTag(String bookId, String tagId) async {
     Book? book = getBook(bookId);
     if (book == null) return;
-    final updatedTags = List<Tag>.from(book.tags)..removeWhere((t) => t.id == tagId);
+    final updatedTags = List<Tag>.from(book.tags)
+      ..removeWhere((t) => t.id == tagId);
     await updateBook(bookId, BookUpdate(id: bookId, tags: updatedTags));
     for (final recipe in getAllRecipes()) {
       if (recipe.tags.contains(tagId)) {
         final updatedRecipeTags = List<String>.from(recipe.tags)..remove(tagId);
-        await updateRecipe(recipe.id, RecipeUpdate(id: recipe.id, tags: updatedRecipeTags));
+        await updateRecipe(
+          recipe.id,
+          RecipeUpdate(id: recipe.id, tags: updatedRecipeTags),
+        );
       }
     }
   }
 
-  Future<void> updateBookTag(String bookId, String tagId, {String? name, String? category}) async {
+  Future<void> updateBookTag(
+    String bookId,
+    String tagId, {
+    String? name,
+    String? category,
+  }) async {
     Book? book = getBook(bookId);
     if (book == null) return;
     final updatedTags = book.tags.map((t) {
       if (t.id != tagId) return t;
-      return Tag(id: t.id, name: name ?? t.name, category: category ?? t.category);
+      return Tag(
+        id: t.id,
+        name: name ?? t.name,
+        category: category ?? t.category,
+      );
     }).toList();
     await updateBook(bookId, BookUpdate(id: bookId, tags: updatedTags));
   }
@@ -681,10 +748,11 @@ class HiveConnector {
   // RECIPE //
   Recipe? getRecipe(String recipeId) {
     try {
-      Recipe? recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == recipeId);
+      Recipe? recipe = _recipeBox.values.firstWhere(
+        (recipe) => recipe.id == recipeId,
+      );
       return recipe;
-    }
-    on StateError {
+    } on StateError {
       return null;
     }
   }
@@ -717,36 +785,56 @@ class HiveConnector {
     return recipes;
   }
 
-  Future<void> addRecipe(Recipe recipe, {bool addToQueue=true}) async {
+  Future<void> addRecipe(Recipe recipe, {bool addToQueue = true, String? bookId}) async {
     try {
       await _recipeBox.add(recipe);
 
       if (addToQueue) {
-        addQueueOperation(type: OperationType.create, object: recipe);
-      }
-      else {
+        addQueueOperation(type: OperationType.create, object: recipe, targetBookId: bookId);
+      } else {
         // if not, the recipe is fetched from more recent: not dirty
         recipe.isDirty = false;
         await recipe.save();
       }
-    } on Exception catch(e) {
+    } on Exception catch (e) {
       throw Exception(e);
     }
   }
 
-  Future<String> addNewRecipe({String name="", required String bookId}) async {
-    Recipe recipe = Recipe(id: ObjectId().hexString, name: name, preparationTime: 0, cookingTime: 0, waitingTime: 0, tags: [], quantity: 2, recipeIngredients: [], steps: [], creationDate: DateTime.now().toUtc());
-    await addRecipe(recipe);
+  Future<String> addNewRecipe({
+    String name = "",
+    required String bookId,
+  }) async {
+    Recipe recipe = Recipe(
+      id: ObjectId().hexString,
+      name: name,
+      preparationTime: 0,
+      cookingTime: 0,
+      waitingTime: 0,
+      tags: [],
+      quantity: 2,
+      recipeIngredients: [],
+      steps: [],
+      creationDate: DateTime.now().toUtc(),
+    );
+    await addRecipe(recipe, bookId: bookId);
 
     Book? book = getBook(bookId);
     if (book != null) {
-      await updateBook(bookId, BookUpdate(id: bookId, recipeIds: [...book.recipeIds, recipe.id]), addToQueue: false);
+      await updateBook(
+        bookId,
+        BookUpdate(id: bookId, recipeIds: [...book.recipeIds, recipe.id]),
+      );
     }
 
     return recipe.id;
   }
 
-  Future<void> updateRecipe(String id, RecipeUpdate recipeUpdate, {bool addToQueue=true}) async {
+  Future<void> updateRecipe(
+    String id,
+    RecipeUpdate recipeUpdate, {
+    bool addToQueue = true,
+  }) async {
     try {
       Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
       recipe.copyFromUpdate(recipeUpdate);
@@ -764,7 +852,9 @@ class HiveConnector {
   }
 
   Future<void> updateRecipeFromDict(Map<String, dynamic> data) async {
-    Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == data['id']);
+    Recipe recipe = _recipeBox.values.firstWhere(
+      (recipe) => recipe.id == data['id'],
+    );
     if (data.keys.contains('name')) {
       recipe.name = data['name'];
     }
@@ -798,7 +888,7 @@ class HiveConnector {
     if (data.keys.contains('lastUpdate')) {
       recipe.lastUpdate = DateTime.parse(data['lastUpdate']);
     }
-    
+
     await recipe.save();
   }
 
@@ -816,23 +906,81 @@ class HiveConnector {
     await recipe.save();
   }
 
+  // Recipe.tags holds tag ids scoped to the book that owns the recipe (each
+  // book has its own independent Tag list/ids, even for same-named defaults).
+  // Duplicating into another book must remap each tag to its by-name
+  // equivalent there, creating it if missing — same dedup-by-name convention
+  // used when a user adds a new tag from the recipe tag editor.
+  Future<List<String>> _remapTagsToBook(List<String> tagIds, String sourceBookId, String destinationBookId) async {
+    if (tagIds.isEmpty || sourceBookId == destinationBookId) return tagIds;
+
+    Book? sourceBook = getBook(sourceBookId);
+    Book? destinationBook = getBook(destinationBookId);
+    if (sourceBook == null || destinationBook == null) return [];
+
+    List<Tag> destinationTags = List<Tag>.from(destinationBook.tags);
+    List<String> mappedIds = [];
+
+    for (String tagId in tagIds) {
+      Tag? sourceTag;
+      try {
+        sourceTag = sourceBook.tags.firstWhere((tag) => tag.id == tagId);
+      } catch (_) {
+        continue;
+      }
+
+      Tag? matchingTag;
+      try {
+        matchingTag = destinationTags.firstWhere((tag) => tag.name == sourceTag!.name);
+      } catch (_) {
+        matchingTag = null;
+      }
+
+      if (matchingTag == null) {
+        matchingTag = Tag.newTag(sourceTag.name, sourceTag.category);
+        destinationTags.add(matchingTag);
+      }
+      mappedIds.add(matchingTag.id);
+    }
+
+    if (destinationTags.length != destinationBook.tags.length) {
+      await updateBook(destinationBookId, BookUpdate(id: destinationBookId, tags: destinationTags));
+    }
+
+    return mappedIds;
+  }
+
   Future<void> duplicateRecipe(Recipe recipe, String destinationBookId) async {
     AccessLevel? accessLevel = getUserAccess(destinationBookId);
     if (accessLevel == null || accessLevel.index == AccessLevel.read.index) {
       _log.warning("access denied for book");
       return;
     }
-    String newRecipeId = await addNewRecipe(name: recipe.name, bookId: destinationBookId);
-    
+
+    Book? sourceBook = findBookForRecipe(recipe.id);
+    List<String> mappedTags = sourceBook != null
+        ? await _remapTagsToBook(recipe.tags, sourceBook.id, destinationBookId)
+        : <String>[];
+
+    String newRecipeId = await addNewRecipe(
+      name: recipe.name,
+      bookId: destinationBookId,
+    );
+
     List<String> duplicatedImages = [];
     for (String imageId in recipe.pictures) {
-      String? newImageId = await duplicateImage(recipe.id, imageId, newRecipeId);
+      String? newImageId = await duplicateImage(
+        recipe.id,
+        imageId,
+        newRecipeId,
+      );
       if (newImageId != null) {
         duplicatedImages.add(newImageId);
       }
     }
-    
-    await updateRecipe(newRecipeId, 
+
+    await updateRecipe(
+      newRecipeId,
       RecipeUpdate(
         id: newRecipeId,
         name: recipe.name,
@@ -844,13 +992,13 @@ class HiveConnector {
         quantityType: recipe.quantityType,
         recipeIngredients: recipe.recipeIngredients,
         steps: recipe.steps,
-        tags: recipe.tags,
-        comments: recipe.comments
-      )
+        tags: mappedTags,
+        comments: recipe.comments,
+      ),
     );
   }
 
-  Future<void> deleteRecipe(String id, {bool addToQueue=true}) async {
+  Future<void> deleteRecipe(String id, {bool addToQueue = true}) async {
     try {
       Recipe recipe = _recipeBox.values.firstWhere((recipe) => recipe.id == id);
       Recipe recipeCopy = Recipe.fromRecipeCopy(recipe);
@@ -859,7 +1007,6 @@ class HiveConnector {
       if (addToQueue) {
         addQueueOperation(type: OperationType.delete, object: recipeCopy);
       }
-
     } on StateError {
       _log.warning("recipe not found");
       return;
@@ -870,15 +1017,29 @@ class HiveConnector {
     await _recipeBox.clear();
   }
 
-  Future<List<String>> saveRecipeImages(List<XFile> images, String recipeId) async {
+  Future<List<String>> saveRecipeImages(
+    List<XFile> images,
+    String recipeId,
+  ) async {
     List<String> newPictures = [];
     for (XFile image in images) {
       final String newImageId = ObjectId().hexString;
-      String? newPath = await fileStorage.writeImage(image: image, recipeId: recipeId, imageId: newImageId);
+      String? newPath = await fileStorage.writeImage(
+        image: image,
+        recipeId: recipeId,
+        imageId: newImageId,
+      );
       if (newPath != null) {
         newPictures.add(newImageId);
 
-        addQueueOperation(type: OperationType.create, object: RecipeImage(path: newPath, recipeId: recipeId, imageId: newImageId));
+        addQueueOperation(
+          type: OperationType.create,
+          object: RecipeImage(
+            path: newPath,
+            recipeId: recipeId,
+            imageId: newImageId,
+          ),
+        );
       }
     }
     return newPictures;
@@ -888,9 +1049,19 @@ class HiveConnector {
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
       if (recipe.pictures.contains(imageId)) {
-        bool result = await fileStorage.deleteImage(recipeId: recipeId, imageId: imageId);
+        bool result = await fileStorage.deleteImage(
+          recipeId: recipeId,
+          imageId: imageId,
+        );
         if (result) {
-          addQueueOperation(type: OperationType.delete, object: RecipeImage(path: fileStorage.idToPath(recipeId: recipeId, imageId: imageId), recipeId: recipeId, imageId: imageId));
+          addQueueOperation(
+            type: OperationType.delete,
+            object: RecipeImage(
+              path: fileStorage.idToPath(recipeId: recipeId, imageId: imageId),
+              recipeId: recipeId,
+              imageId: imageId,
+            ),
+          );
         }
         return true;
       }
@@ -898,7 +1069,39 @@ class HiveConnector {
     return false;
   }
 
-  Future<String?> duplicateImage(String recipeId, String imageId, String newRecipeId) async {
+  // Writes the file to local storage only — no queue operation, no change to
+  // Recipe.pictures — so the image edition page can preview a picked image
+  // (via the same recipeId/imageId lookup PictureListTile already uses)
+  // without committing or syncing it until the user explicitly saves.
+  Future<String?> stageRecipeImage(XFile image, String recipeId) async {
+    final String imageId = ObjectId().hexString;
+    String? path = await fileStorage.writeImage(image: image, recipeId: recipeId, imageId: imageId);
+    return path != null ? imageId : null;
+  }
+
+  // Deletes a staged image file that was never committed (queued/synced),
+  // e.g. because the user removed it again or backed out of the edition page.
+  Future<void> discardStagedImage(String recipeId, String imageId) async {
+    await fileStorage.deleteImage(recipeId: recipeId, imageId: imageId);
+  }
+
+  // Queues the create operation for an already-staged (already-written) image.
+  Future<void> commitStagedImage(String recipeId, String imageId) async {
+    addQueueOperation(
+      type: OperationType.create,
+      object: RecipeImage(
+        path: fileStorage.idToPath(recipeId: recipeId, imageId: imageId),
+        recipeId: recipeId,
+        imageId: imageId,
+      ),
+    );
+  }
+
+  Future<String?> duplicateImage(
+    String recipeId,
+    String imageId,
+    String newRecipeId,
+  ) async {
     String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
     XFile file = XFile(path);
 
@@ -911,21 +1114,21 @@ class HiveConnector {
     Recipe? recipe = getRecipe(recipeId);
     if (recipe != null) {
       List<String> newPictures = await saveRecipeImages(images, recipeId);
-      
+
       if (newPictures.isNotEmpty) {
         updateRecipe(
           recipeId,
           RecipeUpdate(
             id: recipeId,
-            pictures: [...recipe.pictures] + newPictures
-          )
+            pictures: [...recipe.pictures] + newPictures,
+          ),
         );
       }
     }
   }
 
   Future<void> removePictureFromStorage(String recipeId, String imageId) async {
-    bool result  = await removeRecipeImage(recipeId, imageId);
+    bool result = await removeRecipeImage(recipeId, imageId);
     if (result) {
       Recipe? recipe = getRecipe(recipeId);
       if (recipe != null) {
@@ -934,17 +1137,17 @@ class HiveConnector {
         _log.fine("pictures after removal: ${recipe.pictures}");
         updateRecipe(
           recipeId,
-          RecipeUpdate(
-            id: recipeId,
-            pictures: recipe.pictures
-          )
+          RecipeUpdate(id: recipeId, pictures: recipe.pictures),
         );
       }
     }
   }
 
   Future<Image> getRecipeImage(String recipeId, imageId) async {
-    Image? image = await fileStorage.readImage(recipeId: recipeId, imageId: imageId);
+    Image? image = await fileStorage.readImage(
+      recipeId: recipeId,
+      imageId: imageId,
+    );
     if (image != null) {
       return image;
     }
@@ -976,29 +1179,43 @@ class HiveConnector {
 
   Future<void> cleanExtraImages(Recipe recipe) async {
     _log.fine("cleaning extra images for ${recipe.id}");
-    List<String> allRecipeImages = await fileStorage.getAllRecipeImages(recipe.id);
+    List<String> allRecipeImages = await fileStorage.getAllRecipeImages(
+      recipe.id,
+    );
     _log.fine("all recipe images: $allRecipeImages");
     for (String path in allRecipeImages) {
       Map<String, String>? ids = fileStorage.pathToId(path);
       _log.fine("IDs from path: $ids");
       if (ids != null && ids.containsKey('imageId')) {
         if (!recipe.pictures.contains(ids['imageId'])) {
-          _log.fine("deleting image ${ids['imageId']} from recipe ${recipe.id}");
-          await fileStorage.deleteImage(recipeId: recipe.id, imageId: ids['imageId']!);
+          _log.fine(
+            "deleting image ${ids['imageId']} from recipe ${recipe.id}",
+          );
+          await fileStorage.deleteImage(
+            recipeId: recipe.id,
+            imageId: ids['imageId']!,
+          );
         }
       }
     }
   }
 
   // WEB IMAGES //
-  Future<String?> writeWebImage({required XFile image, required String recipeId, required String imageId}) async {
+  Future<String?> writeWebImage({
+    required XFile image,
+    required String recipeId,
+    required String imageId,
+  }) async {
     String imageString = await image.readAsString();
     String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
     await _webImagesBox.put(path, imageString);
     return path;
   }
 
-  Future<Image?> readWebImage({required String recipeId, required String imageId}) async {
+  Future<Image?> readWebImage({
+    required String recipeId,
+    required String imageId,
+  }) async {
     String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
     if (_webImagesBox.containsKey(path)) {
       Uint8List bytes = base64.decode(_webImagesBox.get(path));
@@ -1007,10 +1224,14 @@ class HiveConnector {
     return null;
   }
 
-  Future<String?> writeWebImagefromBytes({required List<int> bytes, required String recipeId, required String imageId}) async {
+  Future<String?> writeWebImagefromBytes({
+    required List<int> bytes,
+    required String recipeId,
+    required String imageId,
+  }) async {
     String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
     String imageString = base64.encode(bytes);
-    
+
     await _webImagesBox.put(path, imageString);
     return path;
   }
@@ -1020,7 +1241,10 @@ class HiveConnector {
     return _webImagesBox.containsKey(path);
   }
 
-  Future<bool> deleteWebImage({required String recipeId, required String imageId}) async {
+  Future<bool> deleteWebImage({
+    required String recipeId,
+    required String imageId,
+  }) async {
     String path = fileStorage.idToPath(recipeId: recipeId, imageId: imageId);
     if (_webImagesBox.containsKey(path)) {
       await _webImagesBox.delete(path);
@@ -1050,10 +1274,20 @@ class HiveConnector {
     return null;
   }
 
-  Future<void> addQueueOperation({required OperationType type, required DatabaseObject object, bool pushAfter=true}) async {
+  Future<void> addQueueOperation({
+    required OperationType type,
+    required DatabaseObject object,
+    bool pushAfter = true,
+    String? targetBookId,
+  }) async {
     OperationQueue queue = _queueBox.getAt(0)!;
 
-    Operation ope = Operation(id: ObjectId().hexString, type: type, object: object);
+    Operation ope = Operation(
+      id: ObjectId().hexString,
+      type: type,
+      object: object,
+      targetBookId: targetBookId,
+    );
     await _queueOperationBox.add(ope);
 
     queue.addOperation(ope.id);
@@ -1108,7 +1342,7 @@ class HiveConnector {
     int lastIndex = _changeBox.length - 1;
     if (lastIndex >= 0) {
       String? lastChange = _changeBox.getAt(lastIndex);
-      if (lastChange != null){
+      if (lastChange != null) {
         return lastChange;
       }
     }

@@ -30,8 +30,10 @@ class _BookNamePageState extends State<BookNamePage> {
   @override
   Widget build(BuildContext context) {
     // load params
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final bool isBookCreation = routeArgs['isBookCreation']!; // false means rename book
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final bool isBookCreation =
+        routeArgs['isBookCreation']!; // false means rename book
     String bookId = "";
     String currentName = "";
     if (!isBookCreation) {
@@ -47,7 +49,10 @@ class _BookNamePageState extends State<BookNamePage> {
     void submit() async {
       if (_controller.text != "" && _controller.text != currentName) {
         if (isBookCreation) {
-          String? newBookId = await DatabaseMgr().localMgr.addNewBook(_controller.text, LocaleMgr.getLocale(context));
+          String? newBookId = await DatabaseMgr().localMgr.addNewBook(
+            _controller.text,
+            LocaleMgr.getLocale(context),
+          );
           if (newBookId != null) {
             Book? newBook = DatabaseMgr().localMgr.getBook(newBookId);
             Navigator.pop(context, newBook);
@@ -55,10 +60,7 @@ class _BookNamePageState extends State<BookNamePage> {
         } else {
           DatabaseMgr().localMgr.updateBook(
             bookId,
-            BookUpdate(
-              id: bookId,
-              name: _controller.text
-            )
+            BookUpdate(id: bookId, name: _controller.text),
           );
           Navigator.pop(context, "update");
         }
@@ -69,7 +71,11 @@ class _BookNamePageState extends State<BookNamePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isBookCreation ? S.of(context).book_creation_title : S.of(context).book_rename_title),
+        title: Text(
+          isBookCreation
+              ? S.of(context).book_creation_title
+              : S.of(context).book_rename_title,
+        ),
       ),
       body: Container(
         padding: const EdgeInsets.all(16),
@@ -80,14 +86,18 @@ class _BookNamePageState extends State<BookNamePage> {
           textCapitalization: TextCapitalization.words,
           icon: FontAwesomeIcons.book,
           label: S.of(context).book_creation_name,
-          onSubmit: (_) => submit()
-        )
+          onSubmit: submit,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
-        label: Text(isBookCreation ? S.of(context).add_button : S.of(context).book_settings_rename),
-        onPressed: submit
-      )
+        label: Text(
+          isBookCreation
+              ? S.of(context).add_button
+              : S.of(context).book_settings_rename,
+        ),
+        onPressed: submit,
+      ),
     );
   }
 }
