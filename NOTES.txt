@@ -1,5 +1,8 @@
 TODO:
-- synchro problem : conflict on some update -> synch status wrong then
+- add photo from camera no refresh
+- send picture after update
+- crash camera linux
+
 - change server then reconnect -> no data
 
 ROADMAP:

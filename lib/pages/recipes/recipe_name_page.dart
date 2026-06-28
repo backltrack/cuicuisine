@@ -32,7 +32,6 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
 
   @override
   Widget build(BuildContext context) {
-
     void submit() async {
       if (_controller.text != "" && _controller.text != widget.currentName) {
         Navigator.pop(context, beautifyName(_controller.text));
@@ -42,9 +41,7 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).recipe_edition_new_name),
-      ),
+      appBar: AppBar(title: Text(S.of(context).recipe_edition_new_name)),
       body: Container(
         padding: const EdgeInsets.all(16),
         child: MyTextField(
@@ -55,14 +52,14 @@ class _RecipeNamePageState extends State<RecipeNamePage> {
           textCapitalization: TextCapitalization.words,
           icon: FontAwesomeIcons.fileLines,
           label: S.of(context).book_creation_name,
-          onSubmit: (_) => submit()
-        )
+          onSubmit: submit,
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
         label: Text(S.of(context).book_settings_rename),
-        onPressed: submit
-      )
+        onPressed: submit,
+      ),
     );
   }
 }

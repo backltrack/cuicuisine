@@ -3,10 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 
 class MyImageSlideshow extends StatefulWidget {
-  const MyImageSlideshow({super.key, required this.recipeId, this.onTap});
+  const MyImageSlideshow({super.key, required this.recipeId, this.onTap, this.pictureIds});
 
   final String recipeId;
   final Function(Image)? onTap;
+  // When provided, overrides which picture ids to display (in this order)
+  // instead of the recipe's persisted Recipe.pictures — lets a caller (e.g.
+  // the images edition page) preview staged/uncommitted changes that haven't
+  // been saved yet.
+  final List<String>? pictureIds;
 
   @override
   State<MyImageSlideshow> createState() => _MyImageSlideshowState();
@@ -15,10 +20,21 @@ class MyImageSlideshow extends StatefulWidget {
 class _MyImageSlideshowState extends State<MyImageSlideshow> {
   Image? _currentImage;
 
+  Future<List<Image>> _loadImages() async {
+    if (widget.pictureIds != null) {
+      List<Image> images = [];
+      for (String imageId in widget.pictureIds!) {
+        images.add(await DatabaseMgr().localMgr.getRecipeImage(widget.recipeId, imageId));
+      }
+      return images;
+    }
+    return DatabaseMgr().localMgr.getRecipeImages(widget.recipeId);
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    DatabaseMgr().localMgr.getRecipeImages(widget.recipeId).then((images) {
+    _loadImages().then((images) {
       if (images.isNotEmpty) {
         _currentImage = images[0];
       }
@@ -31,7 +47,7 @@ class _MyImageSlideshowState extends State<MyImageSlideshow> {
         }
       },
       child: FutureBuilder(
-        future: DatabaseMgr().localMgr.getRecipeImages(widget.recipeId),
+        future: _loadImages(),
         builder: (BuildContext context, AsyncSnapshot<List<Image>> snapshot) {
           return ImageSlideshow(
             height: 300,

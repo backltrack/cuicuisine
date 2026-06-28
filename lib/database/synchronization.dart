@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../utilities/logger.dart';
 import '../utilities/toast_notifier.dart';
 import './database_mgr.dart';
@@ -9,23 +11,34 @@ import './mongodb_connector.dart';
 
 final _log = Logger('Synchronization');
 
-
 class Synchronization {
   final MongoConnector _remoteMgr = DatabaseMgr().remoteMgr;
   final HiveConnector _localMgr = DatabaseMgr().localMgr;
 
   Synchronization();
 
+  // Serializes pushQueue() runs: addQueueOperation() fires a push for every
+  // queued operation without awaiting it, so creating then immediately
+  // updating the same object (e.g. duplicateRecipe) could otherwise start two
+  // overlapping drains that race their network calls out of order (the
+  // update reaching the server before the create it depends on).
+  Completer<void>? _pushLock;
+
   Future<bool> pushQueue() async {
-    // Push Queue
-    // create operation -> push
-    // delete operation -> check last update
-      // Queue document more recent -> push
-      // server document more recent -> conflict
-    // update operation -> check last update 
-      // Queue document more recent -> push
-      // server document more recent -> conflict
-    
+    while (_pushLock != null) {
+      await _pushLock!.future;
+    }
+    final completer = Completer<void>();
+    _pushLock = completer;
+    try {
+      return await _pushQueueLocked();
+    } finally {
+      _pushLock = null;
+      completer.complete();
+    }
+  }
+
+  Future<bool> _pushQueueLocked() async {
     Operation? ope = await _localMgr.getFirstOperation();
     _log.fine("operation queue length: ${_localMgr.getQueueLength()}");
     List<Operation> failedOperations = [];
@@ -36,21 +49,28 @@ class Synchronization {
     int conflictCount = 0;
 
     while (ope != null) {
-      OperationResult operationResult = OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+      OperationResult operationResult = OperationResult(
+        action: OperationResultAction.requeue,
+        status: UpdateStatus.error,
+      );
 
       switch (ope.type) {
         case OperationType.create:
-          operationResult = await createObject(ope.object);
+          operationResult = await createObject(
+            ope.object,
+            targetBookId: ope.targetBookId,
+          );
         case OperationType.update:
           operationResult = await updateObject(ope.object);
         case OperationType.delete:
           operationResult = await deleteObject(ope.object);
       }
-      _log.fine("${ope.id}: ${operationResult.action} ${operationResult.status}");
+      _log.fine(
+        "${ope.id}: ${operationResult.action} ${operationResult.status}",
+      );
       if (operationResult.action == OperationResultAction.requeue) {
         failedOperations.add(ope);
-      }
-      else {
+      } else {
         switch (operationResult.status) {
           case UpdateStatus.success:
             successCount++;
@@ -72,7 +92,9 @@ class Synchronization {
       ToastNotifier().showSuccess("$successCount operations pushed");
     }
     if (notAuthorizedCount > 0) {
-      ToastNotifier().showError("$notAuthorizedCount operations failed: not authorized");
+      ToastNotifier().showError(
+        "$notAuthorizedCount operations failed: not authorized",
+      );
     }
     if (notFoundCount > 0) {
       ToastNotifier().showError("$notFoundCount operations failed: not found");
@@ -83,10 +105,8 @@ class Synchronization {
 
     if (failedOperations.isEmpty) {
       return true;
-    }
-    else {
+    } else {
       for (Operation ope in failedOperations) {
-
         _log.warning("re-queuing failed operation: ${ope.type} ${ope.object}");
         if (ope.object is RecipeUpdate && ope.type == OperationType.update) {
           _log.fine((ope.object as RecipeUpdate).toJson().toString());
@@ -97,9 +117,15 @@ class Synchronization {
         if (ope.object is RecipeImage && ope.type == OperationType.create) {
           _log.fine((ope.object as RecipeImage).path);
         }
-        _localMgr.addQueueOperation(type: ope.type, object: ope.object, pushAfter: false);
+        _localMgr.addQueueOperation(
+          type: ope.type,
+          object: ope.object,
+          pushAfter: false,
+        );
       }
-      ToastNotifier().showWarning("${failedOperations.length} operations failed to push, re-queued");
+      ToastNotifier().showWarning(
+        "${failedOperations.length} operations failed to push, re-queued",
+      );
 
       return false;
     }
@@ -116,8 +142,7 @@ class Synchronization {
         _log.fine("last change not found on server");
         // await DatabaseMgr().remoteMgr.fetchAllFromUser();
       }
-    }
-    else {
+    } else {
       // fetchAll only when there is no local data — avoids redundant full
       // re-fetch when the server has no change record yet (e.g. new account
       // with no writes) but local data is already present.
@@ -146,48 +171,49 @@ class Synchronization {
     return true;
   }
 
-  Future<OperationResult> createObject(object) async {
+  Future<OperationResult> createObject(object, {String? targetBookId}) async {
     if (object is Book) {
       return await _remoteMgr.createBook(object);
-    }
-    else if (object is Recipe) {
-      return await _remoteMgr.createRecipe(object);
-    }
-    else if (object is RecipeImage) {
+    } else if (object is Recipe) {
+      return await _remoteMgr.createRecipe(object, bookId: targetBookId);
+    } else if (object is RecipeImage) {
       return await _remoteMgr.uploadImage(object);
     }
 
-    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+    return OperationResult(
+      action: OperationResultAction.requeue,
+      status: UpdateStatus.error,
+    );
   }
 
   Future<OperationResult> updateObject(object) async {
     if (object is UserUpdate) {
       return await _remoteMgr.updateUser(object);
-    }
-    else if (object is BookUpdate) {
+    } else if (object is BookUpdate) {
       return await _remoteMgr.updateBook(object);
-    }
-    else if (object is RecipeUpdate) {
+    } else if (object is RecipeUpdate) {
       return await _remoteMgr.updateRecipe(object);
     }
 
-    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+    return OperationResult(
+      action: OperationResultAction.requeue,
+      status: UpdateStatus.error,
+    );
   }
 
   Future<OperationResult> deleteObject(object) async {
     if (object is AppUser) {
-
-    }
-    else if (object is Book) {
+    } else if (object is Book) {
       return await _remoteMgr.deleteBook(object);
-    }
-    else if (object is Recipe) {
+    } else if (object is Recipe) {
       return await _remoteMgr.deleteRecipe(object);
-    }
-    else if (object is RecipeImage) {
+    } else if (object is RecipeImage) {
       return await _remoteMgr.deleteImage(object.recipeId, object.imageId);
     }
 
-    return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
+    return OperationResult(
+      action: OperationResultAction.requeue,
+      status: UpdateStatus.error,
+    );
   }
 }
