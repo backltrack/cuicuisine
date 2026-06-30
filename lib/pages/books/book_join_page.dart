@@ -49,11 +49,6 @@ class _BookJoinPageState extends State<BookJoinPage> {
         qrViewController!.resumeCamera();
       }
     }
-    if (Platform.isAndroid) {
-      qrViewController!.pauseCamera();
-    } else if (Platform.isIOS) {
-      qrViewController!.resumeCamera();
-    }
   }
 
   @override
@@ -132,7 +127,7 @@ class _BookJoinPageState extends State<BookJoinPage> {
                 child: const FaIcon(FontAwesomeIcons.paste, size: 20)
               ),
             ),
-            if (Platform.isAndroid) ...[
+            if (!kIsWeb && Platform.isAndroid) ...[
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.symmetric(horizontal: 8),

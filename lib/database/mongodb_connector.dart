@@ -383,7 +383,7 @@ class MongoConnector {
     try {
       oauth2.Client? client = await OAuth2Connexion.createClientFromPassword(serverUri: server, email: encEmail, password: encPwd);
       if (client != null) {
-        client = client;
+        this.client = client;
 
         AppUser user = await fetchUser();
         await DatabaseMgr().localMgr.setUser(user);
@@ -776,7 +776,6 @@ class MongoConnector {
 
     if (response != null && response.statusCode == 200) {
       try {
-        dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         String change = DatabaseMgr().localMgr.createChange();
         final changeResponse = await _securePostJsonRequest('/change/add', {
           'changeId': change,
@@ -786,7 +785,10 @@ class MongoConnector {
         });
         if (changeResponse != null && bool.parse(changeResponse.body)) {
           DatabaseMgr().localMgr.addChange(change);
-          DatabaseMgr().localMgr.updateBookLastUpdate(bookId, DateTime.parse(data['dateTime']));
+          // Remove the book and all its recipes from local storage — the user
+          // no longer has access, but the book itself still exists on the
+          // server for other members, so addToQueue: false.
+          await DatabaseMgr().localMgr.deleteBook(bookId, addToQueue: false);
           return true;
         }
       } catch (e) {
@@ -807,6 +809,24 @@ class MongoConnector {
 
         if (data) {
           await DatabaseMgr().synchronization.fetchNew();
+
+          // fetchNew() pulls the book itself (via its change entry) but the
+          // book's pre-existing recipes all predate the user's lastChange, so
+          // the change-log delta never includes them. Fetch any that are still
+          // missing locally after the sync.
+          Book? joinedBook = DatabaseMgr().localMgr.getBook(bookId);
+          if (joinedBook != null) {
+            for (String recipeId in joinedBook.recipeIds) {
+              if (DatabaseMgr().localMgr.getRecipe(recipeId) == null) {
+                Recipe? recipe = await fetchRecipe(recipeId);
+                if (recipe != null) {
+                  await DatabaseMgr().localMgr.addRecipe(recipe, addToQueue: false);
+                  await removeExtraImages(recipe);
+                  await downloadMissingImages(recipe);
+                }
+              }
+            }
+          }
         }
 
         return null;
