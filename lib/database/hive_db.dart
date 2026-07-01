@@ -582,7 +582,7 @@ class HiveConnector {
       }
 
       for (String recipeId in bookCopy.recipeIds) {
-        await deleteRecipe(recipeId);
+        await deleteRecipe(recipeId, addToQueue: false);
       }
     } on StateError {
       _log.warning("book not found");
@@ -785,12 +785,20 @@ class HiveConnector {
     return recipes;
   }
 
-  Future<void> addRecipe(Recipe recipe, {bool addToQueue = true, String? bookId}) async {
+  Future<void> addRecipe(
+    Recipe recipe, {
+    bool addToQueue = true,
+    String? bookId,
+  }) async {
     try {
       await _recipeBox.add(recipe);
 
       if (addToQueue) {
-        addQueueOperation(type: OperationType.create, object: recipe, targetBookId: bookId);
+        addQueueOperation(
+          type: OperationType.create,
+          object: recipe,
+          targetBookId: bookId,
+        );
       } else {
         // if not, the recipe is fetched from more recent: not dirty
         recipe.isDirty = false;
@@ -911,7 +919,11 @@ class HiveConnector {
   // Duplicating into another book must remap each tag to its by-name
   // equivalent there, creating it if missing — same dedup-by-name convention
   // used when a user adds a new tag from the recipe tag editor.
-  Future<List<String>> _remapTagsToBook(List<String> tagIds, String sourceBookId, String destinationBookId) async {
+  Future<List<String>> _remapTagsToBook(
+    List<String> tagIds,
+    String sourceBookId,
+    String destinationBookId,
+  ) async {
     if (tagIds.isEmpty || sourceBookId == destinationBookId) return tagIds;
 
     Book? sourceBook = getBook(sourceBookId);
@@ -931,7 +943,9 @@ class HiveConnector {
 
       Tag? matchingTag;
       try {
-        matchingTag = destinationTags.firstWhere((tag) => tag.name == sourceTag!.name);
+        matchingTag = destinationTags.firstWhere(
+          (tag) => tag.name == sourceTag!.name,
+        );
       } catch (_) {
         matchingTag = null;
       }
@@ -944,7 +958,10 @@ class HiveConnector {
     }
 
     if (destinationTags.length != destinationBook.tags.length) {
-      await updateBook(destinationBookId, BookUpdate(id: destinationBookId, tags: destinationTags));
+      await updateBook(
+        destinationBookId,
+        BookUpdate(id: destinationBookId, tags: destinationTags),
+      );
     }
 
     return mappedIds;
@@ -1075,7 +1092,11 @@ class HiveConnector {
   // without committing or syncing it until the user explicitly saves.
   Future<String?> stageRecipeImage(XFile image, String recipeId) async {
     final String imageId = ObjectId().hexString;
-    String? path = await fileStorage.writeImage(image: image, recipeId: recipeId, imageId: imageId);
+    String? path = await fileStorage.writeImage(
+      image: image,
+      recipeId: recipeId,
+      imageId: imageId,
+    );
     return path != null ? imageId : null;
   }
 

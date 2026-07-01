@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cuicuisine/database/database_mgr.dart';
 import 'package:cuicuisine/models/update_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -39,7 +40,7 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
 
   bool isEditMode = false;
-  bool canOpenImagePopup = !(Platform.isAndroid || Platform.isIOS);
+  bool canOpenImagePopup = kIsWeb || !(Platform.isAndroid || Platform.isIOS);
 
   // Modal Rout args not loaded yet
   bool shouldInit = true;

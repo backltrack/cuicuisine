@@ -1,9 +1,4 @@
 TODO:
-- add photo from camera no refresh
-- send picture after update
-- crash camera linux
-
-- change server then reconnect -> no data
 
 ROADMAP:
 - research all book

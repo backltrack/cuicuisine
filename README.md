@@ -73,6 +73,21 @@ class HiveMigration {
 
 This is independent from the app's release version in `pubspec.yaml` (`version: x.y.z`), which is only checked against a `minimum_app_version` served by the backend (`lib/database/mongodb_connector.dart`) to block outdated app installs — it has no bearing on local Hive data and doesn't need to change just because a model changed.
 
+## Releasing a build
+
+The backend no longer gets the web build/APK copied and committed into its repo — instead it fetches them from a GitHub release published here.
+
+1. Generate a token (one-time setup): GitHub → Settings → Developer settings → [Fine-grained tokens](https://github.com/settings/tokens?type=beta) → New token, scoped to the `cuicuisine` repo only, with **Contents: Read and write** permission.
+2. Copy `.env.example` to `.env` and set `GITHUB_TOKEN` to that token. `.env` is gitignored.
+3. Build, then release:
+   ```sh
+   scripts/build.sh
+   scripts/release.sh
+   ```
+   `release.sh` zips `build/web`, then creates a new GitHub release tagged `build-<timestamp>` with the zip and the dated APK (from `scripts/build.sh`) attached as assets.
+
+The backend's `scripts/fetch-frontend-build.sh` always pulls whatever release GitHub marks as "latest" (the most recent non-draft, non-prerelease one — created automatically by every run of `release.sh`), so there's nothing else to configure on that side.
+
 ## Encrypted credentials (RSAEncrypter)
 
 `lib/security/rsa.dart` defines `RSAEncrypter`, a singleton used to encrypt sensitive data (email, password, password-reset codes) before sending it to the backend — see its usages in `lib/database/mongodb_connector.dart`.
