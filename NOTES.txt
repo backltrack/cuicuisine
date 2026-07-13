@@ -1,6 +1,8 @@
 TODO:
 
+
 ROADMAP:
+- list/edit/merge ingredients from book
 - research all book
 - speach to text
 - text to speach

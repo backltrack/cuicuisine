@@ -30,15 +30,12 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
 
     wakelockState = DatabaseMgr().localMgr.loadWakelock() ?? false;
     setState(() {});
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).settings),
-      ),
+      appBar: AppBar(title: Text(S.of(context).settings)),
       body: Column(
         children: [
           // Theme
@@ -46,19 +43,28 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Text(S.of(context).general_settings_theme, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+                Text(
+                  S.of(context).general_settings_theme,
+                  style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+                ),
                 const Spacer(),
                 PopupMenuButton(
-                    icon: const Icon(Icons.palette),
-                    itemBuilder: (context) => List<PopupMenuItem>.generate(AppThemes.themes.length, (index) => PopupMenuItem(
-                      child: Text(AppThemes.themes[index], style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                  icon: const Icon(Icons.palette),
+                  itemBuilder: (context) => List<PopupMenuItem>.generate(
+                    AppThemes.themes.length,
+                    (index) => PopupMenuItem(
+                      child: Text(
+                        AppThemes.themes[index],
+                        style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
+                      ),
                       onTap: () {
                         setState(() {
                           ThemeMgr.setTheme(context, index);
                         });
                       },
-                    ))
-                )
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -67,40 +73,57 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                Text(S.of(context).general_settings_language, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+                Text(
+                  S.of(context).general_settings_language,
+                  style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+                ),
                 const Spacer(),
                 PopupMenuButton(
-                    icon: const Icon(Icons.language),
-                    itemBuilder: (context) => List<PopupMenuItem>.generate(S.delegate.supportedLocales.length, (index) => PopupMenuItem(
-                      child: Text(S.delegate.supportedLocales[index].languageCode, style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge),
+                  icon: const Icon(Icons.language),
+                  itemBuilder: (context) => List<PopupMenuItem>.generate(
+                    S.delegate.supportedLocales.length,
+                    (index) => PopupMenuItem(
+                      child: Text(
+                        S.delegate.supportedLocales[index].languageCode,
+                        style: ThemeMgr.getTheme(context)!.textTheme.bodyLarge,
+                      ),
                       onTap: () {
-                        LocaleMgr.setLocale(context, S.delegate.supportedLocales[index].languageCode);
+                        LocaleMgr.setLocale(
+                          context,
+                          S.delegate.supportedLocales[index].languageCode,
+                        );
                       },
-                    ))
-                )
+                    ),
+                  ),
+                ),
               ],
-            )
+            ),
           ),
 
           // Keep Screen Awake
           Container(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Text(S.of(context).general_settings_awake, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
-                  const Spacer(),
-                  Switch(
-                    value: wakelockState,
-                    onChanged: (bool val) {
-                      setState(() {
-                        wakelockState = val;
-                      });
-                      DatabaseMgr().localMgr.saveWakelock(wakelockState);
-                      wakelockState ? WakelockPlus.enable() : WakelockPlus.disable();
-                    },
-                  )
-                ],
-              )
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Text(
+                  S.of(context).general_settings_awake,
+                  style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+                ),
+                const Spacer(),
+                Switch(
+                  value: wakelockState,
+                  onChanged: (bool val) {
+                    setState(() {
+                      wakelockState = val;
+                    });
+                    DatabaseMgr().localMgr.saveWakelock(wakelockState);
+                    wakelockState
+                        ? WakelockPlus.enable()
+                        : WakelockPlus.disable();
+                  },
+                ),
+              ],
+            ),
           ),
 
           // const Divider(),
@@ -129,7 +152,7 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
             leading: const FaIcon(FontAwesomeIcons.circleInfo),
             onTap: () {
               Navigator.pushNamed(context, CreditsPage.route);
-            }
+            },
           ),
           const Divider(),
           // remove account
@@ -138,7 +161,7 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
             leading: const FaIcon(FontAwesomeIcons.user),
             onTap: () {
               Navigator.pushNamed(context, AccountPage.route);
-            }
+            },
           ),
           const Divider(),
           // Sign out
@@ -149,15 +172,19 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
               bool? shouldSignOut = await showAlertDialog(
                 context: context,
                 title: S.of(context).sign_out_popup_title,
-                description: Text(S.of(context).sign_out_popup_description)
+                description: Text(S.of(context).sign_out_popup_description),
               );
-              if(shouldSignOut != null && shouldSignOut) {
-                DatabaseMgr().localMgr.deleteCredentials();
+              if (shouldSignOut != null && shouldSignOut) {
+                await DatabaseMgr().localMgr.deleteCredentials();
                 await DatabaseMgr().localMgr.clearAllUserData();
-                Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  LogInPage.route,
+                  (route) => false,
+                );
               }
-            }
-          )
+            },
+          ),
         ],
       ),
     );
