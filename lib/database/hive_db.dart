@@ -691,6 +691,42 @@ class HiveConnector {
     }
   }
 
+  Future<void> mergeBookIngredients(
+    String bookId,
+    List<String> mergeIds,
+    String keepId,
+  ) async {
+    final idsToReplace = mergeIds.where((id) => id != keepId).toSet();
+    for (final recipe in getAllRecipes()) {
+      bool modified = false;
+      final updatedIngredients = recipe.recipeIngredients.map((ing) {
+        if (idsToReplace.contains(ing.bookIngredientId)) {
+          modified = true;
+          return Ingredient(
+            bookIngredientId: keepId,
+            quantity: ing.quantity,
+            unitOverride: ing.unitOverride,
+            densityOverride: ing.densityOverride,
+          );
+        }
+        return ing;
+      }).toList();
+      if (modified) {
+        await updateRecipe(
+          recipe.id,
+          RecipeUpdate(id: recipe.id, recipeIngredients: updatedIngredients),
+        );
+      }
+    }
+    final book = getBook(bookId);
+    if (book != null) {
+      final updatedBis = book.bookIngredients
+          .where((bi) => !idsToReplace.contains(bi.id))
+          .toList();
+      await updateBook(bookId, BookUpdate(id: bookId, bookIngredients: updatedBis));
+    }
+  }
+
   List<Ingredient> getIngredientsRelatedToBookIngredient(
     BookIngredient bookIngredient,
   ) {

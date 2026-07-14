@@ -24,14 +24,13 @@ class _RemoveAccountPageState extends State<RemoveAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).remove_account),
-      ),
+      appBar: AppBar(title: Text(S.of(context).remove_account)),
       body: Column(
         children: [
           Container(
             margin: const EdgeInsets.all(12),
-            child: Text(S.of(context).remove_account_method,
+            child: Text(
+              S.of(context).remove_account_method,
               textAlign: TextAlign.center,
               style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
             ),
@@ -40,7 +39,9 @@ class _RemoveAccountPageState extends State<RemoveAccountPage> {
           MyTextField(
             label: S.of(context).auth_email_label,
             icon: FontAwesomeIcons.at,
-            suffixIcon: EmailPasswordValidator.isEmailValid(_email) ? FontAwesomeIcons.circleCheck : null,
+            suffixIcon: EmailPasswordValidator.isEmailValid(_email)
+                ? FontAwesomeIcons.circleCheck
+                : null,
             keyboardType: TextInputType.emailAddress,
             onChanged: (String val) {
               setState(() {
@@ -51,27 +52,35 @@ class _RemoveAccountPageState extends State<RemoveAccountPage> {
           // Agreement
           Container(
             margin: const EdgeInsets.all(12),
-            child: Text(S.of(context).remove_account_agreement,
+            child: Text(
+              S.of(context).remove_account_agreement,
               textAlign: TextAlign.center,
             ),
           ),
           SocialButton(
-            onPressed: EmailPasswordValidator.isEmailValid(_email) ? () async {
+            onPressed: EmailPasswordValidator.isEmailValid(_email)
+                ? () async {
+                    if (_email == DatabaseMgr().localMgr.getUser()!.email) {
+                      // remove recipes, books and user from database
+                      bool result = await DatabaseMgr().remoteMgr.deleteUser();
 
-              if(_email == DatabaseMgr().localMgr.getUser()!.email) {
-                // remove recipes, books and user from database
-                bool result = await DatabaseMgr().remoteMgr.deleteUser();
-
-                if (result) {
-                  DatabaseMgr().remoteMgr.disconnect();
-                  Navigator.pushNamedAndRemoveUntil(context, LogInPage.route, (route) => false);
-                }
-              }
-            } : null,
+                      if (result) {
+                        await DatabaseMgr().localMgr.deleteCredentials();
+                        await DatabaseMgr().localMgr.clearAllUserData();
+                        DatabaseMgr().remoteMgr.disconnect();
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          LogInPage.route,
+                          (route) => false,
+                        );
+                      }
+                    }
+                  }
+                : null,
             child: Text(S.of(context).remove_button),
-          )
+          ),
         ],
-      )
+      ),
     );
   }
 }

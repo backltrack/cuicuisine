@@ -20,11 +20,11 @@ class RecipeImagesEditionPage extends StatefulWidget {
   const RecipeImagesEditionPage({super.key});
 
   @override
-  State<RecipeImagesEditionPage> createState() => _RecipeImagesEditionPageState();
+  State<RecipeImagesEditionPage> createState() =>
+      _RecipeImagesEditionPageState();
 }
 
 class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
-
   // Create Image picker
   final ImagePicker _picker = ImagePicker();
 
@@ -54,11 +54,16 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
 
   Future<void> _commit() async {
     for (String imageId in _pendingNewImageIds) {
-      await DatabaseMgr().localMgr.commitStagedImage(_recipe.id, imageId);
+      if (!_pendingRemovedImageIds.contains(imageId)) {
+        await DatabaseMgr().localMgr.commitStagedImage(_recipe.id, imageId);
+      }
     }
     for (String imageId in _pendingRemovedImageIds) {
-      await DatabaseMgr().localMgr.removeRecipeImage(_recipe.id, imageId);
+      if (!_pendingNewImageIds.contains(imageId)) {
+        await DatabaseMgr().localMgr.removeRecipeImage(_recipe.id, imageId);
+      }
     }
+    print(_pictures);
     await DatabaseMgr().localMgr.updateRecipe(
       _recipe.id,
       RecipeUpdate(id: _recipe.id, pictures: _pictures),
@@ -69,9 +74,9 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
 
   @override
   Widget build(BuildContext context) {
-
     // load params
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final Recipe recipe = routeArgs['recipe']!;
 
     // Init
@@ -95,10 +100,22 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
           description: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-              Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-              Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
+              Text(
+                S.of(context).popup_loose_data_1,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                S.of(context).recipe_edition_update,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                S.of(context).popup_loose_data_2,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                S.of(context).popup_loose_data_3,
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         );
@@ -108,76 +125,94 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(S.of(context).images_edition_title),
-        ),
+        appBar: AppBar(title: Text(S.of(context).images_edition_title)),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () async {
             await _commit();
             if (context.mounted) Navigator.pop(context);
           },
-          label: Text(S.of(context).recipe_edition_update)
+          label: Text(S.of(context).recipe_edition_update),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: Column(
           children: [
-            MyImageSlideshow(
-              recipeId: recipe.id,
-              pictureIds: _pictures,
-            ),
+            MyImageSlideshow(recipeId: recipe.id, pictureIds: _pictures),
             Container(
               margin: const EdgeInsets.all(12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("${_pictures.length}/$maxPictures", style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+                  Text(
+                    "${_pictures.length}/$maxPictures",
+                    style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+                  ),
                   Row(
                     children: [
                       FloatingActionButton(
-                        backgroundColor: _pictures.length >= maxPictures ? Colors.grey : ThemeMgr.getTheme(context)!.primaryColorDark,
-                        onPressed: _pictures.length >= maxPictures ? null : () async {
-                          // Pick images from gallery
-                          List<XFile> images = await _picker.pickMultiImage(maxHeight: 720);
-                          // check images quantity
-                          if (_pictures.length + images.length > maxPictures) {
-                            images = images.sublist(0, maxPictures - _pictures.length);
-                          }
-                          for (XFile image in images) {
-                            String? newImageId = await DatabaseMgr().localMgr.stageRecipeImage(image, recipe.id);
-                            if (newImageId != null) {
-                              setState(() {
-                                _pictures.add(newImageId);
-                                _pendingNewImageIds.add(newImageId);
-                              });
-                            }
-                          }
-                        },
+                        backgroundColor: _pictures.length >= maxPictures
+                            ? Colors.grey
+                            : ThemeMgr.getTheme(context)!.primaryColorDark,
+                        onPressed: _pictures.length >= maxPictures
+                            ? null
+                            : () async {
+                                // Pick images from gallery
+                                List<XFile> images = await _picker
+                                    .pickMultiImage(maxHeight: 720);
+                                // check images quantity
+                                if (_pictures.length + images.length >
+                                    maxPictures) {
+                                  images = images.sublist(
+                                    0,
+                                    maxPictures - _pictures.length,
+                                  );
+                                }
+                                for (XFile image in images) {
+                                  String? newImageId = await DatabaseMgr()
+                                      .localMgr
+                                      .stageRecipeImage(image, recipe.id);
+                                  if (newImageId != null) {
+                                    setState(() {
+                                      _pictures.add(newImageId);
+                                      _pendingNewImageIds.add(newImageId);
+                                    });
+                                  }
+                                }
+                              },
                         heroTag: "btnGallery",
                         child: const FaIcon(FontAwesomeIcons.image),
                       ),
                       if (_supportsCamera) ...[
                         const SizedBox(width: 12),
                         FloatingActionButton(
-                          backgroundColor: _pictures.length >= maxPictures ? Colors.grey : ThemeMgr.getTheme(context)!.primaryColorDark,
-                          onPressed: _pictures.length >= maxPictures ? null : () async {
-                            // take new picture
-                            final XFile? photo = await _picker.pickImage(source: ImageSource.camera, maxHeight: 720);
-                            if (photo != null) {
-                              String? newImageId = await DatabaseMgr().localMgr.stageRecipeImage(photo, recipe.id);
-                              if (newImageId != null) {
-                                setState(() {
-                                  _pictures.add(newImageId);
-                                  _pendingNewImageIds.add(newImageId);
-                                });
-                              }
-                            }
-                          },
+                          backgroundColor: _pictures.length >= maxPictures
+                              ? Colors.grey
+                              : ThemeMgr.getTheme(context)!.primaryColorDark,
+                          onPressed: _pictures.length >= maxPictures
+                              ? null
+                              : () async {
+                                  // take new picture
+                                  final XFile? photo = await _picker.pickImage(
+                                    source: ImageSource.camera,
+                                    maxHeight: 720,
+                                  );
+                                  if (photo != null) {
+                                    String? newImageId = await DatabaseMgr()
+                                        .localMgr
+                                        .stageRecipeImage(photo, recipe.id);
+                                    if (newImageId != null) {
+                                      setState(() {
+                                        _pictures.add(newImageId);
+                                        _pendingNewImageIds.add(newImageId);
+                                      });
+                                    }
+                                  }
+                                },
                           heroTag: "btnPhoto",
                           child: const FaIcon(FontAwesomeIcons.camera),
                         ),
                       ],
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -192,18 +227,25 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
                       await showAlertDialog(
                         context: context,
                         title: S.of(context).popup_delete_title,
-                        description: Text(S.of(context).popup_remove_image_description)
+                        description: Text(
+                          S.of(context).popup_remove_image_description,
+                        ),
                       ).then((value) async {
                         if (value != null && value) {
                           final String removedId = _pictures[index];
-                          final bool wasPending = _pendingNewImageIds.remove(removedId);
+                          final bool wasPending = _pendingNewImageIds.remove(
+                            removedId,
+                          );
                           setState(() {
                             _pictures.remove(removedId);
                           });
                           if (wasPending) {
                             // staged-new image removed before commit: drop its orphan
                             // file right away, nothing was ever queued/synced for it
-                            await DatabaseMgr().localMgr.discardStagedImage(recipe.id, removedId);
+                            await DatabaseMgr().localMgr.discardStagedImage(
+                              recipe.id,
+                              removedId,
+                            );
                           } else {
                             _pendingRemovedImageIds.add(removedId);
                           }
@@ -217,9 +259,9 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
                     String movedPicture = _pictures.removeAt(oldIndex);
                     _pictures.insert(newIndex, movedPicture);
                   });
-                }
-              )
-            )
+                },
+              ),
+            ),
           ],
         ),
       ),

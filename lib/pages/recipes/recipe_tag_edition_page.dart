@@ -24,7 +24,7 @@ class RecipeTagEditionPage extends StatefulWidget {
 class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
   bool shouldInitialize = true;
 
-  List<Tag> _selectedTags = [];
+  final List<Tag> _selectedTags = [];
 
   String _search = "";
 
@@ -193,17 +193,15 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
                 if (!tags.any((t) => t.name == name)) {
                   final String? currentBookId = DatabaseMgr().localMgr.getCurrentBookId();
                   if (currentBookId != null) {
+                    final Tag newTag = Tag.newTag(name, category);
                     setState(() {
-                      final Tag newTag = Tag.newTag(name, category);
-                      final selectedIds = _selectedTags.map((t) => t.id).toSet()..add(newTag.id);
                       tags.add(newTag);
-                      DatabaseMgr().localMgr.updateBook(
-                        currentBookId,
-                        BookUpdate(id: currentBookId, tags: tags),
-                      );
-                      tags = _computeTags();
-                      _selectedTags = tags.where((t) => selectedIds.contains(t.id)).toList();
+                      _selectedTags.add(newTag);
                     });
+                    DatabaseMgr().localMgr.updateBook(
+                      currentBookId,
+                      BookUpdate(id: currentBookId, tags: tags),
+                    );
                   }
                 }
               }

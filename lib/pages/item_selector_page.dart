@@ -18,16 +18,15 @@ class ItemSelector extends StatefulWidget {
 }
 
 class _ItemSelectorState extends State<ItemSelector> {
-
   final List<int> _selectedIndices = [];
 
   String _search = "";
 
   @override
   Widget build(BuildContext context) {
-
     // load params
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final List<dynamic> items = routeArgs['items']!;
     final String itemType = routeArgs['itemType'];
 
@@ -41,7 +40,9 @@ class _ItemSelectorState extends State<ItemSelector> {
         }
       } else if (itemType == "tags") {
         for (int i = 0; i < items.length; i++) {
-          if (FilterBottomMenu.mandatoryTags.any((t) => t.id == (items[i] as Tag).id)) {
+          if (FilterBottomMenu.mandatoryTags.any(
+            (t) => t.id == (items[i] as Tag).id,
+          )) {
             _selectedIndices.add(i);
           }
         }
@@ -56,17 +57,29 @@ class _ItemSelectorState extends State<ItemSelector> {
       title = S.of(context).filter_tags;
     }
 
-    // indices matching the current search, in original order
+    // indices matching the current search, sorted alphabetically for ingredients
     final List<int> matchingIndices = [];
     for (int i = 0; i < items.length; i++) {
-      final String displayName = itemType == "tags" ? (items[i] as Tag).name : items[i] as String;
-      if (_search.isEmpty || removeDiacritics(displayName.toLowerCase()).contains(removeDiacritics(_search.toLowerCase()))) {
+      final String displayName = itemType == "tags"
+          ? (items[i] as Tag).name
+          : items[i] as String;
+      if (_search.isEmpty ||
+          removeDiacritics(
+            displayName.toLowerCase(),
+          ).contains(removeDiacritics(_search.toLowerCase()))) {
         matchingIndices.add(i);
       }
     }
+    if (itemType == "ingredients") {
+      matchingIndices.sort((a, b) => removeDiacritics(
+            (items[a] as String).toLowerCase(),
+          ).compareTo(removeDiacritics((items[b] as String).toLowerCase())));
+    }
 
     // render entries: either a category header (String) or an index (int) into `items`
-    final List<dynamic> renderEntries = itemType == "tags" ? _groupByCategory(items, matchingIndices) : matchingIndices;
+    final List<dynamic> renderEntries = itemType == "tags"
+        ? _groupByCategory(items, matchingIndices)
+        : matchingIndices;
 
     return Scaffold(
       appBar: SearchAppBar(
@@ -85,12 +98,12 @@ class _ItemSelectorState extends State<ItemSelector> {
             if (itemType == "ingredients") {
               FilterBottomMenu.mandatoryIngredients.clear();
               FilterBottomMenu.mandatoryIngredients.addAll(
-                _selectedIndices.map((i) => items[i] as String).toList()
+                _selectedIndices.map((i) => items[i] as String).toList(),
               );
             } else if (itemType == "tags") {
               FilterBottomMenu.mandatoryTags.clear();
               FilterBottomMenu.mandatoryTags.addAll(
-                _selectedIndices.map((i) => items[i] as Tag).toList()
+                _selectedIndices.map((i) => items[i] as Tag).toList(),
               );
             }
           });
@@ -104,20 +117,28 @@ class _ItemSelectorState extends State<ItemSelector> {
           if (entry is String) return _categoryHeader(context, entry);
 
           final int index = entry as int;
-          final String displayName = itemType == "tags" ? (items[index] as Tag).name : items[index] as String;
+          final String displayName = itemType == "tags"
+              ? (items[index] as Tag).name
+              : items[index] as String;
           return ListTile(
-            title: Text(itemType == "ingredients" ? beautifyName(displayName) : displayName),
+            title: Text(
+              itemType == "ingredients"
+                  ? beautifyName(displayName)
+                  : displayName,
+            ),
             trailing: IconButton(
-                onPressed: () {
-                  setState(() {
-                    if (_selectedIndices.contains(index)) {
-                      _selectedIndices.remove(index);
-                    } else {
-                      _selectedIndices.add(index);
-                    }
-                  });
-                },
-                icon: _selectedIndices.contains(index) ? const FaIcon(FontAwesomeIcons.solidCircleCheck) : const FaIcon(FontAwesomeIcons.circlePlus)
+              onPressed: () {
+                setState(() {
+                  if (_selectedIndices.contains(index)) {
+                    _selectedIndices.remove(index);
+                  } else {
+                    _selectedIndices.add(index);
+                  }
+                });
+              },
+              icon: _selectedIndices.contains(index)
+                  ? const FaIcon(FontAwesomeIcons.solidCircleCheck)
+                  : const FaIcon(FontAwesomeIcons.circlePlus),
             ),
           );
         },
@@ -137,26 +158,37 @@ class _ItemSelectorState extends State<ItemSelector> {
       ..sort((a, b) {
         if (a.isEmpty) return 1;
         if (b.isEmpty) return -1;
-        return removeDiacritics(a.toLowerCase()).compareTo(removeDiacritics(b.toLowerCase()));
+        return removeDiacritics(
+          a.toLowerCase(),
+        ).compareTo(removeDiacritics(b.toLowerCase()));
       });
 
     final List<dynamic> result = [];
     for (final category in sortedCategories) {
       result.add(category);
       final List<int> categoryIndices = byCategory[category]!
-        ..sort((a, b) => removeDiacritics((items[a] as Tag).name).compareTo(removeDiacritics((items[b] as Tag).name)));
+        ..sort(
+          (a, b) => removeDiacritics(
+            (items[a] as Tag).name,
+          ).compareTo(removeDiacritics((items[b] as Tag).name)),
+        );
       result.addAll(categoryIndices);
     }
     return result;
   }
 
   Widget _categoryHeader(BuildContext context, String category) {
-    final String label = category.isEmpty ? S.of(context).tag_category_other : beautifyName(category);
+    final String label = category.isEmpty
+        ? S.of(context).tag_category_other
+        : beautifyName(category);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
         children: [
-          Text(label, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+          Text(
+            label,
+            style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+          ),
           const SizedBox(width: 8),
           const Expanded(child: Divider()),
         ],

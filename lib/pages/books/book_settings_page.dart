@@ -122,6 +122,22 @@ class _BookSettingsPageState extends State<BookSettingsPage> {
                 );
               },
             ),
+          // ingredients management
+          if (_book!.access[DatabaseMgr().localMgr.getUser()!.id]!.index >= AccessLevel.write.index)
+            ListTile(
+              title: Text(S.of(context).book_settings_ingredients),
+              onTap: () {
+                if (!DatabaseMgr().isCompatible) {
+                  ToastNotifier().showWarning(S.of(context).outdated_version_login_blocked);
+                  return;
+                }
+                Navigator.pushNamed(
+                  context,
+                  '${BookSettingsPage.route}/${_book!.id}/ingredients',
+                  arguments: {'bookId': _book!.id},
+                );
+              },
+            ),
           // share book
           ListTile(
             title: Text(S.of(context).book_settings_share),

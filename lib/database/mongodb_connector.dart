@@ -747,6 +747,11 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
+        // Update local lastUpdate immediately after the server confirms (200) so
+        // that if change registration fails and the op is requeued, the retry
+        // sends the correct requestDate instead of triggering a false 409.
+        DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
+
         String change = DatabaseMgr().localMgr.createChange();
         final changeResponse = await _securePostJsonRequest('/change/add', {
           'changeId': change,
@@ -756,7 +761,6 @@ class MongoConnector {
         });
         if (changeResponse != null && bool.parse(changeResponse.body)) {
           DatabaseMgr().localMgr.addChange(change);
-          DatabaseMgr().localMgr.updateBookLastUpdate(bookUpdate.id, DateTime.parse(data['dateTime']));
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
@@ -971,6 +975,10 @@ class MongoConnector {
         dynamic data = jsonDecode(utf8.decode(response.bodyBytes));
         if (data == null) return OperationResult(action: OperationResultAction.requeue, status: UpdateStatus.error);
 
+        // Same pattern as updateBook: update local lastUpdate on 200 before
+        // change registration so requeued retries don't produce false 409s.
+        DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
+
         String change = DatabaseMgr().localMgr.createChange();
         final changeResponse = await _securePostJsonRequest('/change/add', {
           'changeId': change,
@@ -980,7 +988,6 @@ class MongoConnector {
         });
         if (changeResponse != null && bool.parse(changeResponse.body)) {
           DatabaseMgr().localMgr.addChange(change);
-          DatabaseMgr().localMgr.updateRecipeLastUpdate(recipeUpdate.id, DateTime.parse(data['dateTime']));
           return OperationResult(action: OperationResultAction.delete, status: UpdateStatus.success);
         }
       } catch (e) {
@@ -1000,6 +1007,13 @@ class MongoConnector {
 
     if (response != null && response.statusCode == 200) {
       try {
+        final data = jsonDecode(utf8.decode(response.bodyBytes));
+        if (data != null && data['bookId'] != null && data['bookLastUpdate'] != null) {
+          DatabaseMgr().localMgr.updateBookLastUpdate(
+            data['bookId'] as String,
+            DateTime.parse(data['bookLastUpdate'] as String),
+          );
+        }
         String change = DatabaseMgr().localMgr.createChange();
         final changeResponse = await _securePostJsonRequest('/change/add', {
           'changeId': change,

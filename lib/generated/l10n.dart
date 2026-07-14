@@ -1400,6 +1400,16 @@ class S {
     );
   }
 
+  /// `Ingrédients`
+  String get book_settings_ingredients {
+    return Intl.message(
+      'Ingrédients',
+      name: 'book_settings_ingredients',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Partager`
   String get book_settings_share {
     return Intl.message(
@@ -1725,6 +1735,56 @@ class S {
     return Intl.message(
       'Modifier l\'ingrédient maître',
       name: 'ingredient_edit_book_ingredient',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Ingrédients maîtres`
+  String get book_ingredients_title {
+    return Intl.message(
+      'Ingrédients maîtres',
+      name: 'book_ingredients_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mode fusion`
+  String get book_ingredients_merge_mode {
+    return Intl.message(
+      'Mode fusion',
+      name: 'book_ingredients_merge_mode',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Fusionner la sélection`
+  String get book_ingredients_merge {
+    return Intl.message(
+      'Fusionner la sélection',
+      name: 'book_ingredients_merge',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Quel ingrédient conserver ?`
+  String get book_ingredients_merge_keep {
+    return Intl.message(
+      'Quel ingrédient conserver ?',
+      name: 'book_ingredients_merge_keep',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Aucun ingrédient`
+  String get book_ingredients_empty {
+    return Intl.message(
+      'Aucun ingrédient',
+      name: 'book_ingredients_empty',
       desc: '',
       args: [],
     );
