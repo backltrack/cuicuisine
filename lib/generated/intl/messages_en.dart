@@ -69,11 +69,23 @@ class MessageLookup extends MessageLookupByLibrary {
         "book_creation_title": MessageLookupByLibrary.simpleMessage("New book"),
         "book_ingredient_edition_title":
             MessageLookupByLibrary.simpleMessage("Edit master ingredient"),
+        "book_ingredients_empty":
+            MessageLookupByLibrary.simpleMessage("No ingredients yet"),
+        "book_ingredients_merge":
+            MessageLookupByLibrary.simpleMessage("Merge selected"),
+        "book_ingredients_merge_keep":
+            MessageLookupByLibrary.simpleMessage("Which ingredient to keep?"),
+        "book_ingredients_merge_mode":
+            MessageLookupByLibrary.simpleMessage("Merge mode"),
+        "book_ingredients_title":
+            MessageLookupByLibrary.simpleMessage("Master ingredients"),
         "book_join_scan": MessageLookupByLibrary.simpleMessage("Scan ID"),
         "book_join_title": MessageLookupByLibrary.simpleMessage("Join book"),
         "book_join_uid": MessageLookupByLibrary.simpleMessage("Book ID"),
         "book_rename_title":
             MessageLookupByLibrary.simpleMessage("Rename book"),
+        "book_settings_ingredients":
+            MessageLookupByLibrary.simpleMessage("Ingredients"),
         "book_settings_need_online": MessageLookupByLibrary.simpleMessage(
             "Internet connexion required to edit user rights."),
         "book_settings_page_title":

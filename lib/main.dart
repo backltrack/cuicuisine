@@ -30,6 +30,7 @@ import 'pages/books/book_join_page.dart';
 import 'pages/books/book_name_page.dart';
 import 'pages/books/book_settings_page.dart';
 import 'pages/books/book_share_page.dart';
+import 'pages/books/book_ingredients_page.dart';
 import 'pages/books/book_tags_edition_page.dart';
 import 'pages/settings/general_settings_page.dart';
 import 'pages/home_page.dart';
@@ -257,6 +258,16 @@ class _CuicuisineState extends State<Cuicuisine> {
                 // navigate to book tags edition page
                 else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 5 && settings.name!.split('/').last == 'tags') {
                   return MaterialPageRoute(builder: (context) => const BookTagsEditionPage(), settings: settings);
+                }
+
+                // navigate to book ingredients page
+                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 5 && settings.name!.split('/').last == 'ingredients') {
+                  return MaterialPageRoute(builder: (context) => const BookIngredientsPage(), settings: settings);
+                }
+
+                // navigate to book ingredient edition from book ingredients page
+                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/')[4] == 'ingredients' && settings.name!.split('/').last == 'book_ingredient') {
+                  return MaterialPageRoute(builder: (context) => const BookIngredientEditionPage(), settings: settings);
                 }
 
                 // navigate to book share page
