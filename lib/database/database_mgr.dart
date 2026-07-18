@@ -15,6 +15,7 @@ class DatabaseMgr with ChangeNotifier {
   double? _syncProgress;
 
   String? pendingDeepLinkRecipeId;
+  String? pendingDeepLinkBookId;
 
   bool get isOnline => _isOnline;
   bool get isCompatible => _isCompatible;

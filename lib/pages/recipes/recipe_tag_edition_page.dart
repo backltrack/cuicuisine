@@ -55,14 +55,19 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
       ..sort((a, b) {
         if (a.isEmpty) return 1;
         if (b.isEmpty) return -1;
-        return removeDiacritics(a.toLowerCase()).compareTo(removeDiacritics(b.toLowerCase()));
+        return removeDiacritics(
+          a.toLowerCase(),
+        ).compareTo(removeDiacritics(b.toLowerCase()));
       });
 
     final List<dynamic> items = [];
     for (final cat in sortedCats) {
       items.add(cat); // category header (String)
       final catTags = byCategory[cat]!
-        ..sort((a, b) => removeDiacritics(a.name).compareTo(removeDiacritics(b.name)));
+        ..sort(
+          (a, b) =>
+              removeDiacritics(a.name).compareTo(removeDiacritics(b.name)),
+        );
       items.addAll(catTags);
     }
     items.add(null); // bottom spacer sentinel
@@ -77,7 +82,10 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
         children: [
-          Text(label, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+          Text(
+            label,
+            style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+          ),
           const SizedBox(width: 8),
           const Expanded(child: Divider()),
         ],
@@ -104,7 +112,8 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final List<Tag> currentTags = routeArgs['currentTags']!;
     final String recipeId = routeArgs['id']!;
 
@@ -116,8 +125,13 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
 
     final List<Tag> filtered = _search.isEmpty
         ? tags
-        : tags.where((t) => removeDiacritics(t.name.toLowerCase())
-            .contains(removeDiacritics(_search.toLowerCase()))).toList();
+        : tags
+              .where(
+                (t) => removeDiacritics(
+                  t.name.toLowerCase(),
+                ).contains(removeDiacritics(_search.toLowerCase())),
+              )
+              .toList();
 
     final List<dynamic> listItems = _buildListItems(filtered);
 
@@ -125,7 +139,9 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
       appBar: SearchAppBar(
         myTitle: S.of(context).recipe_edition_tags_title,
         onSearchChanged: (String val) {
-          setState(() { _search = val; });
+          setState(() {
+            _search = val;
+          });
         },
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -134,13 +150,26 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             await showAlertDialog(
               context: context,
               title: S.of(context).popup_loose_data_title,
+              action: S.of(context).popup_quit_title,
               description: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center),
+                  Text(
+                    S.of(context).popup_loose_data_1,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    S.of(context).recipe_edition_update,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    S.of(context).popup_loose_data_2,
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    S.of(context).popup_loose_data_3,
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ).then((value) {
@@ -161,7 +190,10 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             recipeId,
             RecipeUpdate(
               id: recipeId,
-              tags: List.generate(_selectedTags.length, (i) => _selectedTags[i].id),
+              tags: List.generate(
+                _selectedTags.length,
+                (i) => _selectedTags[i].id,
+              ),
             ),
           );
           Navigator.pop(context, 'update');
@@ -173,7 +205,9 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
             tags: _selectedTags,
             isEditable: true,
             onRemove: (Tag val) {
-              setState(() { _selectedTags.remove(val); });
+              setState(() {
+                _selectedTags.remove(val);
+              });
             },
           ),
 
@@ -191,7 +225,8 @@ class _RecipeTagEditionPageState extends State<RecipeTagEditionPage> {
                 final String name = result['name'] as String;
                 final String category = result['category'] as String? ?? '';
                 if (!tags.any((t) => t.name == name)) {
-                  final String? currentBookId = DatabaseMgr().localMgr.getCurrentBookId();
+                  final String? currentBookId = DatabaseMgr().localMgr
+                      .getCurrentBookId();
                   if (currentBookId != null) {
                     final Tag newTag = Tag.newTag(name, category);
                     setState(() {

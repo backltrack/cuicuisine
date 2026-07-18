@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../generated/l10n.dart';
 
-Future<bool?> showAlertDialog({required context, required String title, Widget? description}) async {
+Future<bool?> showAlertDialog({
+  required context,
+  required String title,
+  String action = "OK",
+  Widget? description,
+}) async {
   return showDialog<bool>(
     context: context,
     builder: (BuildContext context) => AlertDialog(
@@ -10,11 +15,23 @@ Future<bool?> showAlertDialog({required context, required String title, Widget? 
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(S.of(context).cancel),
+          child: Text(
+            S.of(context).cancel,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
         ),
         TextButton(
           onPressed: () => Navigator.pop(context, true),
-          child: Text(S.of(context).ok),
+          child: Text(
+            action,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+          ),
         ),
       ],
     ),

@@ -31,13 +31,18 @@ class _BookTagsEditionPageState extends State<BookTagsEditionPage> {
       ..sort((a, b) {
         if (a.isEmpty) return 1;
         if (b.isEmpty) return -1;
-        return removeDiacritics(a.toLowerCase()).compareTo(removeDiacritics(b.toLowerCase()));
+        return removeDiacritics(
+          a.toLowerCase(),
+        ).compareTo(removeDiacritics(b.toLowerCase()));
       });
     final List<dynamic> items = [];
     for (final cat in sortedCats) {
       items.add(cat);
       final catTags = byCategory[cat]!
-        ..sort((a, b) => removeDiacritics(a.name).compareTo(removeDiacritics(b.name)));
+        ..sort(
+          (a, b) =>
+              removeDiacritics(a.name).compareTo(removeDiacritics(b.name)),
+        );
       items.addAll(catTags);
     }
     items.add(null);
@@ -45,12 +50,17 @@ class _BookTagsEditionPageState extends State<BookTagsEditionPage> {
   }
 
   Widget _categoryHeader(String category) {
-    final label = category.isEmpty ? S.of(context).tag_category_other : beautifyName(category);
+    final label = category.isEmpty
+        ? S.of(context).tag_category_other
+        : beautifyName(category);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       child: Row(
         children: [
-          Text(label, style: ThemeMgr.getTheme(context)!.textTheme.displayMedium),
+          Text(
+            label,
+            style: ThemeMgr.getTheme(context)!.textTheme.displayMedium,
+          ),
           const SizedBox(width: 8),
           const Expanded(child: Divider()),
         ],
@@ -114,7 +124,10 @@ class _BookTagsEditionPageState extends State<BookTagsEditionPage> {
       confirmed = await showAlertDialog(
         context: context,
         title: S.of(context).popup_delete_title,
-        description: Text('${S.of(context).popup_delete_description_as_owner}"${tag.name}"?'),
+        action: S.of(context).popup_delete_title,
+        description: Text(
+          '${S.of(context).popup_delete_description_as_owner}"${tag.name}"?',
+        ),
       );
     } else {
       confirmed = await showDialog<bool>(
@@ -136,8 +149,10 @@ class _BookTagsEditionPageState extends State<BookTagsEditionPage> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(S.of(context).remove_button,
-                  style: const TextStyle(color: Colors.red)),
+              child: Text(
+                S.of(context).remove_button,
+                style: const TextStyle(color: Colors.red),
+              ),
             ),
           ],
         ),
@@ -157,7 +172,8 @@ class _BookTagsEditionPageState extends State<BookTagsEditionPage> {
   @override
   Widget build(BuildContext context) {
     if (!_argsLoaded) {
-      final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      final routeArgs =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
       _bookId = routeArgs['bookId']!;
       _tags = DatabaseMgr().localMgr.getBookTags().toList();
       _argsLoaded = true;
@@ -166,9 +182,7 @@ class _BookTagsEditionPageState extends State<BookTagsEditionPage> {
     final listItems = _buildListItems();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(S.of(context).book_settings_tags),
-      ),
+      appBar: AppBar(title: Text(S.of(context).book_settings_tags)),
       body: ListView.builder(
         itemCount: listItems.length,
         itemBuilder: (context, index) {

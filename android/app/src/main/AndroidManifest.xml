@@ -32,6 +32,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="cuicuisine" android:host="recipe"/>
+                <data android:scheme="cuicuisine" android:host="book"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

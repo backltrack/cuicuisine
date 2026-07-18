@@ -12,7 +12,8 @@ import '../models/data_model.dart';
 import '../utilities/time_functions.dart';
 
 Future<void> exportAllAsJson() async {
-  final String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+  final String? selectedDirectory = await FilePicker.platform
+      .getDirectoryPath();
   if (selectedDirectory != null) {
     // ignore: unused_local_variable
     final File saveFile = File('$selectedDirectory/export.txt');
@@ -59,18 +60,29 @@ Future<void> exportRecipeToPdf({
   }
 }
 
-List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImage logo) {
+List<pw.Widget> _buildContent(
+  Recipe recipe,
+  String bookName,
+  S s,
+  pw.MemoryImage logo,
+) {
   final brique = PdfColor.fromHex('#d65931');
-  const grey   = PdfColors.grey700;
+  const grey = PdfColors.grey700;
 
-  final styleBody    = const pw.TextStyle(fontSize: 11);
-  final styleMuted   = pw.TextStyle(fontSize: 10, color: grey);
-  final styleTitle   = pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold);
-  final styleSection = pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold, color: brique);
+  final styleBody = const pw.TextStyle(fontSize: 11);
+  final styleMuted = pw.TextStyle(fontSize: 10, color: grey);
+  final styleTitle = pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold);
+  final styleSection = pw.TextStyle(
+    fontSize: 13,
+    fontWeight: pw.FontWeight.bold,
+    color: brique,
+  );
 
   String fmtQty(double? qty) {
     if (qty == null) return '';
-    return qty == qty.roundToDouble() ? qty.round().toString() : qty.toStringAsFixed(1);
+    return qty == qty.roundToDouble()
+        ? qty.round().toString()
+        : qty.toStringAsFixed(1);
   }
 
   String quillToText(String json) {
@@ -84,18 +96,25 @@ List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImag
   }
 
   return [
-
     // ── Header ─────────────────────────────────────────────────────────
     pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.center,
       children: [
-        pw.Row(children: [
-          pw.Image(logo, width: 32, height: 32),
-          pw.SizedBox(width: 8),
-          pw.Text('Cuicuisine',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: brique)),
-        ]),
+        pw.Row(
+          children: [
+            pw.Image(logo, width: 32, height: 32),
+            pw.SizedBox(width: 8),
+            pw.Text(
+              'Cuicuisine',
+              style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+                color: brique,
+              ),
+            ),
+          ],
+        ),
         pw.Text(bookName, style: styleMuted),
       ],
     ),
@@ -111,17 +130,30 @@ List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImag
       pw.Text('${recipe.quantity} ${recipe.quantityType}', style: styleMuted),
 
     // ── Times ──────────────────────────────────────────────────────────
-    if (recipe.preparationTime > 0 || recipe.cookingTime > 0 || recipe.waitingTime > 0)
+    if (recipe.preparationTime > 0 ||
+        recipe.cookingTime > 0 ||
+        recipe.waitingTime > 0)
       pw.Padding(
         padding: const pw.EdgeInsets.only(top: 4),
-        child: pw.Row(children: [
-          if (recipe.preparationTime > 0)
-            pw.Text('${s.time_widget_preparation}  ${minutesToTime(recipe.preparationTime)}    ', style: styleMuted),
-          if (recipe.cookingTime > 0)
-            pw.Text('${s.time_widget_cooking}  ${minutesToTime(recipe.cookingTime)}    ', style: styleMuted),
-          if (recipe.waitingTime > 0)
-            pw.Text('${s.time_widget_waiting}  ${minutesToTime(recipe.waitingTime)}', style: styleMuted),
-        ]),
+        child: pw.Row(
+          children: [
+            if (recipe.preparationTime > 0)
+              pw.Text(
+                '${s.time_widget_preparation}  ${minutesToTime(recipe.preparationTime)}    ',
+                style: styleMuted,
+              ),
+            if (recipe.cookingTime > 0)
+              pw.Text(
+                '${s.time_widget_cooking}  ${minutesToTime(recipe.cookingTime)}    ',
+                style: styleMuted,
+              ),
+            if (recipe.waitingTime > 0)
+              pw.Text(
+                '${s.time_widget_waiting}  ${minutesToTime(recipe.waitingTime)}',
+                style: styleMuted,
+              ),
+          ],
+        ),
       ),
 
     // ── Ingredients ────────────────────────────────────────────────────
@@ -129,19 +161,23 @@ List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImag
       pw.SizedBox(height: 20),
       pw.Text(s.ingredient_widget_title, style: styleSection),
       pw.Divider(thickness: 0.5),
-      ...recipe.recipeIngredients.map((ing) => pw.Padding(
-        padding: const pw.EdgeInsets.symmetric(vertical: 3),
-        child: pw.Row(children: [
-          pw.Text('-  ', style: styleBody),
-          pw.Expanded(child: pw.Text(ing.getName(), style: styleBody)),
-          pw.Text(
-            ing.getUnit().isNotEmpty
-                ? '${fmtQty(ing.quantity)} ${ing.getUnit()}'
-                : fmtQty(ing.quantity),
-            style: styleMuted,
+      ...recipe.recipeIngredients.map(
+        (ing) => pw.Padding(
+          padding: const pw.EdgeInsets.symmetric(vertical: 3),
+          child: pw.Row(
+            children: [
+              pw.Text('-  ', style: styleBody),
+              pw.Expanded(child: pw.Text(ing.getName(), style: styleBody)),
+              pw.Text(
+                ing.getUnit().isNotEmpty && ing.getUnit() != 'none'
+                    ? '${fmtQty(ing.quantity)} ${ing.getUnit()}'
+                    : fmtQty(ing.quantity),
+                style: styleMuted,
+              ),
+            ],
           ),
-        ]),
-      )),
+        ),
+      ),
     ],
 
     // ── Steps ──────────────────────────────────────────────────────────
@@ -150,7 +186,7 @@ List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImag
       pw.Text(s.steps_widget_title, style: styleSection),
       pw.Divider(thickness: 0.5),
       ...recipe.steps.asMap().entries.map((entry) {
-        final i    = entry.key;
+        final i = entry.key;
         final step = entry.value;
         return pw.Padding(
           padding: const pw.EdgeInsets.only(top: 10),
@@ -166,7 +202,10 @@ List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImag
                     if (step.time > 0)
                       pw.Padding(
                         padding: const pw.EdgeInsets.only(top: 3),
-                        child: pw.Text(minutesToTime(step.time), style: styleMuted),
+                        child: pw.Text(
+                          minutesToTime(step.time),
+                          style: styleMuted,
+                        ),
                       ),
                   ],
                 ),
@@ -176,6 +215,5 @@ List<pw.Widget> _buildContent(Recipe recipe, String bookName, S s, pw.MemoryImag
         );
       }),
     ],
-
   ];
 }

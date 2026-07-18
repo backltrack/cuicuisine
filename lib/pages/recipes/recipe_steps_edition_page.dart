@@ -26,7 +26,8 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
   @override
   Widget build(BuildContext context) {
     // load params
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final String recipeId = routeArgs['recipeId'];
     final List<RecipeStep> steps = routeArgs['steps'];
 
@@ -42,104 +43,128 @@ class _RecipeStepsEditionPageState extends State<RecipeStepsEditionPage> {
           return;
         }
         await showAlertDialog(
-            context: context,
-            title: S.of(context).popup_loose_data_title,
-            description: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-                Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
-                Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-                Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
-              ],
-            ),
-          ).then((value) {
-            if (value != null && value) {
-              Navigator.of(context).pop();
-            }
-            else {
-              return;
-            }
-          });
+          context: context,
+          title: S.of(context).popup_loose_data_title,
+          action: S.of(context).popup_quit_title,
+          description: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                S.of(context).popup_loose_data_1,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                S.of(context).recipe_edition_update,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                S.of(context).popup_loose_data_2,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                S.of(context).popup_loose_data_3,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ).then((value) {
+          if (value != null && value) {
+            Navigator.of(context).pop();
+          } else {
+            return;
+          }
+        });
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(S.of(context).steps_edition_title),
           leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () async {
-            bool returnValue = false;
-            await showAlertDialog(
-              context: context,
-              title: S.of(context).popup_loose_data_title,
-              description: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-                  Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
-                  Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-                  Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
-                ],
-              ),
-            ).then((value) {
-              if (value != null && value) {
-                returnValue = true;
-              }
-            });
-            
-            SchedulerBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pop(returnValue);
-            });
-          }
-        ),
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () async {
+              bool returnValue = false;
+              await showAlertDialog(
+                context: context,
+                title: S.of(context).popup_loose_data_title,
+                action: S.of(context).popup_quit_title,
+                description: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      S.of(context).popup_loose_data_1,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      S.of(context).recipe_edition_update,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      S.of(context).popup_loose_data_2,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      S.of(context).popup_loose_data_3,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ).then((value) {
+                if (value != null && value) {
+                  returnValue = true;
+                }
+              });
+
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                Navigator.of(context).pop(returnValue);
+              });
+            },
+          ),
         ),
         body: SingleChildScrollView(
-            child: Column(
-              children: [
-                RecipeStepsEditionWidget(
-                  key: UniqueKey(),
-                  steps: newSteps,
-                  onStepChanged: (Map<String, dynamic> value) {
-                    setState(() {
-                      newSteps[value['index']].step = value['step'];
-                    });
-                  },
-                  onAddStep: (RecipeStep newStep) {
-                    setState(() {
-                      newSteps.add(newStep);
-                    });
-                  },
-                  onRemoveStep: (int index) {
-                    setState(() {
-                      newSteps.removeAt(index);
-                    });
-                  },
-                  onReorderSteps: (int oldIndex, int newIndex) {
-                    setState(() {
-                      newSteps = moveListItem(newSteps, oldIndex, newIndex) as List<RecipeStep>;
-                    });
-                  },
-                ),
-                const SizedBox(height: 80)
-              ],
-            )
+          child: Column(
+            children: [
+              RecipeStepsEditionWidget(
+                key: UniqueKey(),
+                steps: newSteps,
+                onStepChanged: (Map<String, dynamic> value) {
+                  setState(() {
+                    newSteps[value['index']].step = value['step'];
+                  });
+                },
+                onAddStep: (RecipeStep newStep) {
+                  setState(() {
+                    newSteps.add(newStep);
+                  });
+                },
+                onRemoveStep: (int index) {
+                  setState(() {
+                    newSteps.removeAt(index);
+                  });
+                },
+                onReorderSteps: (int oldIndex, int newIndex) {
+                  setState(() {
+                    newSteps =
+                        moveListItem(newSteps, oldIndex, newIndex)
+                            as List<RecipeStep>;
+                  });
+                },
+              ),
+              const SizedBox(height: 80),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton.extended(
-            label: Text(S.of(context).recipe_edition_update),
-            onPressed: () {
-              DatabaseMgr().localMgr.updateRecipe(
-                recipeId,
-                RecipeUpdate(
-                  id: recipeId,
-                  steps: newSteps
-                )
-              );
+          label: Text(S.of(context).recipe_edition_update),
+          onPressed: () {
+            DatabaseMgr().localMgr.updateRecipe(
+              recipeId,
+              RecipeUpdate(id: recipeId, steps: newSteps),
+            );
 
-              Navigator.pop(context, 'update');
-            }
+            Navigator.pop(context, 'update');
+          },
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-      )
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      ),
     );
   }
 }

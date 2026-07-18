@@ -1,6 +1,9 @@
 TODO:
+- pop up issue in ingredient edition
+
 
 ROADMAP:
+- RGPD complient
 - research all book
 - speach to text
 - text to speach

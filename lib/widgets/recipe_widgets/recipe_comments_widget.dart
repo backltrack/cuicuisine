@@ -17,24 +17,37 @@ class RecipeCommentsWidget extends StatefulWidget {
   final AccessLevel userAccess;
   final Function? onUpdate;
   final Function(int)? onRemove;
-  const RecipeCommentsWidget({super.key, required this.recipeId, required this.comments, required this.userAccess, this.onUpdate, this.onRemove});
+  const RecipeCommentsWidget({
+    super.key,
+    required this.recipeId,
+    required this.comments,
+    required this.userAccess,
+    this.onUpdate,
+    this.onRemove,
+  });
 
   @override
   _RecipeCommentsWidgetState createState() => _RecipeCommentsWidgetState();
 }
 
 class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
-  final TextEditingController _newCommentTextController = TextEditingController();
+  final TextEditingController _newCommentTextController =
+      TextEditingController();
   bool widgetApertureState = true;
 
   @override
   Widget build(BuildContext context) {
-    int commentLength = widgetApertureState || widget.comments.isEmpty ? widget.comments.length : 1;
+    int commentLength = widgetApertureState || widget.comments.isEmpty
+        ? widget.comments.length
+        : 1;
 
     return Container(
       decoration: BoxDecoration(
         color: ThemeMgr.getTheme(context)!.cardColor.withValues(alpha: 0.5),
-        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12))
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(12),
+          bottomRight: Radius.circular(12),
+        ),
       ),
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -45,7 +58,8 @@ class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
             width: double.infinity,
             child: Column(
               children: [
-                if (widget.userAccess.index > AccessLevel.read.index && widgetApertureState)
+                if (widget.userAccess.index > AccessLevel.read.index &&
+                    widgetApertureState)
                   MyTextField(
                     textEditingController: _newCommentTextController,
                     label: S.of(context).comment_widget_new,
@@ -54,35 +68,64 @@ class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
                     maxLines: 20,
                     onSubmit: () async {
                       if (_newCommentTextController.text.trim().isEmpty) return;
-                      
+
                       String? userId = DatabaseMgr().localMgr.getUserId();
                       if (userId != null) {
-                        DatabaseMgr().localMgr.updateRecipe(widget.recipeId, RecipeUpdate(id: widget.recipeId, comments: widget.comments + [Comment(userId: userId, comment: _newCommentTextController.text, initials: getInitials(DatabaseMgr().localMgr.getUserName()))])).then((value) {
-                          _newCommentTextController.clear();
-                          if (widget.onUpdate != null) widget.onUpdate!();
-                        });
+                        DatabaseMgr().localMgr
+                            .updateRecipe(
+                              widget.recipeId,
+                              RecipeUpdate(
+                                id: widget.recipeId,
+                                comments:
+                                    widget.comments +
+                                    [
+                                      Comment(
+                                        userId: userId,
+                                        comment: _newCommentTextController.text,
+                                        initials: getInitials(
+                                          DatabaseMgr().localMgr.getUserName(),
+                                        ),
+                                      ),
+                                    ],
+                              ),
+                            )
+                            .then((value) {
+                              _newCommentTextController.clear();
+                              if (widget.onUpdate != null) widget.onUpdate!();
+                            });
                       }
                     },
                   ),
                 Column(
-                    children: List<Widget>.generate(commentLength, (index) {
-                      int invertedIndex = widget.comments.length - 1 - index;
-                      return CommentWidget(
-                        comment: widget.comments[invertedIndex],
+                  children: List<Widget>.generate(commentLength, (index) {
+                    int invertedIndex = widget.comments.length - 1 - index;
+                    return CommentWidget(
+                      comment: widget.comments[invertedIndex],
 
-                        onRemove: widget.onRemove != null ? (widget.comments[invertedIndex].userId == DatabaseMgr().localMgr.getUserId()) || widget.userAccess == AccessLevel.own ? () {
-                          showAlertDialog(
-                              context: context,
-                              title: S.of(context).comment_remove_title,
-                              description: Text(S.of(context).comment_remove_description)
-                          ).then((value) {
-                            if (value != null && value) {
-                              widget.onRemove!(invertedIndex);
-                            }
-                          });
-                        } : null : null,
-                      );
-                    })
+                      onRemove: widget.onRemove != null
+                          ? (widget.comments[invertedIndex].userId ==
+                                        DatabaseMgr().localMgr.getUserId()) ||
+                                    widget.userAccess == AccessLevel.own
+                                ? () {
+                                    showAlertDialog(
+                                      context: context,
+                                      title: S.of(context).comment_remove_title,
+                                      action: S.of(context).popup_delete_title,
+                                      description: Text(
+                                        S
+                                            .of(context)
+                                            .comment_remove_description,
+                                      ),
+                                    ).then((value) {
+                                      if (value != null && value) {
+                                        widget.onRemove!(invertedIndex);
+                                      }
+                                    });
+                                  }
+                                : null
+                          : null,
+                    );
+                  }),
                 ),
                 // IconButton(
                 //   onPressed: () {
@@ -93,10 +136,10 @@ class _RecipeCommentsWidgetState extends State<RecipeCommentsWidget> {
                 //   icon: widgetApertureState ? const Icon(Icons.keyboard_arrow_up_rounded) : const Icon(Icons.keyboard_arrow_down_rounded)
                 // )
               ],
-            )
-          )
+            ),
+          ),
         ],
-      )
+      ),
     );
   }
 }

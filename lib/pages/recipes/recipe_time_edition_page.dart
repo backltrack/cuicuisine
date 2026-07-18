@@ -9,7 +9,6 @@ import '../../widgets/recipe_widgets/recipe_time_widget.dart';
 import '../../widgets/core_widgets/alert_dialog.dart';
 
 class RecipeTimeEditionPage extends StatefulWidget {
-
   const RecipeTimeEditionPage({super.key});
 
   @override
@@ -23,9 +22,12 @@ class _RecipeTimeEditionPageState extends State<RecipeTimeEditionPage> {
 
   bool shouldInit = true;
 
-  final TextEditingController preparationTextEditingController = TextEditingController();
-  final TextEditingController waitingTextEditingController = TextEditingController();
-  final TextEditingController cookingTextEditingController = TextEditingController();
+  final TextEditingController preparationTextEditingController =
+      TextEditingController();
+  final TextEditingController waitingTextEditingController =
+      TextEditingController();
+  final TextEditingController cookingTextEditingController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -38,59 +40,75 @@ class _RecipeTimeEditionPageState extends State<RecipeTimeEditionPage> {
   @override
   Widget build(BuildContext context) {
     // load params
-    final routeArgs = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final routeArgs =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final String recipeId = routeArgs['id']!;
     if (shouldInit) {
       _preparationTime = routeArgs['preparation']!;
       _waitingTime = routeArgs['waiting']!;
       _cookingTime = routeArgs['cooking']!;
 
-      if (_preparationTime > 0) preparationTextEditingController.text = _preparationTime.toString();
-      if (_waitingTime > 0) waitingTextEditingController.text = _waitingTime.toString();
-      if (_cookingTime > 0) cookingTextEditingController.text = _cookingTime.toString();
+      if (_preparationTime > 0) {
+        preparationTextEditingController.text = _preparationTime.toString();
+      }
+      if (_waitingTime > 0) {
+        waitingTextEditingController.text = _waitingTime.toString();
+      }
+      if (_cookingTime > 0) {
+        cookingTextEditingController.text = _cookingTime.toString();
+      }
 
       shouldInit = false;
     }
 
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) async {
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
         if (didPop) {
           return;
         }
-        
+
         bool? result = await showAlertDialog(
           context: context,
           title: S.of(context).popup_loose_data_title,
+          action: S.of(context).popup_quit_title,
           description: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(S.of(context).popup_loose_data_1, textAlign: TextAlign.center),
-              Text(S.of(context).recipe_edition_update, style: const TextStyle(fontWeight: FontWeight.bold),),
-              Text(S.of(context).popup_loose_data_2, textAlign: TextAlign.center),
-              Text(S.of(context).popup_loose_data_3, textAlign: TextAlign.center)
-            ]
-          )
+              Text(
+                S.of(context).popup_loose_data_1,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                S.of(context).recipe_edition_update,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(
+                S.of(context).popup_loose_data_2,
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                S.of(context).popup_loose_data_3,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         );
         if (result ?? false) {
           Navigator.of(context).pop();
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(S.of(context).recipe_edition_time_title),
-        ),
+        appBar: AppBar(title: Text(S.of(context).recipe_edition_time_title)),
         body: Column(
           children: [
             RecipeTimeWidget(
-                preparationTime: _preparationTime,
-                waitingTime: _waitingTime,
-                cookingTime: _cookingTime
+              preparationTime: _preparationTime,
+              waitingTime: _waitingTime,
+              cookingTime: _cookingTime,
             ),
 
-            const SizedBox(
-                height: 12
-            ),
+            const SizedBox(height: 12),
 
             MyTextField(
               keyboardType: TextInputType.number,
@@ -134,28 +152,32 @@ class _RecipeTimeEditionPageState extends State<RecipeTimeEditionPage> {
                   _cookingTime = v!;
                 });
               },
-            )
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton.extended(
-            label: Text(S.of(context).recipe_edition_update),
-            onPressed: () async {
-              DatabaseMgr().localMgr.updateRecipe(recipeId,
-                RecipeUpdate(
-                  id: recipeId,
-                  preparationTime: _preparationTime,
-                  waitingTime: _waitingTime,
-                  cookingTime: _cookingTime
-                )
-              );
+          label: Text(S.of(context).recipe_edition_update),
+          onPressed: () async {
+            DatabaseMgr().localMgr.updateRecipe(
+              recipeId,
+              RecipeUpdate(
+                id: recipeId,
+                preparationTime: _preparationTime,
+                waitingTime: _waitingTime,
+                cookingTime: _cookingTime,
+              ),
+            );
 
-              bool update = _preparationTime != routeArgs['preparation']! || _waitingTime != routeArgs['waiting']! || _cookingTime != routeArgs['cooking']!;
+            bool update =
+                _preparationTime != routeArgs['preparation']! ||
+                _waitingTime != routeArgs['waiting']! ||
+                _cookingTime != routeArgs['cooking']!;
 
-              Navigator.pop(context, update ? 'update' : null);
-            }
+            Navigator.pop(context, update ? 'update' : null);
+          },
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat
-      )
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      ),
     );
   }
 }

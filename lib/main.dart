@@ -53,12 +53,16 @@ void main() async {
   setupLogging();
   WidgetsFlutterBinding.ensureInitialized();
   // Disable landscape mode
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   HttpOverrides.global = MyHttpOverrides();
 
-  if (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS) {
+  if (defaultTargetPlatform == TargetPlatform.windows ||
+      defaultTargetPlatform == TargetPlatform.linux ||
+      defaultTargetPlatform == TargetPlatform.macOS) {
     setWindowMinSize(const Size(400, 500));
   }
 
@@ -75,7 +79,8 @@ class Cuicuisine extends StatefulWidget {
   @override
   State<Cuicuisine> createState() => _CuicuisineState();
 
-  static _CuicuisineState? of(BuildContext context) => context.findAncestorStateOfType<_CuicuisineState>();
+  static _CuicuisineState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_CuicuisineState>();
 }
 
 class _CuicuisineState extends State<Cuicuisine> {
@@ -85,7 +90,9 @@ class _CuicuisineState extends State<Cuicuisine> {
 
   void changeLocale(String localeCode) {
     setState(() {
-      _locale = S.delegate.supportedLocales.firstWhere((l) => l.languageCode == localeCode);
+      _locale = S.delegate.supportedLocales.firstWhere(
+        (l) => l.languageCode == localeCode,
+      );
     });
   }
 
@@ -100,8 +107,7 @@ class _CuicuisineState extends State<Cuicuisine> {
     String? localeCode = DatabaseMgr().localMgr.loadLocale();
     if (localeCode != null) {
       changeLocale(localeCode);
-    }
-    else {
+    } else {
       changeLocale("fr");
     }
 
@@ -128,12 +134,21 @@ class _CuicuisineState extends State<Cuicuisine> {
   }
 
   void _handleDeepLink(Uri uri) {
-    if (uri.scheme != 'cuicuisine' || uri.host != 'recipe') return;
-    final recipeId = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
-    if (recipeId == null || recipeId.isEmpty) return;
-    DatabaseMgr().pendingDeepLinkRecipeId = recipeId;
+    if (uri.scheme != 'cuicuisine') return;
+    final id = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
+    if (id == null || id.isEmpty) return;
+    if (uri.host == 'recipe') {
+      DatabaseMgr().pendingDeepLinkRecipeId = id;
+    } else if (uri.host == 'book') {
+      DatabaseMgr().pendingDeepLinkBookId = id;
+    } else {
+      return;
+    }
     if (DatabaseMgr().localMgr.getUser() != null) {
-      navigatorKey.currentState?.pushNamedAndRemoveUntil(HomePage.route, (r) => false);
+      navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        HomePage.route,
+        (r) => false,
+      );
     }
   }
 
@@ -148,153 +163,222 @@ class _CuicuisineState extends State<Cuicuisine> {
 
   @override
   Widget build(BuildContext context) {
-
     return DynamicTheme(
-        themeCollection: setThemeCollection(context),
-        defaultThemeId: AppThemes.Dark, // optional, default id is 0
-        builder: (context, theme) {
-          return ToastificationWrapper(
-            child: MaterialApp(
-              navigatorKey: navigatorKey,
-              theme: theme,
-              debugShowCheckedModeBanner: false,
-              localizationsDelegates: const [
-                S.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-                FlutterQuillLocalizations.delegate,
-              ],
-              supportedLocales: S.delegate.supportedLocales,
-              localeResolutionCallback: (locale, supportedLocales) {
-                for (var supportedLocale in supportedLocales) {
-                  if (supportedLocale.languageCode == locale!.languageCode &&
-                      supportedLocale.countryCode == locale.countryCode) {
-                    return supportedLocale;
-                  }
+      themeCollection: setThemeCollection(context),
+      defaultThemeId: AppThemes.Dark, // optional, default id is 0
+      builder: (context, theme) {
+        return ToastificationWrapper(
+          child: MaterialApp(
+            navigatorKey: navigatorKey,
+            theme: theme,
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              S.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
+            ],
+            supportedLocales: S.delegate.supportedLocales,
+            localeResolutionCallback: (locale, supportedLocales) {
+              for (var supportedLocale in supportedLocales) {
+                if (supportedLocale.languageCode == locale!.languageCode &&
+                    supportedLocale.countryCode == locale.countryCode) {
+                  return supportedLocale;
                 }
-                return supportedLocales.first;
-              },
-              locale: _locale,
-              initialRoute: LogInPage.route,
-              routes: {
-                LogInPage.route: (ctx) => LogInPage(),
-                EmailCheck.route: (ctx) => const EmailCheck(),
-                EmailConnexion.route: (ctx) => const EmailConnexion(),
-                EmailRegistration.route: (ctx) => EmailRegistration(),
-                OnboardingPage.route: (ctx) => const OnboardingPage(),
-                ForgottenPasswordPage.route: (ctx) => const ForgottenPasswordPage(),
-                HomePage.route: (ctx) => HomePage(),
-                GeneralSettingsPage.route: (ctx) => const GeneralSettingsPage(),
-                SynchronizationStatusPage.route: (ctx) => const SynchronizationStatusPage(),
-                CreditsPage.route: (ctx) => const CreditsPage(),
-                AccountPage.route: (ctx) => const AccountPage(),
-                UpdatePassword.route: (ctx) => const UpdatePassword(),
-                RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),
-                BookNamePage.route: (ctx) => const BookNamePage(),
-                ItemSelector.route: (ctx) => const ItemSelector(),
-                PageNotFound.route: (ctx) => const PageNotFound()
-              },
-              onGenerateRoute: (RouteSettings settings) {
-                // navigate to recipe page
-                if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 4) {
-                  return MaterialPageRoute(builder: (context) => RecipePage(), settings: settings);
-                }
-                // navigate to recipe name edition page
-                // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
-                //   return MaterialPageRoute(builder: (context) => const RecipeNamePage(), settings: settings);
-                // }
-                // // navigate to recipe image edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'images') {
-                  return MaterialPageRoute(builder: (context) => const RecipeImagesEditionPage(), settings: settings);
-                }
-                // navigate to recipe time edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'time') {
-                  return MaterialPageRoute(builder: (context) => const RecipeTimeEditionPage(), settings: settings);
-                }
-                // navigate to recipe tags edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'tags') {
-                  return MaterialPageRoute(builder: (context) => const RecipeTagEditionPage(), settings: settings);
-                }
-                // navigate to recipe tags edition -> new tag page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
-                    && settings.name!.split('/')[5] == 'tags'
-                    && settings.name!.split('/').last == 'new') {
-                  return MaterialPageRoute(builder: (context) => const NewTagPage(), settings: settings);
-                }
-                // navigate to recipe ingredients edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'ingredients') {
-                  return MaterialPageRoute(builder: (context) => const RecipeIngredientsEditionPage(), settings: settings);
-                }
-                // navigate to specific ingredient edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
-                    && settings.name!.split('/')[5] == 'ingredients'
-                    && settings.name!.split('/').last == 'edition') {
-                  return MaterialPageRoute(builder: (context) => const IngredientEditionPage(), settings: settings);
-                }
-                // navigate to book ingredient edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 8
-                    && settings.name!.split('/')[5] == 'ingredients'
-                    && settings.name!.split('/')[6] == 'edition'
-                    && settings.name!.split('/').last == 'book_ingredient') {
-                  return MaterialPageRoute(builder: (context) => const BookIngredientEditionPage(), settings: settings);
-                }
-                // navigate to recipe steps edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'steps') {
-                  return MaterialPageRoute(builder: (context) => const RecipeStepsEditionPage(), settings: settings);
-                }
-                // navigate to specific step edition page
-                else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 7
-                    && settings.name!.split('/')[5] == 'steps'
-                    && int.tryParse(settings.name!.split('/').last) != null) {
-                  return MaterialPageRoute(builder: (context) => const StepEditionPage(), settings: settings);
-                }
-
-                // navigate to book settings page
-                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 4) {
-                  return MaterialPageRoute(builder: (context) => const BookSettingsPage(), settings: settings);
-                }
-
-                // navigate to book tags edition page
-                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 5 && settings.name!.split('/').last == 'tags') {
-                  return MaterialPageRoute(builder: (context) => const BookTagsEditionPage(), settings: settings);
-                }
-
-                // navigate to book ingredients page
-                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 5 && settings.name!.split('/').last == 'ingredients') {
-                  return MaterialPageRoute(builder: (context) => const BookIngredientsPage(), settings: settings);
-                }
-
-                // navigate to book ingredient edition from book ingredients page
-                else if (settings.name!.contains(BookSettingsPage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/')[4] == 'ingredients' && settings.name!.split('/').last == 'book_ingredient') {
-                  return MaterialPageRoute(builder: (context) => const BookIngredientEditionPage(), settings: settings);
-                }
-
-                // navigate to book share page
-                else if (settings.name!.contains(BookSharePage.route) && settings.name!.split('/').length == 4) {
-                  return MaterialPageRoute(builder: (context) => const BookSharePage(), settings: settings);
-                }
-
-                // navigate to join book page
-                else if (settings.name!.contains(BookJoinPage.route)) {
-                  return MaterialPageRoute(builder: (context) => const BookJoinPage(), settings: settings);
-                }
-
-                else {
-                  //404
-                  return MaterialPageRoute(builder: (context) => const PageNotFound());
-                }
-              },
-            )
-          );
-        }
+              }
+              return supportedLocales.first;
+            },
+            locale: _locale,
+            initialRoute: LogInPage.route,
+            routes: {
+              LogInPage.route: (ctx) => LogInPage(),
+              EmailCheck.route: (ctx) => const EmailCheck(),
+              EmailConnexion.route: (ctx) => const EmailConnexion(),
+              EmailRegistration.route: (ctx) => EmailRegistration(),
+              OnboardingPage.route: (ctx) => const OnboardingPage(),
+              ForgottenPasswordPage.route: (ctx) =>
+                  const ForgottenPasswordPage(),
+              HomePage.route: (ctx) => HomePage(),
+              GeneralSettingsPage.route: (ctx) => const GeneralSettingsPage(),
+              SynchronizationStatusPage.route: (ctx) =>
+                  const SynchronizationStatusPage(),
+              CreditsPage.route: (ctx) => const CreditsPage(),
+              AccountPage.route: (ctx) => const AccountPage(),
+              UpdatePassword.route: (ctx) => const UpdatePassword(),
+              RemoveAccountPage.route: (ctx) => const RemoveAccountPage(),
+              BookNamePage.route: (ctx) => const BookNamePage(),
+              ItemSelector.route: (ctx) => const ItemSelector(),
+              PageNotFound.route: (ctx) => const PageNotFound(),
+            },
+            onGenerateRoute: (RouteSettings settings) {
+              // navigate to recipe page
+              if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 4) {
+                return MaterialPageRoute(
+                  builder: (context) => RecipePage(),
+                  settings: settings,
+                );
+              }
+              // navigate to recipe name edition page
+              // else if (settings.name!.contains(RecipePage.route) && settings.name!.split('/').length == 6 && settings.name!.split('/').last == 'rename') {
+              //   return MaterialPageRoute(builder: (context) => const RecipeNamePage(), settings: settings);
+              // }
+              // // navigate to recipe image edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 6 &&
+                  settings.name!.split('/').last == 'images') {
+                return MaterialPageRoute(
+                  builder: (context) => const RecipeImagesEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to recipe time edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 6 &&
+                  settings.name!.split('/').last == 'time') {
+                return MaterialPageRoute(
+                  builder: (context) => const RecipeTimeEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to recipe tags edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 6 &&
+                  settings.name!.split('/').last == 'tags') {
+                return MaterialPageRoute(
+                  builder: (context) => const RecipeTagEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to recipe tags edition -> new tag page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 7 &&
+                  settings.name!.split('/')[5] == 'tags' &&
+                  settings.name!.split('/').last == 'new') {
+                return MaterialPageRoute(
+                  builder: (context) => const NewTagPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to recipe ingredients edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 6 &&
+                  settings.name!.split('/').last == 'ingredients') {
+                return MaterialPageRoute(
+                  builder: (context) => const RecipeIngredientsEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to specific ingredient edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 7 &&
+                  settings.name!.split('/')[5] == 'ingredients' &&
+                  settings.name!.split('/').last == 'edition') {
+                return MaterialPageRoute(
+                  builder: (context) => const IngredientEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to book ingredient edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 8 &&
+                  settings.name!.split('/')[5] == 'ingredients' &&
+                  settings.name!.split('/')[6] == 'edition' &&
+                  settings.name!.split('/').last == 'book_ingredient') {
+                return MaterialPageRoute(
+                  builder: (context) => const BookIngredientEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to recipe steps edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 6 &&
+                  settings.name!.split('/').last == 'steps') {
+                return MaterialPageRoute(
+                  builder: (context) => const RecipeStepsEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to specific step edition page
+              else if (settings.name!.contains(RecipePage.route) &&
+                  settings.name!.split('/').length == 7 &&
+                  settings.name!.split('/')[5] == 'steps' &&
+                  int.tryParse(settings.name!.split('/').last) != null) {
+                return MaterialPageRoute(
+                  builder: (context) => const StepEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to book settings page
+              else if (settings.name!.contains(BookSettingsPage.route) &&
+                  settings.name!.split('/').length == 4) {
+                return MaterialPageRoute(
+                  builder: (context) => const BookSettingsPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to book tags edition page
+              else if (settings.name!.contains(BookSettingsPage.route) &&
+                  settings.name!.split('/').length == 5 &&
+                  settings.name!.split('/').last == 'tags') {
+                return MaterialPageRoute(
+                  builder: (context) => const BookTagsEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to book ingredients page
+              else if (settings.name!.contains(BookSettingsPage.route) &&
+                  settings.name!.split('/').length == 5 &&
+                  settings.name!.split('/').last == 'ingredients') {
+                return MaterialPageRoute(
+                  builder: (context) => const BookIngredientsPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to book ingredient edition from book ingredients page
+              else if (settings.name!.contains(BookSettingsPage.route) &&
+                  settings.name!.split('/').length == 6 &&
+                  settings.name!.split('/')[4] == 'ingredients' &&
+                  settings.name!.split('/').last == 'book_ingredient') {
+                return MaterialPageRoute(
+                  builder: (context) => const BookIngredientEditionPage(),
+                  settings: settings,
+                );
+              }
+              // navigate to book share page
+              else if (settings.name!.contains(BookSharePage.route) &&
+                  settings.name!.split('/').length == 4) {
+                return MaterialPageRoute(
+                  builder: (context) => const BookSharePage(),
+                  settings: settings,
+                );
+              }
+              // navigate to join book page
+              else if (settings.name!.contains(BookJoinPage.route)) {
+                return MaterialPageRoute(
+                  builder: (context) => const BookJoinPage(),
+                  settings: settings,
+                );
+              } else {
+                //404
+                return MaterialPageRoute(
+                  builder: (context) => const PageNotFound(),
+                );
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }
 
-class MyHttpOverrides extends HttpOverrides{
+class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context){
-    return super.createHttpClient(context)..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }

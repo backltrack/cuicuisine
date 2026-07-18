@@ -1,6 +1,7 @@
 import 'package:cuicuisine/pages/recipes/recipe_name_page.dart';
 import 'package:cuicuisine/themes/theme_mgr.dart';
 import 'package:flutter/foundation.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -184,6 +185,11 @@ class _HomePageState extends State<HomePage> {
                   setState(() {});
                 }
               });
+            case "share":
+              return Share.share(
+                'cuicuisine://recipe/${recipe.id}',
+                subject: recipe.name,
+              );
             case "remove":
               return showAlertDialog(
                 context: context,
@@ -318,9 +324,23 @@ class _HomePageState extends State<HomePage> {
 
   void _checkPendingDeepLink() {
     final recipeId = DatabaseMgr().pendingDeepLinkRecipeId;
-    if (recipeId == null) return;
-    DatabaseMgr().pendingDeepLinkRecipeId = null;
-    _openRecipeFromDeepLink(recipeId);
+    if (recipeId != null) {
+      DatabaseMgr().pendingDeepLinkRecipeId = null;
+      _openRecipeFromDeepLink(recipeId);
+    }
+
+    final bookId = DatabaseMgr().pendingDeepLinkBookId;
+    if (bookId != null) {
+      DatabaseMgr().pendingDeepLinkBookId = null;
+      Navigator.of(context).pushNamed('${BookJoinPage.route}/$bookId').then((
+        value,
+      ) async {
+        if (value is Book) {
+          books = DatabaseMgr().localMgr.getUserBooks();
+          await setBookAsDefaultAndRefresh(value);
+        }
+      });
+    }
   }
 
   void _openRecipeFromDeepLink(String recipeId) {

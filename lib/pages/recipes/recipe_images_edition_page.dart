@@ -97,6 +97,7 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
         bool? leave = await showAlertDialog(
           context: context,
           title: S.of(context).popup_loose_data_title,
+          action: S.of(context).popup_quit_title,
           description: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -227,6 +228,7 @@ class _RecipeImagesEditionPageState extends State<RecipeImagesEditionPage> {
                       await showAlertDialog(
                         context: context,
                         title: S.of(context).popup_delete_title,
+                        action: S.of(context).popup_delete_title,
                         description: Text(
                           S.of(context).popup_remove_image_description,
                         ),

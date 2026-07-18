@@ -172,6 +172,7 @@ class _GeneralSettingsPageState extends State<GeneralSettingsPage> {
               bool? shouldSignOut = await showAlertDialog(
                 context: context,
                 title: S.of(context).sign_out_popup_title,
+                action: S.of(context).sign_out_popup_title,
                 description: Text(S.of(context).sign_out_popup_description),
               );
               if (shouldSignOut != null && shouldSignOut) {
